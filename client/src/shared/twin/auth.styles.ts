@@ -1,7 +1,10 @@
 import tw from 'twin.macro'
 
+const slate_500 = '#64748b'
+const slate_50 = '#f8fafc'
+
 export const styles = {
-  main: tw`flex min-h-screen items-center justify-center bg-white md:(bg-[#f8fafc])`,
+  main: tw`flex min-h-screen items-center justify-center bg-white md:(bg-[${slate_50}])`,
   section: tw`w-full max-w-[423px] rounded-lg bg-white py-12 px-10 shadow-none md:(shadow-lg)`,
   nav: tw`flex flex-col items-center space-y-2`,
   business_logo: [
@@ -40,7 +43,7 @@ export const styles = {
   ],
   footer: [
     tw`
-      mt-5 text-center text-xs text-[#64748b]
+      mt-5 text-center text-xs text-[${slate_500}]
       [> a]:(ml-2 text-blue-600 font-semibold hover:underline focus:underline)
     `
   ]
