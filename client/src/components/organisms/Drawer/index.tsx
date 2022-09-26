@@ -71,7 +71,7 @@ const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element =>
                             <a
                               className={classNames(
                                 router.asPath.includes(`/team/${id}`)
-                                  ? 'bg-blue-600 text-slate-400'
+                                  ? 'bg-blue-600 text-white'
                                   : ' hover:bg-blue-600'
                               )}
                             >

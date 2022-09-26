@@ -8,6 +8,7 @@ export const slate_500 = '#64748b'
 export const slate_400 = '#94a3b8'
 export const slate_300 = '#cbd5e1'
 export const slate_200 = '#e2e8f0'
+export const slate_100 = '#f1f5f9'
 export const slate_50 = '#f8fafc'
 
 export const globals = {
