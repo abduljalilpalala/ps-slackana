@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .error {
+    @apply mt-1 ml-0.5 block text-left text-xs text-red-500;
+  }
+}
