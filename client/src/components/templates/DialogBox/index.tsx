@@ -67,7 +67,7 @@ const DialogBox: FC<Props> = ({
               <Dialog.Panel className={`w-px-500 mobile:max-w-[90%] transform rounded-lg bg-white shadow-xl transition-all ${className}`}>
                 {hasHeader && header}
 
-                <div className='px-20 mobile:px-10 flex flex-col pt-10 pb-20'>
+                <div className={`px-20 mobile:px-10 flex flex-col ${hasMenu || 'pt-10'} pb-20 gap-10`}>
                   {children}
                 </div>
               </Dialog.Panel>
