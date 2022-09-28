@@ -1,5 +1,4 @@
 import type { NextPage } from 'next'
-import { string } from 'yup'
 
 import Layout from '~/components/templates/HomeLayout'
 import ProjectTemplate from '~/components/templates/ProjectTemplate'
@@ -8,16 +7,68 @@ import { ThreeDot } from '~/shared/icons/ThreeDotIcon'
 import { projectDataList } from '~/shared/jsons/projectDataList'
 import { useState } from "react";
 import DropDown from '~/components/templates/DropDown'
+import InputTags from '~/components/molecules/InputTags'
+import DialogBox from '~/components/templates/DialogBox'
+
+import { Spinner } from '~/shared/icons/SpinnerIcon'
+import { styles } from '~/shared/twin/auth.styles'
+import { styles as homeStyle } from '~/shared/twin/home-content.style'
+import { globals } from '~/shared/twin/globals.styles'
 
 const Index: NextPage = () => {
   const [limit, setLimit] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [newProjectModal, setNewProjectModal] = useState<boolean>(false);
 
   const projectList = projectDataList.slice(0, limit ? projectDataList.length : 12).map((data: any, index: number) => {
     return <ProjectTemplate data={data} key={index} />
   })
 
+  const addNewProject = (
+    <DialogBox isOpen={true} closeModal={() => setNewProjectModal(false)}>
+
+      <div className='flex flex-col gap-9'>
+        <div >
+          <label htmlFor="tite" css={globals.form_label} className="float-left">
+            Title <span>*</span>
+          </label>
+          <input
+            type="text"
+            name="tite"
+            css={globals.form_control}
+            disabled={isSubmitting}
+            placeholder="Team name"
+          />
+        </div>
+
+        <div css={homeStyle.tags}>
+          <p css={globals.form_label} className="">Team <span>*</span></p>
+          <InputTags isSubmitting={isSubmitting} />
+        </div>
+
+        <div >
+          <label htmlFor="description" css={globals.form_label} className="float-left">
+            Description
+          </label>
+          <textarea
+            name='description'
+            css={globals.form_control}
+            disabled={isSubmitting}
+            placeholder="Lorem ipsum dolor sit amet, consectetur."
+            rows={6}
+          />
+        </div>
+
+        <button onClick={() => setIsSubmitting(!isSubmitting)} type="submit" css={styles.form_submit} disabled={isSubmitting}>
+          {isSubmitting ? <Spinner className="h-5 w-5" /> : 'Save'}
+        </button>
+      </div>
+    </DialogBox>
+  );
+
   const add = () => {
     console.log('add');
+    setNewProjectModal(true);
   }
 
   const filter = (value: string) => {
@@ -26,6 +77,7 @@ const Index: NextPage = () => {
 
   return (
     <Layout metaTitle="Home">
+      {newProjectModal && addNewProject}
       <div className="p-8 h-full grid">
         <div className="flex items-center justify-center flex-col gap-16 w-fill">
           <div className='flex flex-col gap-5 items-center justify-center'>
