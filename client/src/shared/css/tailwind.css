@@ -13,7 +13,7 @@
     @apply overflow-x-hidden overflow-y-hidden hover:overflow-y-auto;
   }
   .drawer {
-    @apply fixed top-0 left-0 z-30 h-full min-h-screen w-full max-w-[280px];
+    @apply fixed top-0 left-0 z-40 h-full min-h-screen w-full max-w-[280px];
     @apply transform bg-slate-800 text-slate-400 transition-all duration-300;
     @apply ease-in-out scrollbar-thin scrollbar-thumb-slate-500 scrollbar-track-rounded-full;
   }

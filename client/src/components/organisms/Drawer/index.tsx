@@ -114,7 +114,7 @@ const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element =>
         {isOpenDrawer && (
           <div
             onClick={handleToggleDrawer}
-            className="fixed inset-0 z-0 cursor-default bg-slate-700/50 backdrop-blur-sm"
+            className="fixed inset-0 z-30 cursor-default bg-slate-700/50 backdrop-blur-sm"
           ></div>
         )}
       </>

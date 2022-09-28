@@ -11,3 +11,10 @@ export interface Link {
   name: string
   Icon: IconType
 }
+
+export interface ProjectList {
+  team_name: string,
+  icon: string,
+  date: string,
+  status: string,
+} 
