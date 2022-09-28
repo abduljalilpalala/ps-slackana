@@ -1,16 +1,16 @@
-import Head from 'next/head'
 import type { NextPage } from 'next'
 
-import UnderContruction from '~/utils/UnderContruction'
+import Layout from '~/components/templates/HomeLayout'
 
 const Index: NextPage = () => {
   return (
-    <>
-      <Head>
-        <title>Home Page</title>
-      </Head>
-      <UnderContruction />
-    </>
+    <Layout metaTitle="Home">
+      <div className="container p-8">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores iste aut ut velit nobis
+        et, tempore perspiciatis odio adipisci debitis esse, saepe, at nulla accusantium quam
+        provident beatae quibusdam deleniti.
+      </div>
+    </Layout>
   )
 }
 

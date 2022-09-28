@@ -2,9 +2,9 @@ import React from 'react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 
-import AuthForm from '~/components/AuthForm'
-import AuthLayout from '~/layouts/AuthLayout'
 import { SignInUpFormValues } from '~/shared/types'
+import AuthForm from '~/components/molecules/AuthForm'
+import AuthLayout from '~/components/templates/AuthLayout'
 
 const SignUp: NextPage = (): JSX.Element => {
   const router = useRouter()
