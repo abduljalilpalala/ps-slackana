@@ -21,8 +21,8 @@ export const styles = {
     `
   ],
   nav: [
-    tw`
-      border-t border-[${slate_700}]
+    tw` 
+      border-t border-[${slate_700}] 
       min-h-[82.5vh] min-w-[280px]
       [> ul]:(flex flex-col)
       [> ul > li > a]:(
