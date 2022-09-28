@@ -5,6 +5,7 @@ type PopoverButtonProps = {
 }
 
 const slate_900 = '#0f172a'
+const slate_200 = '#e2e8f0'
 
 export const styles = {
   popover: tw`relative`,
@@ -18,7 +19,7 @@ export const styles = {
   popover_panel: [
     tw`
       absolute right-0 mt-2 w-64 origin-top-right divide-y divide-gray-200 overflow-hidden
-      rounded-b-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none
+      rounded-b-md bg-white shadow-lg border border border-[${slate_200}] focus:outline-none
     `
   ],
   header: [

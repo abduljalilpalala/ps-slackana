@@ -22,7 +22,6 @@ export const styles = {
   ],
   nav: [
     tw`
-      border-t border-[${slate_700}]
       min-h-[82.5vh] min-w-[280px]
       [> ul]:(flex flex-col)
       [> ul > li > a]:(
@@ -32,7 +31,7 @@ export const styles = {
       [> ul > li > a > svg]:(h-4 w-4)
     `
   ],
-  project_wrapper: tw`flex-1 border-t border-[${slate_600}]`,
+  project_wrapper: tw`flex-1`,
   project_caret: [
     tw`
       flex items-center justify-start px-5 py-3

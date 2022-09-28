@@ -13,7 +13,7 @@ type Props = {
 
 const Layout: React.FC<Props> = ({ children, metaTitle }): JSX.Element => {
   const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(true)
-  const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(true)
+  const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false)
 
   const handleToggleSidebar = (): void => setIsOpenSidebar(!isOpenSidebar)
   const handleToggleDrawer = (): void => setIsOpenDrawer(!isOpenDrawer)
