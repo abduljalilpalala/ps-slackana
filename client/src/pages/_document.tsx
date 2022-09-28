@@ -31,7 +31,7 @@ export default class MyDocument extends Document {
 
   render() {
     return (
-      <Html className="bg-gray-100">
+      <Html>
         <Head>
           <link rel="icon" href="/favicon.ico" />
           <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
