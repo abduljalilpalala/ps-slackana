@@ -82,7 +82,7 @@ const Index: NextPage = () => {
         <div className="flex items-center justify-center flex-col gap-16 w-fill">
           <div className='flex flex-col gap-5 items-center justify-center'>
             <p className="text-sm">Tuesday, September 20</p>
-            <h1 className="text-3xl">Good afternoon, Abraham</h1>
+            <h1 className="text-3xl text-center">Good afternoon, Abraham</h1>
           </div>
 
           <div className='w-full'>
@@ -96,6 +96,7 @@ const Index: NextPage = () => {
                 </div>
                 <DropDown callback={filter}>
                   <div className='hover:bg-slate-100 z-0 cursor-pointer w-12 h-12 flex items-center justify-center rounded-lg border border-slate-500'>
+
                     <ThreeDot />
                   </div>
                 </DropDown>
@@ -104,9 +105,12 @@ const Index: NextPage = () => {
 
             <div className='border-b border-x rounded-b-lg border-slate-300 mobile:grid-cols-1 tablet:grid-cols-2 px-7 py-10 grid grid-cols-3 gap-6 h-px-400 overflow-y-scroll scrollbar-thin scrollbar-thumb-slate-400 scrollbar-thumb-rounded-md scrollbar-track-gray-100'>
               {projectList}
-              <div onClick={() => setLimit(!limit)} className='text-slate-600 font-medium cursor-pointer flex justify-start items-center'>
-                <span>Show {limit ? "less" : "more"}</span>
-              </div>
+              {
+                projectDataList.slice(0, 12).length === 12 &&
+                <div onClick={() => setLimit(!limit)} css={homeStyle.more}>
+                  <span>Show {limit ? "less" : "more"}</span>
+                </div>
+              }
             </div>
           </div>
         </div>
@@ -114,5 +118,4 @@ const Index: NextPage = () => {
     </Layout>
   )
 }
-
 export default Index

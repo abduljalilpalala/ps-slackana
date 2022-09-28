@@ -1,16 +1,20 @@
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { Popover } from '@headlessui/react'
 import { MoreHorizontal, ChevronDown } from 'react-feather'
 
 import { globals } from '~/shared/twin/globals.styles'
 import { styles } from '~/shared/twin/user-menu-popover.styles'
 import PopoverTransition from '~/components/templates/PopoverTransition'
+import SettingsModal from "~/components/organisms/SettingsModal";
 
 const UserMenuPopover: FC = (): JSX.Element => {
+  const [settingsModal, setSettingsModal] = useState<boolean>(false);
+
   return (
     <Popover css={styles.popover}>
       {({ open }) => (
         <>
+          {settingsModal && <SettingsModal close={setSettingsModal} />}
           <Popover.Button css={styles.popover_button({ open })}>
             <MoreHorizontal className="h-6 w-6" />
           </Popover.Button>
@@ -29,7 +33,7 @@ const UserMenuPopover: FC = (): JSX.Element => {
                   </div>
                   <ChevronDown />
                 </div>
-                <button type="button">Profile</button>
+                <button onClick={() => setSettingsModal(!settingsModal)} type="button">Profile</button>
                 <button type="button">Log out @angryboy_19</button>
               </section>
             </Popover.Panel>
