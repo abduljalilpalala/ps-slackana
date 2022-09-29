@@ -26,9 +26,7 @@ const Layout: React.FC<Props> = ({ children, metaTitle }): JSX.Element => {
       <main css={styles.main}>
         <Header actions={{ handleToggleSidebar, handleToggleDrawer }} />
         <section css={styles.section}>
-          <div className="hidden md:block z-50">
-            <Sidebar isOpenSidebar={isOpenSidebar} />
-          </div>
+          <Sidebar isOpenSidebar={isOpenSidebar} />
           <div className="block md:hidden">
             <Drawer isOpenDrawer={isOpenDrawer} handleToggleDrawer={handleToggleDrawer} />
           </div>

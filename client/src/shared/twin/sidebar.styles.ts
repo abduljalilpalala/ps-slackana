@@ -7,11 +7,13 @@ const slate_700 = '#334155'
 
 export const styles = {
   aside: [
-    tw`w-full border-r border-[${slate_600}] bg-[${slate_800}]`,
-    tw`flex h-full flex-col justify-between text-[${slate_400}]`,
-    tw`flex-shrink-0 transition-all duration-300 ease-in-out`
+    tw`
+      w-full border-r border-[${slate_600}] bg-[${slate_800}]
+      flex flex-col justify-between text-[${slate_400}]
+      flex-shrink-0 transition-all duration-300 ease-in-out
+    `
   ],
-  wrapper: tw`flex flex-col overflow-hidden`,
+  wrapper: tw`hidden flex-col overflow-hidden md:flex`,
   business_logo: [
     tw`
       flex w-full items-center justify-between px-5 py-2.5
@@ -22,17 +24,16 @@ export const styles = {
   ],
   nav: [
     tw` 
-      border-t border-[${slate_700}] 
-      min-h-[82.5vh] min-w-[280px]
+      md:h-screen min-w-[280px]
       [> ul]:(flex flex-col)
       [> ul > li > a]:(
-        block w-full py-2 px-5 text-sm transition duration-150 ease-in-out
+        block w-full py-2 px-5 text-sm 
         flex cursor-pointer items-center space-x-3 font-medium
       )
       [> ul > li > a > svg]:(h-4 w-4)
     `
   ],
-  project_wrapper: tw`flex-1 border-t border-[${slate_600}]`,
+  project_wrapper: tw`flex-1`,
   project_caret: [
     tw`
       flex items-center justify-start px-5 py-3
@@ -45,7 +46,6 @@ export const styles = {
       inline-flex w-full items-center space-x-3 text-sm
       [> a]:(
         flex w-full items-center justify-between px-5 py-1.5
-        transition duration-150 ease-in
       )
     `
   ],
@@ -57,10 +57,11 @@ export const styles = {
   ],
   footer: [
     tw`
-      flex flex-shrink-0 items-center justify-between border-t border-[${slate_700}] px-5 py-2
+      flex items-center justify-between border-t 
+      border-[${slate_700}] px-5 py-2
     `
   ],
-  user_wrapper: tw`flex items-center space-x-3`,
+  user_wrapper: tw`flex items-center space-x-3 flex-shrink-0`,
   user_details: [
     tw`
       flex flex-col
