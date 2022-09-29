@@ -1,21 +1,20 @@
-import type { NextPage } from 'next'
-
-import Layout from '~/components/templates/HomeLayout'
-import ProjectTemplate from '~/components/templates/ProjectTemplate'
-import { Add } from '~/shared/icons/AddIcon'
-import { ThreeDot } from '~/shared/icons/ThreeDotIcon'
-import { projectDataList } from '~/shared/jsons/projectDataList'
+import { NextPage } from 'next'
 import { useState } from 'react'
+
+import { Add } from '~/shared/icons/AddIcon'
+import { styles } from '~/shared/twin/auth.styles'
+import { Spinner } from '~/shared/icons/SpinnerIcon'
+import { globals } from '~/shared/twin/globals.styles'
+import Layout from '~/components/templates/HomeLayout'
+import { ThreeDot } from '~/shared/icons/ThreeDotIcon'
 import DropDown from '~/components/templates/DropDown'
 import InputTags from '~/components/molecules/InputTags'
 import DialogBox from '~/components/templates/DialogBox'
-
-import { Spinner } from '~/shared/icons/SpinnerIcon'
-import { styles } from '~/shared/twin/auth.styles'
+import { projectDataList } from '~/shared/jsons/projectDataList'
+import ProjectTemplate from '~/components/templates/ProjectTemplate'
 import { styles as homeStyle } from '~/shared/twin/home-content.style'
-import { globals } from '~/shared/twin/globals.styles'
 
-const Index: NextPage = () => {
+const Index: NextPage = (): JSX.Element => {
   const [limit, setLimit] = useState<boolean>(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [newProjectModal, setNewProjectModal] = useState<boolean>(false)
