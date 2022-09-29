@@ -16,7 +16,7 @@ class SignUpController extends Controller
       'password' => bcrypt($request->password),
     ]);
     $token = $user->createToken('access-token')->plainTextToken;
-    $user->addMedia(public_path('assets\avatar\avatar-'.rand(1,12).'.png'))
+    $user->addMedia(public_path('assets/avatar/avatar-'.rand(1,12).'.png'))
             ->preservingOriginal()->toMediaCollection('avatar', 'public');
 
     return response()->json([
