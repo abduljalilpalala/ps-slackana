@@ -1,11 +1,12 @@
 import tw from 'twin.macro'
 
-const slate_50 = '#f8fafc'
 const slate_700 = '#334155'
 const slate_900 = '#0f172a'
+const slate_50 = '#f8fafc'
 
 export const styles = {
-  header: tw`flex w-full items-center justify-between border-b border-[${slate_700}] bg-[${slate_900}]`,
+  header: tw`border-b border-[${slate_700}] bg-[${slate_900}]`,
+  container: tw`flex w-full items-center justify-between`,
   menu_wrapper: [
     tw`
       flex items-center

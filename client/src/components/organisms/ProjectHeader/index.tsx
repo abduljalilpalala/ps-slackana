@@ -2,7 +2,9 @@ import Link from 'next/link'
 import React, { FC } from 'react'
 import { Airplay } from 'react-feather'
 import { useRouter } from 'next/router'
+import { FaRegUser } from 'react-icons/fa'
 
+import { classNames } from '~/helpers/classNames'
 import { styles } from '~/shared/twin/project-header.styles'
 import ProjectActionDropdown from '~/components/molecules/ProjectActionDropdown'
 import ProjectStatusDropdown from '~/components/molecules/ProjectStatusDropdown'
@@ -53,13 +55,16 @@ const ProjectHead: FC = (): JSX.Element => {
           </ul>
         </nav>
       </section>
-      <button type="button" css={styles.members}>
-        <div>
-          <img src="/images/animated-avatar.jpg" alt="" />
-          <img src="/images/animated-avatar.jpg" alt="" />
-          <img src="/images/404.png" alt="" />
+      <button type="button" className="group" css={styles.btn_members}>
+        <div className="hidden lg:block">
+          <section>
+            <img src="https://ca.slack-edge.com/E028JVBUY4F-U03N2F2SHV2-39c1dcf42b67-32" alt="" />
+            <img src="https://ca.slack-edge.com/E028JVBUY4F-U03N1UNTGAY-5ef1b06f109b-32" alt="" />
+            <img src="https://ca.slack-edge.com/E028JVBUY4F-U03DUBE2G9W-974bff0bc22c-32" alt="" />
+          </section>
         </div>
-        <h3>12</h3>
+        <FaRegUser className="group-hover:text-slate-800" />
+        <h3 className="group-hover:text-slate-800">12</h3>
       </button>
     </header>
   )

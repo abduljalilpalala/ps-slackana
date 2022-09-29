@@ -72,7 +72,7 @@ const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element =>
                               className={classNames(
                                 router.asPath.includes(`/team/${id}`)
                                   ? 'bg-blue-600 text-white'
-                                  : ' hover:bg-blue-600'
+                                  : ' hover:bg-slate-700'
                               )}
                             >
                               <div css={sidebarStyles.link}>

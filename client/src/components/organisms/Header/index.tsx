@@ -18,27 +18,29 @@ const Header: FC<Props> = (props): JSX.Element => {
 
   return (
     <header css={styles.header}>
-      <div css={styles.menu_wrapper}>
-        <div className="hidden md:block">
-          <button type="button" onClick={handleToggleSidebar}>
-            <IoIosMenu />
-          </button>
-        </div>
-        <div className="block md:hidden">
-          <button type="button" onClick={handleToggleDrawer}>
-            <IoIosMenu />
-          </button>
-        </div>
-        <div className="block md:hidden">
-          <div css={styles.bussiness_logo}>
-            <Logo2Icon />
-            <h1>Slackana</h1>
+      <div css={styles.container}>
+        <div css={styles.menu_wrapper}>
+          <div className="hidden md:block">
+            <button type="button" onClick={handleToggleSidebar}>
+              <IoIosMenu />
+            </button>
+          </div>
+          <div className="block md:hidden">
+            <button type="button" onClick={handleToggleDrawer}>
+              <IoIosMenu />
+            </button>
+          </div>
+          <div className="block md:hidden">
+            <div css={styles.bussiness_logo}>
+              <Logo2Icon />
+              <h1>Slackana</h1>
+            </div>
           </div>
         </div>
-      </div>
-      <div css={styles.options}>
-        <NotificationPopover />
-        <UserMenuDropDown />
+        <div css={styles.options}>
+          <NotificationPopover />
+          <UserMenuDropDown />
+        </div>
       </div>
     </header>
   )
