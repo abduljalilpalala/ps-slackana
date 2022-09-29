@@ -1,13 +1,13 @@
 import React, { useState } from "react";
+import Image from 'next/image';
+
 import SubmitButton from "~/components/atoms/SubmitButton";
-import DialogBox from "~/components/templates/DialogBox";
-import Image from 'next/image'
-import { globals } from "~/shared/twin/globals.styles";
-import { styles as settingsStyle } from '~/shared/twin/settings-modal.style'
 import TaskIcon from "~/shared/icons/TaskIcon";
-import { Switch } from '@headlessui/react'
-import SwitchToggle from "~/components/atoms/SwitchToggle";
+import { globals } from "~/shared/twin/globals.styles";
 import CalendarIcon from "~/shared/icons/CalendarIcon";
+import DialogBox from "~/components/templates/DialogBox";
+import SwitchToggle from "~/components/atoms/SwitchToggle";
+import { styles as settingsStyle } from '~/shared/twin/settings-modal.style';
 
 const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);

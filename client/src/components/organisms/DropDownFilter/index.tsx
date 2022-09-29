@@ -1,11 +1,11 @@
-import { Fragment, useState } from 'react'
 import { Menu, Transition } from '@headlessui/react'
-
-import { CheckIcon } from '~/shared/icons/CheckIcon';
+import { Fragment, useState } from 'react'
+import { ProjectStatus } from '~/shared/icons/ProjectStatus'
+import { projectStatusData } from '~/shared/jsons/projectStatusData';
 import { styles as homeStyle } from '~/shared/twin/home-content.style'
 
-const DropDown = ({ children, callback, data }: any) => {
-  const [selected, setSelected] = useState<string>(data[0]);
+export default function DropDownFilter({ children, callback }: any) {
+  const [selected, setSelected] = useState<string>('All');
 
   const onSelect = (e: any): void => {
     const value = e.target.innerText;
@@ -13,20 +13,18 @@ const DropDown = ({ children, callback, data }: any) => {
     setSelected(value)
   }
 
-  const dropDownMenu = data.map((status: string, index: number) => {
+  const dropDownMenu = projectStatusData.map((status) => {
     return (
       <div className="px-1 py-1 " key={status}>
         <Menu.Item>
           {({ active }) => (
             <button
               onClick={onSelect}
-              className={`${active || selected === status ? 'bg-blue-600 text-white' : 'text-gray-900'
+              className={`${active || selected === status ? 'bg-slate-500 text-white' : 'text-gray-900'
                 } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
             >
-              <div className='flex flex-row gap-2 items-center justify-center'>
-                {selected === status ? <CheckIcon /> : <div className='w-[10px]'></div>}
-                {status}
-              </div>
+              {<ProjectStatus status={status.toLowerCase().replace(/ /g, "-")} className='mx-2 mr-3' />}
+              {status}
             </button>
           )}
         </Menu.Item>
@@ -59,4 +57,3 @@ const DropDown = ({ children, callback, data }: any) => {
     </div>
   )
 }
-export default DropDown;

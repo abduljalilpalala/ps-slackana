@@ -2,13 +2,13 @@ import React from "react";
 import { Spinner } from "~/shared/icons/SpinnerIcon";
 import { styles } from '~/shared/twin/auth.styles'
 
-type SubmitButtonType = {
+type Props = {
   submitted: () => void;
   isSubmitting: boolean;
-  text: string
+  text: string;
 }
 
-const SubmitButton = ({ submitted, isSubmitting, text = "Submit" }: SubmitButtonType) => {
+const SubmitButton: React.FC<Props> = ({ submitted, isSubmitting, text = "Submit" }) => {
   return (
     <button onClick={submitted} type="submit" css={styles.form_submit} disabled={isSubmitting}>
       {isSubmitting ? <Spinner className="h-5 w-5" /> : text}
