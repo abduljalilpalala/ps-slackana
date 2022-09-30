@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 
+import { teamTempoData } from '~/shared/jsons/teamTempoData'
+
 const InputTags = ({ isSubmitting }: { isSubmitting: boolean }) => {
-  const [tags, setTags] = useState([
-    "Frontend", "Backend"
-  ]);
+  const teamList = teamTempoData.map((team) => {
+    return team.team;
+  });
+
+  const [tags, setTags] = useState(teamList);
+
+  console.log(tags);
 
   const addTags = (e: any) => {
     const value = e.target.value;

@@ -41,6 +41,18 @@ const Overview: FC = (): JSX.Element => {
     setRenameTeamState(!renameTeamState);
   }
 
+  const addTeamModal = (
+    <DialogBox isOpen={addTeamState} closeModal={addTeam} headerTitle="Add team">
+      <div css={homeStyle.tags}>
+        <p css={globals.form_label} className="">
+          Team <span>*</span>
+        </p>
+        <InputTags isSubmitting={false} />
+      </div>
+      <SubmitButton text="Save" submitted={addTeamSubmit} isSubmitting={isSubmitting} className="mobile:!w-full !text-slate-50 !bg-blue-600 hover:!bg-blue-800" />
+    </DialogBox>
+  );
+
   const renameModal = (
     <DialogBox isOpen={renameTeamState} closeModal={renameTeam} headerTitle="Rename team">
       <div >
@@ -66,6 +78,7 @@ const Overview: FC = (): JSX.Element => {
   return (
     <ProjectLayout metaTitle="Overview">
       {renameModal}
+      {addTeamModal}
       <div className="pb-40 grid h-screen place-items-center w-full px-10 overflow-y-scroll scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-slate-400 scrollbar-thumb-rounded-md">
         <div className='py-20 max-w-[900px] flex flex-col gap-10 items-start justify-center'>
           <div className='flex flex-col gap-6'>
