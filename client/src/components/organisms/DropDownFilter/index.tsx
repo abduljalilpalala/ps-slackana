@@ -33,7 +33,7 @@ export default function DropDownFilter({ children, callback }: any) {
   });
 
   return (
-    <div className='z-0'>
+    <div className='z-10'>
       <Menu as="div" className="relative inline-block text-left">
         <div>
           <Menu.Button >
