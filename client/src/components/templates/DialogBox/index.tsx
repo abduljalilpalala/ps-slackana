@@ -4,6 +4,7 @@ import { CloseIcon } from '~/shared/icons/CloseIcon';
 
 type Props = {
   hasHeader?: boolean;
+  headerTitle?: string;
   isOpen: boolean;
   closeModal: () => void;
   children: ReactNode;
@@ -11,23 +12,26 @@ type Props = {
   headerClassName?: string;
   hasMenu?: boolean;
   menu?: any;
+  bodyClass?: string;
 }
 
 const DialogBox: FC<Props> = ({
   hasHeader = true,
+  headerTitle = "Header title",
   isOpen,
   closeModal,
   children,
   className = "",
   headerClassName = "",
   hasMenu = false,
-  menu
+  menu,
+  bodyClass = ""
 }: Props): JSX.Element => {
 
   const header = (
     <>
       <div className={`flex items-center justify-between px-6 py-3 ${hasMenu || 'border-b border-slate-300'} ${headerClassName}`}>
-        <h1 className='font-medium text-xl'>New Project</h1>
+        <h1 className='font-medium text-xl'>{headerTitle}</h1>
         <div onClick={closeModal}><CloseIcon className='cursor-pointer' /></div>
       </div>
       {
@@ -67,7 +71,7 @@ const DialogBox: FC<Props> = ({
               <Dialog.Panel className={`w-px-500 mobile:max-w-[90%] transform rounded-lg bg-white shadow-xl transition-all ${className}`}>
                 {hasHeader && header}
 
-                <div className={`px-20 mobile:px-10 flex flex-col ${hasMenu || 'pt-10'} pb-20 gap-10`}>
+                <div className={`mobile:px-10 flex flex-col ${hasMenu || 'pt-10'} ${bodyClass ? bodyClass : "px-20 pb-20 gap-10"}`}>
                   {children}
                 </div>
               </Dialog.Panel>

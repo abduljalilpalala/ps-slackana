@@ -7,7 +7,7 @@ import { Spinner } from '~/shared/icons/SpinnerIcon'
 import { globals } from '~/shared/twin/globals.styles'
 import Layout from '~/components/templates/HomeLayout'
 import { ThreeDot } from '~/shared/icons/ThreeDotIcon'
-import DropDown from '~/components/templates/DropDown'
+import DropDown from '~/components/organisms/DropDownFilter'
 import InputTags from '~/components/molecules/InputTags'
 import DialogBox from '~/components/templates/DialogBox'
 import { projectDataList } from '~/shared/jsons/projectDataList'
@@ -26,9 +26,10 @@ const Index: NextPage = (): JSX.Element => {
     })
 
   const addNewProject = (
-    <DialogBox isOpen={true} closeModal={() => setNewProjectModal(false)}>
-      <div className="flex flex-col gap-9">
-        <div>
+    <DialogBox isOpen={true} closeModal={() => setNewProjectModal(false)} headerTitle="New project">
+
+      <div className='flex flex-col gap-9'>
+        <div >
           <label htmlFor="tite" css={globals.form_label} className="float-left">
             Title <span>*</span>
           </label>
@@ -105,7 +106,7 @@ const Index: NextPage = (): JSX.Element => {
                   <h1 className="text-2xl">Projects</h1>
                 </div>
                 <DropDown callback={filter}>
-                  <div className="z-0 flex h-12 w-12 cursor-pointer items-center justify-center rounded-lg border border-slate-500 hover:bg-slate-100">
+                  <div className='hover:bg-slate-100 z-0 cursor-pointer w-12 h-12 flex items-center justify-center rounded-lg border border-slate-500'>
                     <ThreeDot />
                   </div>
                 </DropDown>

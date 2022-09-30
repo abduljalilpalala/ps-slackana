@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { Switch } from '@headlessui/react'
 
-type SwitchToggleType = {
+type Props = {
   value: (value: boolean) => void;
   className?: string;
   isDisabled?: boolean;
   state: boolean
 }
 
-export default function SwitchToggle({ value, className, isDisabled, state }: SwitchToggleType) {
+const SwitchToggle: React.FC<Props> = ({ value, className, isDisabled, state }) => {
   const [enabled, setEnabled] = useState(state);
 
   const onChange = () => {
@@ -35,3 +35,4 @@ export default function SwitchToggle({ value, className, isDisabled, state }: Sw
     </div>
   )
 }
+export default SwitchToggle;
