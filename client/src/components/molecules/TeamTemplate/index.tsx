@@ -64,4 +64,4 @@ const TeamTemplate = ({ data, callBack }: any) => {
   );
 };
 
-export default TeamTemplate; 
+export default TeamTemplate;
