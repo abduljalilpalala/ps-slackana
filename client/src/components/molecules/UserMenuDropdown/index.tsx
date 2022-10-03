@@ -8,7 +8,7 @@ import MenuTransition from '~/components/templates/MenuTransition'
 
 const UserMenuDropDown: FC = (): JSX.Element => {
   return (
-    <Menu as="div" className="relative inline-block text-left">
+    <Menu as="div" className="relative z-10 inline-block text-left">
       <Menu.Button css={globals.avatar}>
         <img src="/images/animated-avatar.jpg" />
       </Menu.Button>
