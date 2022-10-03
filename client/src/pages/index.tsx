@@ -38,7 +38,7 @@ const Index: NextPage = (): JSX.Element => {
             name="tite"
             css={globals.form_control}
             disabled={isSubmitting}
-            placeholder="Team name"
+            placeholder="Project name"
           />
         </div>
 
@@ -86,8 +86,8 @@ const Index: NextPage = (): JSX.Element => {
   return (
     <Layout metaTitle="Home">
       {newProjectModal && addNewProject}
-      <div className="default-scrollbar grid h-full overflow-y-auto p-8">
-        <div className="w-fill flex flex-col items-center justify-center gap-16 md:container">
+      <div className="default-scrollbar grid w-full h-screen overflow-y-scroll p-10">
+        <div className="!max-w-[900px] flex flex-col items-center justify-center gap-16 md:container mobile:!pb-20 mobile:!gap-10">
           <div className="flex flex-col items-center justify-center gap-5">
             <p className="text-sm">Tuesday, September 20</p>
             <h1 className="text-center text-3xl">Good afternoon, Abraham</h1>
