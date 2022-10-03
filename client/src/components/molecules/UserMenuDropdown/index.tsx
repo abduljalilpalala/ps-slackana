@@ -5,21 +5,27 @@ import { Settings, LogOut, User } from 'react-feather'
 import { globals } from '~/shared/twin/globals.styles'
 import { styles } from '~/shared/twin/user-menu-dropdown.styles'
 import MenuTransition from '~/components/templates/MenuTransition'
+import { useAuthMethods } from '~/hooks/authMethods'
+import { useAppSelector } from '~/hooks/reduxSelector'
 
 const UserMenuDropDown: FC = (): JSX.Element => {
+  const { handleAuthSignOut } = useAuthMethods()
+  const { user } = useAppSelector((state) => state.auth)
+  const { name, avatar } = user || {}
+
   return (
     <Menu as="div" className="relative z-10 inline-block text-left">
       <Menu.Button css={globals.avatar}>
-        <img src="/images/animated-avatar.jpg" />
+        <img src={avatar?.url} />
       </Menu.Button>
       <MenuTransition>
         <Menu.Items css={styles.menu_items}>
           <div css={styles.user_wrapper}>
             <div css={globals.avatar}>
-              <img src="/images/animated-avatar.jpg" />
+              <img src={avatar?.url} />
             </div>
             <div>
-              <h1>Joshua Galit</h1>
+              <h1>{name}</h1>
               <p>Developer</p>
             </div>
           </div>
@@ -44,7 +50,11 @@ const UserMenuDropDown: FC = (): JSX.Element => {
           <div>
             <Menu.Item>
               {({ active }) => (
-                <button css={styles.menu_item({ active })} className="group">
+                <button
+                  css={styles.menu_item({ active })}
+                  className="group"
+                  onClick={handleAuthSignOut}
+                >
                   <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
                   Logout
                 </button>

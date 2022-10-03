@@ -9,5 +9,5 @@ Route::post('/sign-up', [SignUpController::class, 'store']);
 
 Route::group(['middleware' => 'auth:sanctum'], function() {
   Route::get('/auth', [AuthController::class, 'index']);
-  Route::post('/logout', [AuthController::class, 'destroy']);
+  Route::post('/sign-out', [AuthController::class, 'destroy']);
 });

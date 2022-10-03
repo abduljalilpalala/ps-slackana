@@ -28,7 +28,7 @@ export const useAuthStatus = (setError: UseFormSetError<SignInUpFormValues>) => 
 
   useEffect(() => {
     if (isSuccess) {
-      toast.success('You have successfully logged in', { position: 'top-right' })
+      toast.success('You have successfully signed-in', { position: 'top-right' })
       router.push('/')
     }
   }, [isSuccess])
