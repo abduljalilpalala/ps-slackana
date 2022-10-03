@@ -2,5 +2,12 @@ export type SignInUpFormValues = {
   name: string
   email: string
   password: string
-  confirm_password: string
+  password_confirmation: string
 }
+
+export type AxiosResponseError = {
+  status: number | undefined
+  content: any
+}
+
+export type SignInUpFormFields = 'name' | 'email' | 'password' | 'password_confirmation'

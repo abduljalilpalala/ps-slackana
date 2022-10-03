@@ -7,6 +7,7 @@ import { SignInUpFormValues } from '~/shared/types'
 import { Spinner } from '~/shared/icons/SpinnerIcon'
 import { globals } from '~/shared/twin/globals.styles'
 import { SignInFormSchema, SignUpFormSchema } from '~/shared/validation'
+import { useAuthStatus } from '~/hooks/authStatus'
 
 type Props = {
   isLogin: boolean
@@ -24,11 +25,14 @@ const AuthForm: FC<Props> = (props): JSX.Element => {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting, errors }
+    setError,
+    formState: { errors }
   } = useForm<SignInUpFormValues>({
     mode: 'onTouched',
     resolver: yupResolver(isLogin ? SignInFormSchema : SignUpFormSchema)
   })
+
+  const { isLoading } = useAuthStatus(setError)
 
   return (
     <form css={styles.form} onSubmit={handleSubmit(handleAuthSubmit)}>
@@ -40,7 +44,7 @@ const AuthForm: FC<Props> = (props): JSX.Element => {
           <input
             type="text"
             css={globals.form_control}
-            disabled={isSubmitting}
+            disabled={isLoading}
             placeholder="john doe"
             {...register('name')}
           />
@@ -54,7 +58,7 @@ const AuthForm: FC<Props> = (props): JSX.Element => {
         <input
           type="email"
           css={globals.form_control}
-          disabled={isSubmitting}
+          disabled={isLoading}
           placeholder="name@company.com"
           {...register('email')}
         />
@@ -67,7 +71,7 @@ const AuthForm: FC<Props> = (props): JSX.Element => {
         <input
           type="password"
           css={globals.form_control}
-          disabled={isSubmitting}
+          disabled={isLoading}
           placeholder="•••••••••"
           {...register('password')}
         />
@@ -75,23 +79,23 @@ const AuthForm: FC<Props> = (props): JSX.Element => {
       </div>
       {!isLogin && (
         <div>
-          <label htmlFor="confirm_password" css={globals.form_label}>
+          <label htmlFor="password_confirmation" css={globals.form_label}>
             Confirm password <span>*</span>
           </label>
           <input
             type="password"
             css={globals.form_control}
-            disabled={isSubmitting}
+            disabled={isLoading}
             placeholder="•••••••••"
-            {...register('confirm_password')}
+            {...register('password_confirmation')}
           />
-          {errors?.confirm_password && (
-            <span className="error">{`${errors?.confirm_password?.message}`}</span>
+          {errors?.password_confirmation && (
+            <span className="error">{`${errors?.password_confirmation?.message}`}</span>
           )}
         </div>
       )}
-      <button type="submit" css={styles.form_submit} disabled={isSubmitting}>
-        {isSubmitting ? <Spinner className="h-5 w-5" /> : 'Continue'}
+      <button type="submit" css={styles.form_submit} disabled={isLoading}>
+        {isLoading ? <Spinner className="h-5 w-5" /> : 'Continue'}
       </button>
     </form>
   )

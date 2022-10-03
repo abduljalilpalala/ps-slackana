@@ -127,4 +127,6 @@ const Index: NextPage = (): JSX.Element => {
     </Layout>
   )
 }
+
+export { authCheck as getServerSideProps } from '~/utils/getServerSideProps'
 export default Index

@@ -1,21 +1,17 @@
 import React from 'react'
 import { NextPage } from 'next'
-import { useRouter } from 'next/router'
 
 import { SignInUpFormValues } from '~/shared/types'
 import AuthForm from '~/components/molecules/AuthForm'
 import AuthLayout from '~/components/templates/AuthLayout'
+import { signUp } from '~/redux/auth/authSlice'
+import { useAppDispatch } from '~/hooks/reduxSelector'
 
 const SignUp: NextPage = (): JSX.Element => {
-  const router = useRouter()
+  const dispatch = useAppDispatch()
 
   const handleAuthSubmit = async (data: SignInUpFormValues): Promise<void> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve()
-        router.push('/')
-      }, 3000)
-    })
+    await dispatch(signUp(data))
   }
 
   return (
@@ -25,4 +21,5 @@ const SignUp: NextPage = (): JSX.Element => {
   )
 }
 
+export { signInUpAuthCheck as getServerSideProps } from '~/utils/getServerSideProps'
 export default SignUp
