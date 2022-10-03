@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 
 import { classNames } from '~/helpers/classNames'
 import ProjectLayout from '~/components/templates/ProjectLayout'
+import UnderContruction from '~/utils/UnderContruction'
 
 const Chat: FC = (): JSX.Element => {
   const router = useRouter()
@@ -17,10 +18,11 @@ const Chat: FC = (): JSX.Element => {
           'scrollbar-thin scrollbar-track-rounded-full'
         )}
       >
-        This is the overview {id}
+        <UnderContruction/>
       </div>
     </ProjectLayout>
   )
 }
 
+export { authCheck as getServerSideProps } from '~/utils/getServerSideProps'
 export default Chat
