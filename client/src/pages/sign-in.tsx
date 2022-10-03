@@ -24,5 +24,5 @@ const SignIn: NextPage = (): JSX.Element => {
     </AuthLayout>
   )
 }
-
+export { signInUpAuthCheck as getServerSideProps } from '~/utils/getServerSideProps'
 export default SignIn
