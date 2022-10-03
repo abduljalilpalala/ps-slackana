@@ -168,7 +168,8 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
       closeModal={() => close(false)}
       hasMenu={true}
       menu={modalMenu}
-      className="flex flex-col gap-10"
+      className="flex flex-col"
+      headerTitle="My settings"
     >
       {activeComponent(active)}
     </DialogBox>
