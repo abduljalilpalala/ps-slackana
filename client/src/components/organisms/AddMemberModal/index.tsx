@@ -25,7 +25,7 @@ const AddMemberModal = ({ close }: { close: (value: boolean) => void }) => {
   }
 
   const addPeopleComponent = (
-    <DialogBox hasMenu={true} isOpen={true} closeModal={() => setAddPeopleModal(!addPeopleModal)} headerTitle="Add people" bodyClass="!px-0 !pb-0 mobile:!px-0">
+    <DialogBox isOpen={true} closeModal={() => setAddPeopleModal(!addPeopleModal)} headerTitle="Add people" bodyClass="!px-0 !pb-0 mobile:!px-0 !pt-0">
       <div className="flex flex-col">
         <div className="mt-3 flex items-center justify-between border-b pb-3 px-6">
           <div className="w-full flex flex-row border border-slate-300 items-center pl-2 rounded-md">
@@ -44,7 +44,7 @@ const AddMemberModal = ({ close }: { close: (value: boolean) => void }) => {
   );
 
   return (
-    <DialogBox hasMenu={true} isOpen={true} closeModal={() => close(false)} headerTitle="Add member" bodyClass="!px-0 !pb-0 mobile:!px-0">
+    <DialogBox isOpen={true} closeModal={() => close(false)} headerTitle="Add member" bodyClass="!px-0 !pb-0 mobile:!px-0 !pt-0">
       {addPeopleModal && addPeopleComponent}
       <div className="flex flex-col">
         <div className="mt-3 flex items-center justify-between border-b pb-3 px-6">
