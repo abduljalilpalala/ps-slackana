@@ -54,4 +54,9 @@ class User extends Authenticatable implements HasMedia
   {
     return $this->belongsToMany(Project::class, 'project_members')->withPivot(['role_id']);
   }
+
+  public function notificationSettings()
+  {
+    return $this->belongsToMany(Setting::class, 'notification_settings')->withPivot(['status']);
+  }
 }
