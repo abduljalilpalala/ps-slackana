@@ -138,4 +138,5 @@ const Overview: FC = (): JSX.Element => {
   )
 }
 
+export { authCheck as getServerSideProps } from '~/utils/getServerSideProps'
 export default Overview
