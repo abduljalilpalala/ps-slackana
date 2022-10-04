@@ -10,11 +10,11 @@ import Logo2Icon from '~/shared/icons/Logo2Icon'
 import { classNames } from '~/helpers/classNames'
 import { styles } from '~/shared/twin/sidebar.styles'
 import { globals } from '~/shared/twin/globals.styles'
-import UserMenuPopover from '~/components/molecules/UserMenuPopover'
 import { useAppSelector } from '~/hooks/reduxSelector'
+import UserMenuPopover from '~/components/molecules/UserMenuPopover'
 
 type Props = {
-  isOpenSidebar: ConstrainBoolean
+  isOpenSidebar: boolean
 }
 
 const Sidebar: FC<Props> = ({ isOpenSidebar }): JSX.Element => {
@@ -28,9 +28,9 @@ const Sidebar: FC<Props> = ({ isOpenSidebar }): JSX.Element => {
   return (
     <aside
       css={styles.aside}
-      className={classNames(
+      className={
         isOpenSidebar ? 'max-w-0 translate-x-0 md:max-w-[280px]' : 'max-w-0 -translate-x-full'
-      )}
+      }
     >
       <div css={styles.wrapper}>
         <header css={styles.business_logo}>

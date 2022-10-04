@@ -1,18 +1,23 @@
 import Head from 'next/head'
+import dynamic from 'next/dynamic'
 import React, { useState } from 'react'
+import createPersistedState from 'use-persisted-state'
 
 import Drawer from '~/components/organisms/Drawer'
 import Header from '~/components/organisms/Header'
-import Sidebar from '~/components/organisms/Sidebar'
 import { styles } from '~/shared/twin/home-layout.styles'
+
+const Sidebar = dynamic(() => import('~/components/organisms/Sidebar'), { ssr: false })
 
 type Props = {
   children: React.ReactNode
   metaTitle: string
 }
 
+const useSidebarState = createPersistedState<boolean>('sidebarToggle')
+
 const Layout: React.FC<Props> = ({ children, metaTitle }): JSX.Element => {
-  const [isOpenSidebar, setIsOpenSidebar] = useState<boolean>(true)
+  const [isOpenSidebar, setIsOpenSidebar] = useSidebarState(true)
   const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false)
 
   const handleToggleSidebar = (): void => setIsOpenSidebar(!isOpenSidebar)
