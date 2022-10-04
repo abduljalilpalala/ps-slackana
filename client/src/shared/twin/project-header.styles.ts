@@ -16,17 +16,17 @@ const slate_200 = '#e2e8f0'
 const slate_100 = '#f1f5f9'
 
 export const styles = {
-  header: tw`z-10 flex items-center justify-between border-b border-[${slate_300}] bg-white px-3 md:px-5`,
+  header: tw`z-10 flex items-center justify-between border-b border-[${slate_300}] bg-white px-3 md:px-5  py-1`,
   section: [
     tw`
-      flex items-center space-x-2 pr-2
+      flex items-center space-x-3 pr-2
       [> button]:(rounded-lg bg-blue-600 px-1.5 py-1)
-      [> button > svg]:(h-7 w-7 text-white)
+      [> button > svg]:(h-8 w-8 text-white)
     `
   ],
   project_details: [
     tw`
-      -mb-1.5 flex items-center space-x-2 text-[${slate_600}]
+       flex items-center space-x-2 text-[${slate_600}]
       [> h1]:(text-lg font-semibold text-[${slate_900}] line-clamp-1)
     `
   ],
@@ -37,8 +37,8 @@ export const styles = {
   ],
   a: ({ router, id, slug }: LinkProps) => [
     tw`
-      border-b-[3px] pb-0.5 text-sm font-normal
-      transition duration-150 ease-in-out cursor-pointer
+      border-b-[3px] pb-0.5 text-sm font-normal py-1.5
+      transition duration-150 ease-out cursor-pointer
     `,
     router.asPath.includes(`/team/${id}/${slug}`)
       ? tw`border-blue-600 font-medium text-blue-600`
