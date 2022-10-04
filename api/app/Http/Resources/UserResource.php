@@ -19,6 +19,7 @@ class UserResource extends JsonResource
       'name' => $this->name,
       'email' => $this->email,
       'avatar' => new AvatarResource($this->whenLoaded('avatar')),
+      'projects' => ProjectResource::collection($this->whenLoaded('projects')),
       'isloggedIn' => $this->is_logged_in,
       'created_at' => $this->created_at,
       'updated_at' => $this->updated_at,

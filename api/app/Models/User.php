@@ -50,4 +50,8 @@ class User extends Authenticatable implements HasMedia
     $this->addMediaCollection('avatar')->singleFile();
   }
 
+  public function projects()
+  {
+    return $this->belongsToMany(Project::class, 'project_members')->withPivot(['role_id']);
+  }
 }
