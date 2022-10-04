@@ -21,12 +21,12 @@ const AuthForm: FC<Props> = (props): JSX.Element => {
     isLogin,
     actions: { handleAuthSubmit }
   } = props
-
+  
   const {
     register,
     handleSubmit,
     setError,
-    formState: { errors }
+    formState: { errors } 
   } = useForm<SignInUpFormValues>({
     mode: 'onTouched',
     resolver: yupResolver(isLogin ? SignInFormSchema : SignUpFormSchema)

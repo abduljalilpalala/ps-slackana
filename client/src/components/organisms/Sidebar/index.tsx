@@ -11,6 +11,7 @@ import { classNames } from '~/helpers/classNames'
 import { styles } from '~/shared/twin/sidebar.styles'
 import { globals } from '~/shared/twin/globals.styles'
 import UserMenuPopover from '~/components/molecules/UserMenuPopover'
+import { useAppSelector } from '~/hooks/reduxSelector'
 
 type Props = {
   isOpenSidebar: ConstrainBoolean
@@ -19,6 +20,8 @@ type Props = {
 const Sidebar: FC<Props> = ({ isOpenSidebar }): JSX.Element => {
   const router = useRouter()
   const [isOpenProject, setIsOpenProject] = useState<boolean>(true)
+  const { user } = useAppSelector((state) => state.auth)
+  const { name, avatar } = user || {}
 
   const handleOpenProject = (): void => setIsOpenProject(!isOpenProject)
 
@@ -92,10 +95,10 @@ const Sidebar: FC<Props> = ({ isOpenSidebar }): JSX.Element => {
         <footer css={styles.footer}>
           <div css={styles.user_wrapper}>
             <div css={globals.avatar}>
-              <img src="/images/animated-avatar.jpg" />
+              <img src={avatar?.url} />
             </div>
             <div css={styles.user_details}>
-              <h1>Joshua Galit</h1>
+              <h1>{name}</h1>
               <span>Developer</span>
             </div>
           </div>

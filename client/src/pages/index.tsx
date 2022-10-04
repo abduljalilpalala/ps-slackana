@@ -13,11 +13,14 @@ import DialogBox from '~/components/templates/DialogBox'
 import { projectDataList } from '~/shared/jsons/projectDataList'
 import ProjectTemplate from '~/components/templates/ProjectTemplate'
 import { styles as homeStyle } from '~/shared/twin/home-content.style'
+import { useAppSelector } from '~/hooks/reduxSelector'
 
 const Index: NextPage = (): JSX.Element => {
   const [limit, setLimit] = useState<boolean>(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [newProjectModal, setNewProjectModal] = useState<boolean>(false)
+  const { user } = useAppSelector((state) => state.auth)
+  const { name } = user || {}
 
   const projectList = projectDataList
     .slice(0, limit ? projectDataList.length : 12)
@@ -90,7 +93,7 @@ const Index: NextPage = (): JSX.Element => {
         <div className="!max-w-[900px] flex flex-col items-center justify-center gap-16 md:container mobile:!pb-20 mobile:!gap-10">
           <div className="flex flex-col items-center justify-center gap-5">
             <p className="text-sm">Tuesday, September 20</p>
-            <h1 className="text-center text-3xl">Good afternoon, Abraham</h1>
+            <h1 className="text-center text-3xl">Good afternoon, {name}</h1>
           </div>
 
           <div className="w-full">

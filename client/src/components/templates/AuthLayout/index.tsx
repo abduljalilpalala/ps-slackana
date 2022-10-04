@@ -20,7 +20,7 @@ const AuthLayout: FC<Props> = ({ children, metaTitle }): JSX.Element => {
   return (
     <>
       <Head>
-        <title key="auth">Slackana | {metaTitle}</title>
+        <title key="auth">{`Slackana | ${metaTitle}`}</title>
       </Head>
       <main css={styles.main}>
         <section css={styles.section}>

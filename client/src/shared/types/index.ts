@@ -11,3 +11,14 @@ export type AxiosResponseError = {
 }
 
 export type SignInUpFormFields = 'name' | 'email' | 'password' | 'password_confirmation'
+
+export type User = {
+  id?: number
+  name: string
+  email: string
+  avatar: {
+    fileName: string
+    url: string
+  }
+  isLoggedIn: number
+}
