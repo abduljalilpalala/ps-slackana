@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProjectController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,5 +17,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 
+Route::group(['middleware' => 'auth:sanctum'], function() {
+  Route::apiResource('project', ProjectController::class);
+});
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
