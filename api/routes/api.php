@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\UpdateUserSettingsController;
+use App\Http\Controllers\ChangeUserPasswordController;
 use App\Http\Controllers\ProjectController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -17,8 +19,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-Route::group(['middleware' => 'auth:sanctum'], function() {
+Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::apiResource('project', ProjectController::class);
+
+  Route::group(['prefix' => 'user'], function () {
+    Route::put('change-password', [ChangeUserPasswordController::class, 'update']);
+    Route::apiResource('setting', UpdateUserSettingsController::class)->only(['store', 'update']);
+    Route::put('change-details', [UserController::class, 'update']);
+  });
 });
 
 require __DIR__ . '/auth.php';
