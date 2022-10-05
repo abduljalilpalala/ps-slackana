@@ -3,6 +3,7 @@
 use App\Http\Controllers\UpdateUserSettingsController;
 use App\Http\Controllers\ChangeUserPasswordController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::apiResource('project', ProjectController::class);
+  Route::group(['prefix' => 'project'], function () {
+    Route::put('/{project}/project-status', [ProjectStatusController::class,'update']);
+  });
 
   Route::group(['prefix' => 'user'], function () {
     Route::put('change-password', [ChangeUserPasswordController::class, 'update']);
