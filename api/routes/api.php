@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ArchiveProjectController;
+use App\Http\Controllers\ProjectMemberStatusController;
 use App\Http\Controllers\UpdateUserSettingsController;
 use App\Http\Controllers\ChangeUserPasswordController;
 use App\Http\Controllers\ProjectController;
@@ -32,6 +33,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::put('/{project}/project-status', [ProjectStatusController::class, 'update']);
     Route::delete('/{project}/archive', [ArchiveProjectController::class, 'destroy']);
     Route::put('/{project}/un-archive', [ArchiveProjectController::class, 'update']);
+    Route::delete('/{project}/leave', [ProjectMemberStatusController::class, 'destroy']);
   });
 
   Route::group(['prefix' => 'user'], function () {
