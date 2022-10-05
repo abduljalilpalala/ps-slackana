@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ProjectStatusEnum;
 use App\Enums\RoleEnum;
+use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Models\Project;
 use App\Models\User;
@@ -53,6 +54,12 @@ class ProjectController extends Controller
 
     $member->teams()->sync($project->teams()->first());
 
+    return response()->noContent();
+  }
+
+  public function update(UpdateProjectRequest $request, Project $project)
+  {
+    $project->update($request->validated());
     return response()->noContent();
   }
 }
