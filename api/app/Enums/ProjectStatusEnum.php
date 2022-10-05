@@ -9,6 +9,7 @@ enum ProjectStatusEnum: int
   case OFF_TRACK = 3;
   case ON_HOLD = 4;
   case COMPLETE = 5;
+  case ARCHIVED = 6;
 
   public function toString() {
     return match($this) {
@@ -16,7 +17,8 @@ enum ProjectStatusEnum: int
       self::AT_RISK => 'At risk',
       self::OFF_TRACK => 'Off track',
       self::ON_HOLD => 'On hold',
-      self::COMPLETE => 'Complete'
+      self::COMPLETE => 'Complete',
+      self::ARCHIVED => 'Archived'
     };
   }
 }
