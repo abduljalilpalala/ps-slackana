@@ -15,12 +15,14 @@ class ProjectController extends Controller
   {
     $projects = User::find(auth()->user()->id)->projects()->with(['icon', 'status']);
 
-    if (intval($request->get('filter')) !== ProjectStatusEnum::ARCHIVED->value) {
-      return ProjectResource::collection($projects->where('status_id', $request->get('filter'))->get());
-    }
+    if ($request->get('filter')) {
+      if (intval($request->get('filter')) !== ProjectStatusEnum::ARCHIVED->value) {
+        return ProjectResource::collection($projects->where('status_id', $request->get('filter'))->get());
+      }
 
-    if (intval($request->get('filter')) === ProjectStatusEnum::ARCHIVED->value) {
-      return ProjectResource::collection($projects->where('is_archived', true)->get());
+      if (intval($request->get('filter')) === ProjectStatusEnum::ARCHIVED->value) {
+        return ProjectResource::collection($projects->where('is_archived', true)->get());
+      }
     }
 
     return ProjectResource::collection($projects->get());
