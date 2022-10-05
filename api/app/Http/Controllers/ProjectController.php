@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ProjectStatusEnum;
 use App\Enums\RoleEnum;
 use App\Http\Resources\ProjectResource;
 use App\Models\Project;
@@ -10,9 +11,19 @@ use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
-  public function index()
+  public function index(Request $request)
   {
-    return ProjectResource::collection(User::find(auth()->user()->id)->projects()->with(['icon', 'status'])->get());
+    $projects = User::find(auth()->user()->id)->projects()->with(['icon', 'status']);
+
+    if (intval($request->get('filter')) !== ProjectStatusEnum::ARCHIVED->value) {
+      return ProjectResource::collection($projects->where('status_id', $request->get('filter'))->get());
+    }
+
+    if (intval($request->get('filter')) === ProjectStatusEnum::ARCHIVED->value) {
+      return ProjectResource::collection($projects->where('is_archived', true)->get());
+    }
+
+    return ProjectResource::collection($projects->get());
   }
 
   public function show(Project $project)
