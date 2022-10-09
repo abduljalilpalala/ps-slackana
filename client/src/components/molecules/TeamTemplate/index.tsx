@@ -65,7 +65,7 @@ const TeamTemplate = ({ data, callBack, teamCount, loadingState }: any) => {
                 <div onClick={() => dispatch(setRemoveTeamID({ teamID, projectID }))} className='flex items-center gap-2 w-[200px] mobile:!w-full truncate'>
                   <div className='max-w-[44px] max-h-[44px] flex justify-center items-center rounded-full border'>
                     <Image
-                      src={icon || dummyTeamIcon[7]}
+                      src={icon?.url || dummyTeamIcon[7]}
                       alt="team-icon"
                       width={100}
                       height={100}

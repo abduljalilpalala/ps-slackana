@@ -20,5 +20,6 @@ export type User = {
     fileName: string
     url: string
   }
-  isLoggedIn: number
+  isloggedIn: number
+  notification: any
 }

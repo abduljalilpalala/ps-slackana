@@ -26,8 +26,8 @@ export const styles = {
   ],
   project_details: [
     tw`
-       flex items-center space-x-2 text-[${slate_600}]
-      [> h1]:(text-lg font-semibold text-[${slate_900}] line-clamp-1)
+      flex items-center space-x-2 text-[${slate_600}]
+      [ > h1]:(text-lg font-semibold text-[${slate_900}] max-w-[150px] truncate)
     `
   ],
   nav: [

@@ -5,14 +5,14 @@ import {
   PayloadAction
 } from '@reduxjs/toolkit'
 
-import { Project, AxiosResponseError } from '~/shared/types'
+import { AxiosResponseError } from '~/shared/types'
 import { catchError } from '~/utils/handleAxiosError'
 import projectService from './projectService'
 
 type InitialState = {
-  project: Project | null
+  project: any
   sidebarProject: any
-  overviewProject: Project | null
+  overviewProject: any
   newProject: {
     title: string,
     description: string,
