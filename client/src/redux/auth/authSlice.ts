@@ -59,6 +59,14 @@ export const signOut = createAsyncThunk('auth/sign-out', async (_, thunkAPI) => 
   }
 })
 
+export const hydrateUserState = createAsyncThunk('auth/hydrateUserState', async (_, thunkAPI) => {
+  try {
+    return await authService.hydrateUserState()
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(catchError(error))
+  }
+})
+
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -131,6 +139,25 @@ export const authSlice = createSlice({
         }
       })
       .addCase(signOut.rejected, (state, action: PayloadAction<any>) => {
+        state.isError = true
+        state.isSuccess = false
+        state.isLoading = false
+        state.error = action.payload
+        state.user = null
+      })
+      .addCase(hydrateUserState.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(hydrateUserState.fulfilled, (state, action: PayloadAction<User>) => {
+        state.isSuccess = true
+        state.isLoading = false
+        state.user = action.payload
+        state.error = {
+          status: 0,
+          content: null
+        }
+      })
+      .addCase(hydrateUserState.rejected, (state, action: PayloadAction<any>) => {
         state.isError = true
         state.isSuccess = false
         state.isLoading = false
