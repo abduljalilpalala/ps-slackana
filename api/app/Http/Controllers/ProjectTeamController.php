@@ -13,7 +13,10 @@ class ProjectTeamController extends Controller
 {
   public function index(Project $project)
   {
-    return TeamResource::collection($project->teams);
+    return response()->json([
+      'teams' => TeamResource::collection($project->teams),
+      'count' => $project->teams->count()
+    ]);
   }
 
   public function store(StoreProjectRequest $request, Project $project)
