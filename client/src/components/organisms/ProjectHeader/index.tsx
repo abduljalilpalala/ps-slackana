@@ -1,20 +1,27 @@
 import Link from 'next/link'
-import React, { FC, useState } from 'react'
-import { Airplay } from 'react-feather'
+import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { FaRegUser } from 'react-icons/fa'
+import React, { FC, useState } from 'react'
 
-import { classNames } from '~/helpers/classNames'
+import { useAppSelector } from '~/hooks/reduxSelector'
 import { styles } from '~/shared/twin/project-header.styles'
+import AddMemberModal from '~/components/organisms/AddMemberModal'
+import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
+import ImageSkeleton from '~/components/atoms/Skeletons/ImageSkeleton'
 import ProjectActionDropdown from '~/components/molecules/ProjectActionDropdown'
 import ProjectStatusDropdown from '~/components/molecules/ProjectStatusDropdown'
-import AddMemberModal from '~/components/organisms/AddMemberModal'
 
 const ProjectHead: FC = (): JSX.Element => {
   const router = useRouter()
+  const { id } = router.query
   const [addModal, setAddModal] = useState<boolean>(false);
 
-  const { id } = router.query
+  const { overviewProject, isLoading, projectDescription: { title } } = useAppSelector((state) => state.project);
+  const { members, icon, id: projectID } = overviewProject || {};
+  const hotReload = id == projectID;
+
+  const membersIcon = [members?.slice(0, 3)?.map((member: any) => { return member.user.avatar.url })];
 
   const tabs = [
     {
@@ -39,14 +46,36 @@ const ProjectHead: FC = (): JSX.Element => {
       {addModal && <AddMemberModal close={() => setAddModal(false)} />}
       <header css={styles.header}>
         <section css={styles.section}>
-          <button type="button">
-            <Airplay />
-          </button>
+          {
+            isLoading
+              ? !hotReload
+                ? <ImageSkeleton className='!max-w-[44px] !min-w-[44px] !max-h-[44px] !min-h-[44px] !rounded-md' />
+                : <Image
+                  src={icon?.url || "/images/image-dummy.png"}
+                  alt="team-icon"
+                  width={44}
+                  height={44}
+                />
+              : <Image
+                src={icon?.url || "/images/image-dummy.png"}
+                alt="team-icon"
+                width={44}
+                height={44}
+              />
+          }
           <nav css={styles.nav}>
-            <div css={styles.project_details}>
-              <h1>Team 6 Digits</h1>
-              <ProjectActionDropdown />
-              <ProjectStatusDropdown />
+            <div css={styles.project_details} className="flex !justify-between h-[20px] mt-1">
+              {
+                isLoading
+                  ? !hotReload
+                    ? <LineSkeleton className='w-[150px] !rounded-md !h-[12px] !mt-[8px]' />
+                    : <h1>{title}</h1>
+                  : <h1>{title}</h1>
+              }
+              <div className='flex justify-center items-center gap-3'>
+                <ProjectActionDropdown />
+                <ProjectStatusDropdown />
+              </div>
             </div>
             <ul>
               {tabs.map(({ name, href, slug }, i) => (
@@ -62,13 +91,13 @@ const ProjectHead: FC = (): JSX.Element => {
         <button onClick={() => setAddModal(!addModal)} type="button" className="group" css={styles.btn_members}>
           <div className="hidden lg:block">
             <section>
-              <img src="https://ca.slack-edge.com/E028JVBUY4F-U03N2F2SHV2-39c1dcf42b67-32" alt="" />
-              <img src="https://ca.slack-edge.com/E028JVBUY4F-U03N1UNTGAY-5ef1b06f109b-32" alt="" />
-              <img src="https://ca.slack-edge.com/E028JVBUY4F-U03DUBE2G9W-974bff0bc22c-32" alt="" />
+              {membersIcon.map((icon: string, index: number) => {
+                return <img key={index} src={icon || "/images/team/qa.png"} alt="team-icon" />
+              })}
             </section>
           </div>
           <FaRegUser className="group-hover:text-slate-800" />
-          <h3 className="group-hover:text-slate-800">12</h3>
+          <h3 className="group-hover:text-slate-800">{members?.length}</h3>
         </button>
       </header>
     </>

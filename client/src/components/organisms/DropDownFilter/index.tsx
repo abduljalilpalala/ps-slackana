@@ -3,27 +3,33 @@ import { Fragment, useState } from 'react'
 import { ProjectStatus } from '~/shared/icons/ProjectStatus'
 import { projectStatusData } from '~/shared/jsons/projectStatusData';
 import { styles as homeStyle } from '~/shared/twin/home-content.style'
+import statusChecker from '~/utils/statusChecker';
+import { setFilter, filterProjects } from "~/redux/project/projectSlice";
+import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
 
 export default function DropDownFilter({ children, callback }: any) {
-  const [selected, setSelected] = useState<string>('All');
+  const dispatch = useAppDispatch();
+  const { filter } = useAppSelector((state) => state.project)
 
-  const onSelect = (e: any): void => {
-    const value = e.target.innerText;
-    callback(value);
-    setSelected(value)
+  const [selected, setSelected] = useState<number>(filter);
+
+  const onSelect = (index: number): void => {
+    dispatch(setFilter(index));
+    dispatch(filterProjects());
+    setSelected(index);
   }
 
-  const dropDownMenu = projectStatusData.map((status) => {
+  const dropDownMenu = projectStatusData.map((status: string, index: number) => {
     return (
-      <div className="px-1 py-1 " key={status}>
+      <div className="px-1 py-1 " key={index}>
         <Menu.Item>
           {({ active }) => (
             <button
-              onClick={onSelect}
-              className={`${active || selected === status ? 'bg-slate-500 text-white' : 'text-gray-900'
+              onClick={() => onSelect(index)}
+              className={`${active || selected === index ? 'bg-slate-500 text-white' : 'text-gray-900'
                 } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
             >
-              {<ProjectStatus status={status.toLowerCase().replace(/ /g, "-")} className='mx-2 mr-3' />}
+              {<ProjectStatus status={statusChecker(status)} className='mx-2 mr-3' />}
               {status}
             </button>
           )}
