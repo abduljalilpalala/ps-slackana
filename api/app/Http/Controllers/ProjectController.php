@@ -32,7 +32,7 @@ class ProjectController extends Controller
   public function show(Project $project)
   {
     return new ProjectResource(User::find(auth()->user()->id)->projects()->with([
-      'icon', 'role', 'status', 'teams', 'members.user.avatar', 'members.role', 'members.teams'
+      'icon', 'role', 'status', 'teams.icon', 'members.user.avatar', 'members.role', 'members.teams'
     ])->where('project_id', $project->id)->first());
   }
 

@@ -19,6 +19,14 @@ class ProjectMemberStatusController extends Controller
     return response()->noContent();
   }
 
+  public function update(Request $request, Project $project)
+  {
+    $member = $project->members()->where('user_id', $request->user_id)->first();
+    $member->update(['is_mvp' => !$member->is_mvp]);
+
+    return response()->noContent();
+  }
+
   public function destroy(Project $project)
   {
     $member = $project->members()->where('user_id', auth()->user()->id)->first();
