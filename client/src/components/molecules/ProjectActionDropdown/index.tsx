@@ -1,14 +1,35 @@
-import React, { FC } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { Menu } from '@headlessui/react'
 import { ChevronDown } from 'react-feather'
 import { HiOutlineArchive } from 'react-icons/hi'
 
 import MenuTransition from '~/components/templates/MenuTransition'
 import { styles } from '~/shared/twin/project-action-dropdown.styles'
+import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
+import { archiveProject, getProject, unarchiveProject } from '~/redux/project/projectSlice'
 
 const ProjectActionDropdown: FC = (): JSX.Element => {
+  const dispatch = useAppDispatch();
+
+  const { overviewProject } = useAppSelector((state) => state.project);
+  const { isArchived, id } = overviewProject || {};
+
+  const onClick = () => {
+    if (isArchived) {
+      dispatch(unarchiveProject())
+        .then(_ => {
+          dispatch(getProject(id));
+        });
+    } else {
+      dispatch(archiveProject())
+        .then(_ => {
+          dispatch(getProject(id));
+        });
+    }
+  }
+
   return (
-    <Menu as="div" className="relative -mb-1.5 inline-block text-left">
+    <Menu as="div" className="relative -mb-1.5 inline-block text-left z-30">
       {({ open }) => (
         <>
           <Menu.Button css={styles.menu_button({ open })}>
@@ -17,9 +38,9 @@ const ProjectActionDropdown: FC = (): JSX.Element => {
           <MenuTransition>
             <Menu.Items css={styles.menu_items}>
               <Menu.Item>
-                <button css={styles.menu_item_button} className="group">
+                <button onClick={onClick} css={styles.menu_item_button} className="group">
                   <HiOutlineArchive aria-hidden="true" />
-                  Archive
+                  {isArchived ? "Unarchive" : "Archive"}
                 </button>
               </Menu.Item>
             </Menu.Items>
