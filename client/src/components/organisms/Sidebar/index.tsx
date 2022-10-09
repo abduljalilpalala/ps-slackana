@@ -2,16 +2,17 @@ import Link from 'next/link'
 import { Hash } from 'react-feather'
 import { useRouter } from 'next/router'
 import { CgHomeAlt } from 'react-icons/cg'
-import React, { FC, useState } from 'react'
 import { AiOutlineCaretDown } from 'react-icons/ai'
+import React, { FC, useEffect, useState } from 'react'
 
-import { teams } from '~/shared/jsons/teams'
+import { isLoggedIn } from '~/utils/isLoggedIn'
 import Logo2Icon from '~/shared/icons/Logo2Icon'
 import { classNames } from '~/helpers/classNames'
 import { styles } from '~/shared/twin/sidebar.styles'
 import { globals } from '~/shared/twin/globals.styles'
-import { useAppSelector } from '~/hooks/reduxSelector'
+import { getSidebarProjects } from '~/redux/project/projectSlice'
 import UserMenuPopover from '~/components/molecules/UserMenuPopover'
+import { useAppSelector, useAppDispatch } from '~/hooks/reduxSelector'
 
 type Props = {
   isOpenSidebar: boolean
@@ -19,11 +20,20 @@ type Props = {
 
 const Sidebar: FC<Props> = ({ isOpenSidebar }): JSX.Element => {
   const router = useRouter()
+  const dispatch = useAppDispatch();
   const [isOpenProject, setIsOpenProject] = useState<boolean>(true)
+
   const { user } = useAppSelector((state) => state.auth)
-  const { name, avatar } = user || {}
+  const { name, avatar, isloggedIn: status, email } = user || {}
 
   const handleOpenProject = (): void => setIsOpenProject(!isOpenProject)
+  const { sidebarProject, isLoading } = useAppSelector((state) => state.project);
+
+  useEffect(() => {
+    if (isLoading) {
+      dispatch(getSidebarProjects());
+    }
+  }, [isLoading])
 
   return (
     <aside
@@ -62,8 +72,8 @@ const Sidebar: FC<Props> = ({ isOpenSidebar }): JSX.Element => {
               </div>
               {isOpenProject && (
                 <ul>
-                  {teams.map(({ id, name, notif }, i) => (
-                    <li key={i} css={styles.li}>
+                  {sidebarProject?.map(({ id, title, isArchived }: { id: number, title: string, isArchived: number }, index: number) => (
+                    isArchived ? null : <li key={index} css={styles.li}>
                       <Link href={`/team/${id}/overview`}>
                         <a
                           className={classNames(
@@ -75,12 +85,9 @@ const Sidebar: FC<Props> = ({ isOpenSidebar }): JSX.Element => {
                           <div css={styles.link}>
                             <Hash />
                             <span
-                              className={classNames(
-                                'line-clamp-1',
-                                notif ? 'font-bold text-white' : ''
-                              )}
+                              className='truncate text-ellipsis max-w-[180px]'
                             >
-                              {name}
+                              {title}
                             </span>
                           </div>
                         </a>
@@ -94,12 +101,12 @@ const Sidebar: FC<Props> = ({ isOpenSidebar }): JSX.Element => {
         </nav>
         <footer css={styles.footer}>
           <div css={styles.user_wrapper}>
-            <div css={globals.avatar}>
+            <div css={globals.avatar} className={isLoggedIn(status)} >
               <img src={avatar?.url} />
             </div>
             <div css={styles.user_details}>
               <h1>{name}</h1>
-              <span>Developer</span>
+              <span>{email}</span>
             </div>
           </div>
           <UserMenuPopover />

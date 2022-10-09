@@ -19,7 +19,7 @@ const AddMemberModal = ({ close }: { close: (value: boolean) => void }) => {
     console.log('integrate add people');
   }
 
-  const seFilter = (data: { team: string, members: number }): void => {
+  const setFilter = (data: { team: string, members: number }): void => {
     setFilterData(data);
     console.log('integrate filter');
   }
@@ -52,7 +52,7 @@ const AddMemberModal = ({ close }: { close: (value: boolean) => void }) => {
             <AddPeopleButton onClick={addPeople} />
             <p>Add people</p>
           </div>
-          <MemberFilter callback={(data: any) => seFilter(data)} data={teamData} className="w-[42%] cursor-pointer">
+          <MemberFilter callback={(data: any) => setFilter(data)} data={teamData} className="w-[42%] cursor-pointer">
             <div className="flex justify-between w-full px-3 py-1 rounded-md border border-slate-300">
               <div className="text-slate-400">
                 {filterData.team}

@@ -8,11 +8,11 @@ type Props = {
   children: ReactNode
 }
 
-const ProjectLayout: FC<Props> = (props): JSX.Element => {
+const ProjectLayout: FC<Props> = ({ metaTitle, children }): JSX.Element => {
   return (
-    <Layout metaTitle={props.metaTitle}>
+    <Layout metaTitle={metaTitle}>
       <ProjectHeader />
-      {props.children}
+      {children}
     </Layout>
   )
 }
