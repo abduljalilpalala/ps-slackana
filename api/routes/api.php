@@ -34,6 +34,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::delete('/{project}/archive', [ArchiveProjectController::class, 'destroy']);
     Route::put('/{project}/un-archive', [ArchiveProjectController::class, 'update']);
     Route::delete('/{project}/leave', [ProjectMemberStatusController::class, 'destroy']);
+    Route::post('/{project}/team-lead', [ProjectMemberStatusController::class, 'store']);
   });
 
   Route::group(['prefix' => 'user'], function () {
