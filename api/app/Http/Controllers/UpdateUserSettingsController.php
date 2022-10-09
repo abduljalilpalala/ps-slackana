@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class UpdateUserSettingsController extends Controller
 {
-  public function store(Request $request)
+  public function update(Request $request)
   {
     auth()->user()->notificationSettings()->update([
       'status' => $request->status
@@ -16,7 +16,7 @@ class UpdateUserSettingsController extends Controller
     return response()->noContent();
   }
 
-  public function update(UpdateUserAvatarRequest $request)
+  public function store(UpdateUserAvatarRequest $request)
   {
     if ($request->hasFile('avatar')) {
       auth()->user()->addMedia($request->file('avatar'))->toMediaCollection('avatar');

@@ -16,9 +16,12 @@ export type User = {
   id?: number
   name: string
   email: string
+  notification: any
   avatar: {
     fileName: string
     url: string
   }
-  isLoggedIn: number
+  isloggedIn: number
 }
+
+export type Project = any

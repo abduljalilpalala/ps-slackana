@@ -1,11 +1,10 @@
 import Link from 'next/link'
 import { X } from 'react-feather'
 import { Hash } from 'react-feather'
-import React, { FC, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { AiOutlineCaretDown } from 'react-icons/ai'
 
 import { useRouter } from 'next/router'
-import { teams } from '~/shared/jsons/teams'
 import Logo2Icon from '~/shared/icons/Logo2Icon'
 import { classNames } from '~/helpers/classNames'
 import { Link as ILink } from '~/shared/interfaces'
@@ -14,6 +13,9 @@ import { styles } from '~/shared/twin/drawer.styles'
 import { globals } from '~/shared/twin/globals.styles'
 import UserMenuPopover from '~/components/molecules/UserMenuPopover'
 import { styles as sidebarStyles } from '~/shared/twin/sidebar.styles'
+import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
+import { isLoggedIn } from '~/utils/isLoggedIn'
+import { filterProjects } from '~/redux/project/projectSlice'
 
 type Props = {
   isOpenDrawer: boolean
@@ -22,9 +24,18 @@ type Props = {
 
 const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element => {
   const router = useRouter()
+  const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = useState<boolean>(true)
 
+  const { user } = useAppSelector((state) => state.auth)
+  const { name, avatar, isloggedIn: status, email } = user || {}
+
   const handleOpen = (): void => setIsOpen(!isOpen)
+  const { sidebarProject } = useAppSelector((state) => state.project)
+
+  useEffect(() => {
+    dispatch(filterProjects());
+  }, [])
 
   return (
     <aside>
@@ -65,8 +76,8 @@ const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element =>
                   </div>
                   {isOpen && (
                     <ul>
-                      {teams.map(({ id, name, notif }, i) => (
-                        <li key={i} css={sidebarStyles.li}>
+                      {sidebarProject?.map(({ id, title, isArchived }: { id: number, title: string, isArchived: number }, index: number) => (
+                        isArchived ? null : <li key={index} css={sidebarStyles.li} onClick={handleToggleDrawer}>
                           <Link href={`/team/${id}/overview`}>
                             <a
                               className={classNames(
@@ -78,12 +89,9 @@ const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element =>
                               <div css={sidebarStyles.link}>
                                 <Hash />
                                 <span
-                                  className={classNames(
-                                    'line-clamp-1',
-                                    notif ? 'font-bold text-white' : ''
-                                  )}
+                                  className='truncate text-ellipsis max-w-[180px]'
                                 >
-                                  {name}
+                                  {title}
                                 </span>
                               </div>
                             </a>
@@ -98,12 +106,12 @@ const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element =>
           </div>
           <div css={sidebarStyles.footer}>
             <div css={sidebarStyles.user_wrapper}>
-              <div css={globals.avatar}>
-                <img src="/images/animated-avatar.jpg" />
+              <div css={globals.avatar} className={isLoggedIn(status)} >
+                <img src={avatar?.url} />
               </div>
               <div css={sidebarStyles.user_details}>
-                <h1>Joshua Galit</h1>
-                <span>Developer</span>
+                <h1>{name}</h1>
+                <span>{email}</span>
               </div>
             </div>
             <UserMenuPopover />

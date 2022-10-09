@@ -22,7 +22,7 @@ export const signInUpAuthCheck: GetServerSideProps = wrapper.getServerSideProps(
             props: {}
           }
         }
-      } catch (error: any) {}
+      } catch (error: any) { }
 
       return {
         props: {}

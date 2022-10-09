@@ -18,7 +18,9 @@ class ProjectTeamController extends Controller
 
   public function store(StoreProjectRequest $request, Project $project)
   {
-    $project->teams()->createMany($request->teams);
+    foreach ($request->teams as $team) {
+      $project->teams()->firstOrCreate($team);
+    }
     return response()->noContent();
   }
 
@@ -29,12 +31,18 @@ class ProjectTeamController extends Controller
 
   public function update(Request $request, Project $project, Team $team)
   {
-    $project->teams()->find($team->id)->update([
-      'name' => $request->name
-    ]);
-    return response()->noContent();
+    if (!$project->teams()->where('name', $request->name)->exists()) {
+      $project->teams()->find($team->id)->update([
+        'name' => $request->name
+      ]);
+      return response()->noContent();
+    }
+
+    return response()->json([
+      'message' => 'Team already exists'
+    ], 403);
   }
-  
+
   public function destroy(Project $project, Team $team)
   {
     $project->teams()->find($team->id)->delete();
