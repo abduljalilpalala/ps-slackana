@@ -10,19 +10,17 @@ import {
 import getDate from '~/utils/getDate'
 import { Add } from '~/shared/icons/AddIcon'
 import getGreetings from '~/utils/getGreetings'
-import { styles } from '~/shared/twin/auth.styles'
-import { Spinner } from '~/shared/icons/SpinnerIcon'
+import SeeMore from '~/components/atoms/SeeMore'
 import { globals } from '~/shared/twin/globals.styles'
 import { ThreeDot } from '~/shared/icons/ThreeDotIcon'
 import Layout from '~/components/templates/HomeLayout'
 import InputTags from '~/components/molecules/InputTags'
 import DialogBox from '~/components/templates/DialogBox'
+import SubmitButton from '~/components/atoms/SubmitButton'
 import DropDown from '~/components/organisms/DropDownFilter'
 import ProjectTemplate from '~/components/templates/ProjectTemplate'
 import { styles as homeStyle } from '~/shared/twin/home-content.style'
 import { useAppSelector, useAppDispatch } from '~/hooks/reduxSelector'
-import SeeMore from '~/components/atoms/SeeMore'
-import SubmitButton from '~/components/atoms/SubmitButton'
 
 const Index: NextPage = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -53,21 +51,14 @@ const Index: NextPage = (): JSX.Element => {
   const onChange = (e: any): void => {
     const value = e.target.value;
     const name = e.target.name;
+    const isDisable = value.length === 0;
 
     if (name === "title") {
       dispatch(setProjectTitle(value));
-      if (value.length === 0) {
-        setIsTitleDisabled(true);
-      } else {
-        setIsTitleDisabled(false);
-      }
+      setIsTitleDisabled(isDisable);
     } else {
       dispatch(setProjectDescription(value));
-      if (value.length === 0) {
-        setIsDescriptionDisabled(true);
-      } else {
-        setIsDescriptionDisabled(false);
-      }
+      setIsDescriptionDisabled(isDisable);
     }
   }
 

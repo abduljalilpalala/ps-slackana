@@ -3,10 +3,11 @@ import { ChevronDown } from 'react-feather'
 import React, { FC, useEffect, useState } from 'react'
 
 import { classNames } from '~/helpers/classNames'
+import { statusData } from '~/shared/jsons/statusData'
 import MenuTransition from '~/components/templates/MenuTransition'
+import { updateProjectStatus } from '~/redux/project/projectSlice'
 import { styles } from '~/shared/twin/project-status-dropdown.styles'
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
-import { updateProjectStatus } from '~/redux/project/projectSlice'
 
 const ProjectStatusDropdown: FC = (): JSX.Element => {
   const dispatch = useAppDispatch();
@@ -15,28 +16,6 @@ const ProjectStatusDropdown: FC = (): JSX.Element => {
   const { id: projectID, status } = overviewProject || {};
   const { id: statusID } = status || {};
 
-  const statusData = [
-    {
-      name: "On track",
-      style: "bg-green-500 h-2 w-2 rounded-full "
-    },
-    {
-      name: "At risk",
-      style: "bg-amber-400 h-2 w-2 rounded-full "
-    },
-    {
-      name: "Off track",
-      style: "bg-orange-600 h-2 w-2 rounded-full "
-    },
-    {
-      name: "On Hold",
-      style: "bg-blue-500 h-2 w-2 rounded-full "
-    },
-    {
-      name: "Complete",
-      style: "bg-green-500 text-green-500 h-2 w-2 rounded-full "
-    },
-  ]
   const untrackedStatus = {
     name: "Set Status",
     style: "h-2 w-2 rounded-full border border-black-900"
