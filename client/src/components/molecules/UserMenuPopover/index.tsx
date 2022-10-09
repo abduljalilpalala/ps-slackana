@@ -6,8 +6,14 @@ import { globals } from '~/shared/twin/globals.styles'
 import { styles } from '~/shared/twin/user-menu-popover.styles'
 import PopoverTransition from '~/components/templates/PopoverTransition'
 import SettingsModal from "~/components/organisms/SettingsModal";
+import { useAppSelector } from '~/hooks/reduxSelector'
+import { isLoggedIn } from '~/utils/isLoggedIn'
+import { useAuthMethods } from '~/hooks/authMethods'
 
 const UserMenuPopover: FC = (): JSX.Element => {
+  const { handleAuthSignOut } = useAuthMethods()
+  const { user } = useAppSelector((state) => state.auth)
+  const { name, avatar, isloggedIn: status, email } = user || {}
   const [settingsModal, setSettingsModal] = useState<boolean>(false);
 
   return (
@@ -23,18 +29,17 @@ const UserMenuPopover: FC = (): JSX.Element => {
               <section css={styles.section}>
                 <div css={styles.user_wrapper}>
                   <div css={styles.user_details}>
-                    <div css={globals.avatar}>
-                      <img src="/images/animated-avatar.jpg" />
+                    <div css={globals.avatar} className={isLoggedIn(status)} >
+                      <img src={avatar?.url} />
                     </div>
                     <div>
-                      <h1>Joshua Galit</h1>
-                      <span>Developer</span>
+                      <h1>{name}</h1>
+                      <span>{email}</span>
                     </div>
                   </div>
-                  <ChevronDown />
                 </div>
-                <button onClick={() => setSettingsModal(!settingsModal)} type="button">Profile</button>
-                <button type="button">Log out @angryboy_19</button>
+                <button onClick={() => setSettingsModal(!settingsModal)} type="button">Settings</button>
+                <button onClick={handleAuthSignOut} type="button">Log out</button>
               </section>
             </Popover.Panel>
           </PopoverTransition>
