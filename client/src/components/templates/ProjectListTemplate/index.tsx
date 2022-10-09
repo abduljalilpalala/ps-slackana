@@ -16,6 +16,8 @@ type ProjectTemplateType = {
 const ProjectTemplate = ({ data, className, onClick }: ProjectTemplateType): JSX.Element => {
   const { team_name, icon, date, status } = data;
 
+  console.log(data)
+
   return (
     <div
       onClick={onClick}

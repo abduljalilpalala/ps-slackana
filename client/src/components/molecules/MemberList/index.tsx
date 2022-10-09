@@ -32,7 +32,7 @@ const MemberList = ({ data, className }: any) => {
     <div onMouseOverCapture={() => setOptionState(true)} onMouseOut={() => setOptionState(false)} className={`relative flex items-center justify-between hover:bg-slate-200 px-6 py-2 ${className}`}>
       <div className="flex flex-row gap-3 items-center justify-start min-w-[150px] mobile:w-[75%] truncate text-ellipsis">
         <div className="mobile:min-w-[36px] flex items-center justify-center">
-          <Image
+          <img
             src={'/images/animated-avatar.jpg'}
             alt="user-icon"
             width={36}
