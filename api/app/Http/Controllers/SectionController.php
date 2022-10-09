@@ -15,7 +15,7 @@ class SectionController extends Controller
   public function index(Project $project)
   {
     if($this->hasRole($project)){
-      return SectionResource::collection($project->sections()->get());
+      return SectionResource::collection($project->sections()->with('tasks.user')->get());
     }
     return $this->unauthorizedAccess();
   }

@@ -42,6 +42,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/{project}/team-lead', [ProjectMemberStatusController::class, 'store']);
     Route::put('/{project}/mvp', [ProjectMemberStatusController::class, 'update']);
     Route::apiResource('/{project}/section', SectionController::class);
+    Route::apiResource('/{project}/section/{section}/task', TaskController::class);
   });
 
   Route::group(['prefix' => 'user'], function () {
