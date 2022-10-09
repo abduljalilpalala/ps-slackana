@@ -25,6 +25,9 @@ class UpdateTaskRequest extends FormRequest
     {
         return [
           'name' => ['required', 'string'],
+          'description' => ['nullable', 'string'],
+          'estimated_time' => ['nullable', 'integer'],
+          'actual_time_finished' => ['nullable', 'integer'],
         ];
     }
 }
