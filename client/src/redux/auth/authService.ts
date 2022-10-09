@@ -35,10 +35,19 @@ const signOut = async (): Promise<any> => {
   return response.data
 }
 
+const hydrateUserState = async (): Promise<any> => {
+  const response = await axios.get('/api/auth')
+  if (response.status === 200) {
+    return response.data
+  }
+  return "Something went wrong"
+}
+
 const authService = {
   signUp,
   signIn,
-  signOut
+  signOut,
+  hydrateUserState
 }
 
 export default authService

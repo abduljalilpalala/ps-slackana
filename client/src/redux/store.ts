@@ -2,10 +2,14 @@ import { configureStore } from '@reduxjs/toolkit'
 import { createWrapper } from 'next-redux-wrapper'
 
 import authReducer from '~/redux/auth/authSlice'
+import projectReducer from './project/projectSlice'
+import settingReducer from './setting/settingSlice'
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer
+    auth: authReducer,
+    project: projectReducer,
+    setting: settingReducer
   }
 })
 
