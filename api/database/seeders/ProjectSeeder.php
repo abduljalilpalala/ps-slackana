@@ -52,6 +52,10 @@ class ProjectSeeder extends Seeder
       ['user_id' => $janeDoe->id, 'role_id' => RoleEnum::MEMBER],
     ]);
 
+    $section=$project->sections()->create(
+      ['name' => 'To do']
+    );
+
     // John Doe
     ProjectMember::where('user_id', $johnDoe->id)->first()->teams()->sync([1, 2, 3]);
     // Jane Doe
