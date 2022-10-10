@@ -4,10 +4,10 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        'tablet': { 'min': '600px', 'max': '900px' },
+        tablet: { min: '600px', max: '900px' },
         // => @media (min-width: 640px) { ... }
 
-        'mobile': { 'min': '300px', 'max': '599px' },
+        mobile: { min: '300px', max: '599px' }
         // => @media (min-width: 768px) { ... }
       },
       container: {
@@ -38,7 +38,7 @@ module.exports = {
         'px-600': '600px',
         'px-650': '650px',
         'px-700': '700px',
-        'px-750': '750px',
+        'px-750': '750px'
       },
       width: {
         'px-90': '90px',
@@ -59,7 +59,7 @@ module.exports = {
         'px-600': '600px',
         'px-650': '650px',
         'px-700': '700px',
-        'px-750': '750px',
+        'px-750': '750px'
       },
       colors: {
         primary: '#1164a3',
@@ -79,6 +79,7 @@ module.exports = {
   plugins: [
     require('@tailwindcss/forms'),
     require('@tailwindcss/line-clamp'),
-    require('tailwind-scrollbar')({ nocompatible: true })
+    require('tailwind-scrollbar')({ nocompatible: true }),
+    require('tailwindcss-labeled-groups')(['board'])
   ]
 }
