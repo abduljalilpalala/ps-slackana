@@ -16,8 +16,8 @@ class Task extends Model
       return $this->belongsTo(Section::class);
     }
 
-    public function user()
+    public function project_member()
     {
-      return $this->belongsTo(User::class);
+      return $this->belongsTo(ProjectMember::class);
     }
 }
