@@ -42,4 +42,9 @@ class Project extends Model implements HasMedia
   {
     return $this->hasOne(ProjectMember::class)->where('user_id', auth()->user()->id);
   }
+
+  public function sections()
+  {
+    return $this->hasMany(Section::class);
+  }
 }
