@@ -55,6 +55,13 @@ class ProjectSeeder extends Seeder
     $section=$project->sections()->create(
       ['name' => 'To do']
     );
+    
+    $section->tasks()->create([
+      'user_id' => $johnDoe->id,
+      'name'=> "Set-up Section Model and Migrations",
+      'description' => "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam neque, ut dicta voluptate mollitia quo nam, perspiciatis aspernatur, sint nihil facilis ab quas molestiae culpa officiis quis aliquam quidem commodi!",
+      'position'=>1
+    ]);
 
     // John Doe
     ProjectMember::where('user_id', $johnDoe->id)->first()->teams()->sync([1, 2, 3]);
