@@ -23,3 +23,15 @@ export type User = {
   isloggedIn: number
   notification: any
 }
+
+export type SectionFormFields = {
+  id: number
+  project_id: number
+  name?: string | undefined
+}
+
+export type Section = {
+  id?: number
+  project_id?: number
+  name: string
+}
