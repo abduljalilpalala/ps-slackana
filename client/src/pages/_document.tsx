@@ -33,7 +33,7 @@ export default class MyDocument extends Document {
     return (
       <Html>
         <Head>
-          <link rel="icon" href="/favicon.ico" />
+          <link rel="icon" href="/svgs/logo.svg" />
           <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
           {/* eslint-disable-next-line @next/next/no-page-custom-font */}
           <link
