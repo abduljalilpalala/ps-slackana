@@ -8,6 +8,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\ProjectTeamController;
+use App\Http\Controllers\SectionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::apiResource('project', ProjectController::class);
   Route::apiResource('project.team', ProjectTeamController::class);
   Route::apiResource('project.member', ProjectMemberController::class);
+  Route::apiResource('project.section', SectionController::class);
   
   Route::group(['prefix' => 'project'], function () {
     Route::put('/{project}/project-status', [ProjectStatusController::class, 'update']);
