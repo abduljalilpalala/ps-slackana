@@ -31,6 +31,7 @@
     "styled-components": "^5.3.5",
     "twin.macro": "^2.8.2",
     "use-persisted-state": "^0.3.3",
+    "uuid": "^9.0.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {
@@ -41,6 +42,7 @@
     "@types/react-dom": "18.0.6",
     "@types/styled-components": "^5.1.26",
     "@types/use-persisted-state": "^0.3.1",
+    "@types/uuid": "^8.3.4",
     "autoprefixer": "^10.4.11",
     "babel-plugin-styled-components": "^2.0.7",
     "babel-plugin-twin": "^1.0.2",
@@ -51,6 +53,7 @@
     "prettier-plugin-tailwindcss": "^0.1.13",
     "tailwind-scrollbar": "^2.0.1",
     "tailwindcss": "^3.1.8",
+    "tailwindcss-labeled-groups": "^0.0.2",
     "typescript": "4.8.3"
   },
   "babelMacros": {
