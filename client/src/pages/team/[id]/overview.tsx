@@ -184,7 +184,7 @@ const Overview: FC = (): JSX.Element => {
                     <LineSkeleton className='w-[50%]' />
                     <LineSkeleton className='w-[30%]' />
                     <LineSkeleton className='w-[20%]' /></div>
-                  : <textarea placeholder='Description field should not be empty' onChange={updateDescription} value={editDescription || ""} name="description" rows={5} className='text-sm text-slate-500 break-words border border-slate-300 p-5 rounded-md' />
+                  : <textarea placeholder='No project description...' onChange={updateDescription} value={editDescription || ""} name="description" rows={5} className='text-sm text-slate-500 break-words border border-slate-300 p-5 rounded-md' />
               }
               <div className='flex w-full items-end justify-end'>
                 <SubmitButton

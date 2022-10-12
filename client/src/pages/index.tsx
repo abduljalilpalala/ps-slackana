@@ -47,7 +47,6 @@ const Index: NextPage = (): JSX.Element => {
   }
 
   const [isTitleDisabled, setIsTitleDisabled] = useState<boolean>(true);
-  const [isDescriptionDisabled, setIsDescriptionDisabled] = useState<boolean>(true);
   const onChange = (e: any): void => {
     const value = e.target.value;
     const name = e.target.name;
@@ -58,7 +57,6 @@ const Index: NextPage = (): JSX.Element => {
       setIsTitleDisabled(isDisable);
     } else {
       dispatch(setProjectDescription(value));
-      setIsDescriptionDisabled(isDisable);
     }
   }
 
@@ -113,8 +111,8 @@ const Index: NextPage = (): JSX.Element => {
           text="Save"
           submitted={onCreateProject}
           isSubmitting={isLoading}
-          isDisabled={isDescriptionDisabled || isTitleDisabled}
-          className={`!text-slate-50 !bg-blue-600 hover:!bg-blue-600 opacity-60 hover:!opacity-100 ${(isDescriptionDisabled || isTitleDisabled) && "hover:!opacity-60 !cursor-not-allowed"}`} />
+          isDisabled={isTitleDisabled}
+          className={`!text-slate-50 !bg-blue-600 hover:!bg-blue-600 opacity-60 hover:!opacity-100 ${(isTitleDisabled) && "hover:!opacity-60 !cursor-not-allowed"}`} />
 
       </div>
     </DialogBox>
