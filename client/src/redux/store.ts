@@ -3,13 +3,15 @@ import { createWrapper } from 'next-redux-wrapper'
 
 import authReducer from '~/redux/auth/authSlice'
 import projectReducer from './project/projectSlice'
+import sectionReducer from './section/sectionSlice'
 import settingReducer from './setting/settingSlice'
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     project: projectReducer,
-    setting: settingReducer
+    setting: settingReducer,
+    section: sectionReducer
   }
 })
 
