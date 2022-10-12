@@ -4,6 +4,7 @@ use App\Http\Controllers\ArchiveProjectController;
 use App\Http\Controllers\ProjectMemberStatusController;
 use App\Http\Controllers\UpdateUserSettingsController;
 use App\Http\Controllers\ChangeUserPasswordController;
+use App\Http\Controllers\CompleteTaskController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\ProjectStatusController;
@@ -42,6 +43,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/{project}/team-lead', [ProjectMemberStatusController::class, 'store']);
     Route::put('/{project}/mvp', [ProjectMemberStatusController::class, 'update']);
     Route::put('/{project}/task/{task}/details', [TaskDetailsController::class,'update']);
+    Route::put('/{project}/task/{task}/complete', [CompleteTaskController::class,'update']);
   });
 
   Route::group(['prefix' => 'user'], function () {
