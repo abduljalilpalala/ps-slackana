@@ -1,13 +1,16 @@
+import moment from 'moment'
 import { NextPage } from 'next'
 import toast from 'react-hot-toast'
-import { Plus } from 'react-feather'
-import React, { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/router'
+import React, { useEffect, useState } from 'react'
 
+import { getProject } from '~/redux/project/projectSlice'
+import AddSection from '~/components/molecules/AddSection'
 import BoardSection from '~/components/organisms/BoardSection'
 import BoardWrapper from '~/components/templates/BoardWrapper'
 import ProjectLayout from '~/components/templates/ProjectLayout'
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
-import { useRouter } from 'next/router'
+import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
 import {
   createSection,
   getSections,
@@ -21,14 +24,24 @@ import {
   setRemoveSectionData,
   setRenameSectionData
 } from '~/redux/section/sectionSlice'
-import { getProject } from '~/redux/project/projectSlice'
-import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
+import { tasks } from '~/shared/jsons/dummyTasks'
+import AddTask from '~/components/molecules/AddTask'
+import TaskList from '~/components/molecules/TaskList'
 
 const Board: NextPage = (): JSX.Element => {
   const router = useRouter()
   const { id } = router.query
   const dispatch = useAppDispatch()
+  const [newTaskDueDate, setNewTaskDueDate] = useState('')
+  const [currentBoardId, setCurrentBoardId] = useState<any>(null)
   const [showAddSection, setShowAddSection] = useState(true)
+  const [assigneeModal, setAssigneeModal] = useState<boolean>(false)
+  const [assignee, setAssignee] = useState({})
+
+  const [updateAssigneeModal, setUpdateAssigneeModal] = useState<boolean>(false)
+  const [updateAssignee, setUpdateAssignee] = useState({})
+  const [updateTaskDueDate, setUpdateTaskDueDate] = useState('')
+
   const {
     sections: boards,
     refresher: { sectionsStateUpdate, sectionUpdate }
@@ -75,6 +88,9 @@ const Board: NextPage = (): JSX.Element => {
     }
   }
 
+  /**
+   * Implement Save Section
+   */
   const handleSaveSection = async (): Promise<void> => {
     dispatch(sectionRefresher())
     dispatch(createSection()).then((_) => {
@@ -86,6 +102,9 @@ const Board: NextPage = (): JSX.Element => {
     })
   }
 
+  /**
+   * Implement Remove Section
+   */
   const handleRemoveSection = async (id: number): Promise<void> => {
     dispatch(setRemoveSectionData({ id }))
     const message = confirm('Do you want to delete section?')
@@ -99,6 +118,9 @@ const Board: NextPage = (): JSX.Element => {
     }
   }
 
+  /**
+   * Implement Update Section
+   */
   const updateSection = (e: any, id: number) => {
     const name = e.target.value
     dispatch(setRenameSectionData({ id, name }))
@@ -107,6 +129,62 @@ const Board: NextPage = (): JSX.Element => {
       toast.success('Successfully Updated!')
     })
   }
+
+  const handleShowAddTask = (id: number): void => setCurrentBoardId(id)
+
+  const onClickEnterTask = (e: any) => {
+    const value = e.target.value
+    const keyCode = e.which || e.keyCode
+
+    if (keyCode === 13 && !e.shiftKey) {
+      e.preventDefault()
+      if (value.length === 0) {
+        setCurrentBoardId('')
+        setNewTaskDueDate('')
+        setAssignee({})
+      } else {
+        handleSaveTask(value)
+      }
+    }
+  }
+
+  const onClickOutTask = (e: any) => {
+    const value = e.target.value
+
+    if (value.length === 0) {
+      if (!assigneeModal) {
+        setCurrentBoardId('')
+        setNewTaskDueDate('')
+        setAssignee({})
+      }
+    } else {
+      handleSaveTask(value)
+    }
+  }
+
+  const onChangeTask = (e: any) => e.target.value
+  /**
+   * Implement Save Task
+   */
+  const handleSaveTask = async (taskName: any): Promise<void> => {
+    if (assigneeModal) return
+    const task = {
+      taskName,
+      dueDate: newTaskDueDate ? moment(new Date(newTaskDueDate)).format('MMM D') : '',
+      assignee
+    }
+
+    console.log(task)
+    toast.success('Successfully Saved!')
+    setCurrentBoardId('')
+    setNewTaskDueDate('')
+    setAssignee({})
+  }
+
+  const handleAssigneeToggle = () => setAssigneeModal(!assigneeModal)
+
+  const handleUpdateAssigneeToggle = () => setUpdateAssigneeModal(!updateAssigneeModal)
+
   const loadingSkeleton = (
     <section className="group-board w-full max-w-[18rem] flex-shrink-0 ">
       <header className="flex flex-col items-center justify-between py-2">
@@ -131,50 +209,64 @@ const Board: NextPage = (): JSX.Element => {
       </main>
     </section>
   )
+
   return (
     <ProjectLayout metaTitle="Board">
       <BoardWrapper>
         {!sectionsStateUpdate
-          ? boards.map((board) => {
+          ? boards.map((board: any) => {
               return (
                 <BoardSection
                   key={board.id}
                   {...board}
                   permissions={{ canCreatePermission, canRenamePermission, canRemovePermission }}
-                  actions={{ handleRemoveSection, updateSection }}
+                  actions={{ handleRemoveSection, updateSection, handleShowAddTask }}
                 >
-                  <p className="text-center text-sm text-slate-600">No current task</p>
+                  {currentBoardId === board.id && (
+                    <AddTask
+                      assignee={assignee}
+                      assigneeModal={assigneeModal}
+                      newTaskDueDate={newTaskDueDate}
+                      setNewTaskDueDate={setNewTaskDueDate}
+                      setAssignee={setAssignee}
+                      actions={{
+                        onClickEnterTask,
+                        onClickOutTask,
+                        onChangeTask,
+                        handleAssigneeToggle
+                      }}
+                    />
+                  )}
+                  {tasks.map((task: any, i: number) => (
+                    <TaskList
+                      key={task.id}
+                      task={task}
+                      updateAssignee={updateAssignee}
+                      updateAssigneeModal={updateAssigneeModal}
+                      updateTaskDueDate={updateTaskDueDate}
+                      setUpdateTaskDueDate={setUpdateTaskDueDate}
+                      setUpdateAssignee={setUpdateAssignee}
+                      actions={{
+                        handleUpdateAssigneeToggle
+                      }}
+                    />
+                  ))}
                 </BoardSection>
               )
             })
           : Array.from(Array(4).keys()).map(() => loadingSkeleton)}
-        <section className="w-full max-w-[18rem] flex-shrink-0">
-          <header className="-mt-2 flex items-center justify-between py-2">
-            {showAddSection && canCreatePermission && !sectionsStateUpdate && (
-              <button
-                onClick={handleShowAddSection}
-                className="flex items-center space-x-2 rounded-md bg-blue-600 px-10 py-2 text-sm font-normal text-white hover:bg-blue-700 active:bg-blue-600"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Add section
-              </button>
-            )}
-            {!showAddSection &&
-              (!sectionUpdate ? (
-                <input
-                  type="text"
-                  autoFocus
-                  onKeyDown={onClickEnterSection}
-                  onChange={onChangeSection}
-                  onBlur={onClickOutSection}
-                  placeholder="New Section"
-                  className="w-full rounded-lg border-2 py-1 px-1 font-semibold text-slate-900 focus:outline focus:outline-4 focus:outline-offset-2"
-                />
-              ) : (
-                loadingSkeleton
-              ))}
-          </header>
-        </section>
+        <AddSection
+          showAddSection={showAddSection}
+          permissions={{ canCreatePermission }}
+          privilege={{ sectionUpdate, sectionsStateUpdate }}
+          actions={{
+            handleShowAddSection,
+            onClickEnterSection,
+            onChangeSection,
+            onClickOutSection
+          }}
+          loadingSkeleton={loadingSkeleton}
+        />
       </BoardWrapper>
     </ProjectLayout>
   )

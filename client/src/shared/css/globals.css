@@ -1,1 +1,6 @@
 @import './tailwind.css';
+@import 'react-datepicker/dist/react-datepicker.css';
+
+.react-datepicker__triangle {
+  display: none;
+}
