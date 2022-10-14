@@ -57,9 +57,9 @@ const Board: NextPage = (): JSX.Element => {
     })
   }, [id])
 
-  const canCreatePermission = project?.can?.some((permission: any) => permission.createSection)
-  const canRenamePermission = project?.can?.some((permission: any) => permission.renameSection)
-  const canRemovePermission = project?.can?.some((permission: any) => permission.removeSection)
+  const canCreatePermission = project?.can?.createSection
+  const canRenamePermission = project?.can?.renameSection
+  const canRemovePermission = project?.can?.removeSection
 
   const handleShowAddSection = (): void => setShowAddSection(!showAddSection)
 
