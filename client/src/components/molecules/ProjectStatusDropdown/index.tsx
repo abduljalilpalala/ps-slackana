@@ -2,6 +2,7 @@ import { Menu } from '@headlessui/react'
 import { ChevronDown } from 'react-feather'
 import React, { FC, useEffect, useState } from 'react'
 
+import { darkToaster } from '~/utils/darkToaster'
 import { classNames } from '~/helpers/classNames'
 import { statusData } from '~/shared/jsons/statusData'
 import MenuTransition from '~/components/templates/MenuTransition'
@@ -12,7 +13,7 @@ import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
 const ProjectStatusDropdown: FC = (): JSX.Element => {
   const dispatch = useAppDispatch();
 
-  const { overviewProject } = useAppSelector((state) => state.project);
+  const { overviewProject, userPermission: can } = useAppSelector((state) => state.project);
   const { id: projectID, status } = overviewProject || {};
   const { id: statusID } = status || {};
 
@@ -24,7 +25,29 @@ const ProjectStatusDropdown: FC = (): JSX.Element => {
   const [activeStatus, setActiveStatus] = useState<number>(0);
   const onSelect = (setStatusID: number) => {
     setActiveStatus(setStatusID);
-    dispatch(updateProjectStatus({ projectID, status: (setStatusID + 1) }));
+    dispatch(updateProjectStatus({ projectID, status: (setStatusID + 1) }))
+      .then(_ => {
+        switch (setStatusID) {
+          case 0:
+            darkToaster('🏃‍♂️', "We are now on track!");
+            break;
+          case 1:
+            darkToaster('😨', "Our project is at risk!");
+            break;
+          case 2:
+            darkToaster('🥹', "Our project is off track!");
+            break;
+          case 3:
+            darkToaster('✊', "Our project is on hold!");
+            break;
+          case 4:
+            darkToaster('🥳', "Great job! Project completed ✅");
+            break;
+
+          default:
+            darkToaster('🪲', "Something went wrong");
+        }
+      });
   }
 
   useEffect(() => {
@@ -37,8 +60,9 @@ const ProjectStatusDropdown: FC = (): JSX.Element => {
   return (
     <Menu as="div" className="relative inline-block text-left z-30">
       {({ open }) => (
+
         <>
-          <Menu.Button css={styles.menu_button({ open })} className="group">
+          <Menu.Button disabled={!can?.setProjectStatus} css={styles.menu_button({ open })} className={`group ${!can?.setProjectStatus && "hover:!cursor-not-allowed"}`}>
             <span className={`${style} mr-[3px]`}></span>
             <span>{name}</span>
             <ChevronDown
@@ -72,8 +96,9 @@ const ProjectStatusDropdown: FC = (): JSX.Element => {
             </Menu.Items>
           </MenuTransition>
         </>
-      )}
-    </Menu>
+      )
+      }
+    </Menu >
   )
 }
 

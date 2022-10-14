@@ -23,7 +23,7 @@ const ProjectTemplate = ({ data, className, onClick }: ProjectTemplateType): JSX
       onClick={onClick}
       className={`flex h-px-48 flex-row gap-3 ${status === 'archive' && 'opacity-50'} ${className}`}
     >
-      <Image src={icon} alt="team-icon" width={48} height={48} className="cursor-pointer" />
+      <img src={icon} alt="team-icon" width={48} height={48} className="cursor-pointer" />
       <div>
         <div className="justify-ceter flex flex-row items-center gap-2">
           <ProjectStatus status={status} />

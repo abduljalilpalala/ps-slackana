@@ -5,13 +5,15 @@ import authReducer from '~/redux/auth/authSlice'
 import projectReducer from './project/projectSlice'
 import sectionReducer from './section/sectionSlice'
 import settingReducer from './setting/settingSlice'
+import memberReducer from './member/memberSlice'
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     project: projectReducer,
     setting: settingReducer,
-    section: sectionReducer
+    section: sectionReducer,
+    member: memberReducer
   }
 })
 

@@ -7,18 +7,20 @@ import {
   setID,
   addNewTeam,
   getProject,
-  renameTeamData,
+  teamRefresher,
+  startRefresher,
   setTeamNewName,
+  resetRefresher,
+  renameTeamData,
   setEditProjectID,
+  projectRefresher,
+  setUserPermission,
   setEditProjectTitle,
   updateProjectDetails,
   setEditProjectDescription,
-  resetRefresher,
-  startRefresher,
-  projectRefresher,
-  teamRefresher,
 } from '~/redux/project/projectSlice'
 import SeeMore from '~/components/atoms/SeeMore'
+import { darkToaster } from '~/utils/darkToaster'
 import { globals } from '~/shared/twin/globals.styles'
 import InputTags from '~/components/molecules/InputTags'
 import DialogBox from '~/components/templates/DialogBox'
@@ -38,11 +40,28 @@ const Overview: FC = (): JSX.Element => {
   const [teamLimit, setTeamLimit] = useState<boolean>(false);
   const [membersLimit, setMembersLimit] = useState<boolean>(false);
 
-  const { overviewProject, renameTeamData: getTeamData, projectDescription, isLoading, refresher } = useAppSelector((state) => state.project);
-  const { title, description, created_at, teams, members } = overviewProject || {};
+  const {
+    isLoading,
+    refresher,
+    userPermission: can,
+    overviewProject,
+    projectDescription,
+    renameTeamData: getTeamData,
+  } = useAppSelector((state) => state.project);
+
+  const { name } = getTeamData || {};
   const { teamStateUpdate, projectStateUpdate, memberStateUpdate } = refresher || {};
   const { title: editTitle, description: editDescription } = projectDescription || {};
-  const { name } = getTeamData || {};
+  const {
+    title,
+    teams,
+    members,
+    created_at,
+    description,
+    can: userPermission,
+    numberOfActiveMembers,
+    isLoading: reloadPermission,
+  } = overviewProject || {};
 
   useEffect(() => {
     setTeamLimit(false);
@@ -50,28 +69,43 @@ const Overview: FC = (): JSX.Element => {
     dispatch(setEditProjectID(id));
     dispatch(setEditProjectTitle(title));
     dispatch(setEditProjectDescription(description));
-    dispatch(getProject(id))
-      .then(_ => {
-        dispatch(resetRefresher());
-      });
+    dispatch(getProject(id)).then(_ => { dispatch(resetRefresher()) });
   }, [id, title])
 
+  useEffect(() => {
+    if (memberStateUpdate) {
+      dispatch(getProject(id))
+        .then(_ => {
+          dispatch(resetRefresher());
+        });
+    }
+  }, [memberStateUpdate])
+
+  useEffect(() => {
+    dispatch(setUserPermission(userPermission));
+  }, [reloadPermission, memberStateUpdate, id, title])
+
+  const [onClickSave, setOnClickSave] = useState<boolean>(true);
   const updateTitle = (e: any) => {
     const value = e.target.value;
+    setOnClickSave(false);
     dispatch(setEditProjectTitle(value));
   };
   const updateDescription = (e: any) => {
     const value = e.target.value;
+    setOnClickSave(false);
     dispatch(setEditProjectDescription(value));
   };
   const [saveChanges, setSaveChanges] = useState<boolean>(false);
   const onSaveChanges = () => {
     setSaveChanges(true);
+    setOnClickSave(true);
     dispatch(projectRefresher());
     dispatch(updateProjectDetails())
-      .then(_ => {
+      .then(({ payload }) => {
         setSaveChanges(false);
         dispatch(resetRefresher());
+        darkToaster('✅', payload);
       });
   };
 
@@ -85,7 +119,8 @@ const Overview: FC = (): JSX.Element => {
 
     dispatch(teamRefresher());
     dispatch(renameTeamData())
-      .then(_ => {
+      .then(({ payload }) => {
+        darkToaster('✅', payload);
         dispatch(getProject(id))
           .then(_ => {
             dispatch(resetRefresher());
@@ -101,51 +136,67 @@ const Overview: FC = (): JSX.Element => {
         <input
           type="text"
           name="tite"
-          css={globals.form_control}
+          value={name}
           disabled={isLoading}
           placeholder="Team name"
-          value={name}
-          onChange={(e: any) => {
-            dispatch(setTeamNewName(e.target.value))
-          }}
+          css={globals.form_control}
+          onChange={(e: any) => { dispatch(setTeamNewName(e.target.value)) }}
         />
       </div>
-      <SubmitButton text="Save" submitted={renameTeamSubmit} isSubmitting={isLoading} className="mobile:!w-full !text-slate-50 !bg-blue-600 hover:!bg-blue-800" />
+      <SubmitButton
+        text="Save"
+        isSubmitting={isLoading}
+        submitted={renameTeamSubmit}
+        className="mobile:!w-full !text-slate-50 !bg-blue-600 hover:!bg-blue-800"
+      />
     </DialogBox>
   );
 
-  const [detectChanges, setDetectChanges] = useState<boolean>(true);
   const [addTeamState, setAddTeamState] = useState<boolean>(false);
+  const [detectChanges, setDetectChanges] = useState<boolean>(true);
   const addTeamSubmit = (): void => {
     setAddTeamState(!addTeamState)
 
     dispatch(teamRefresher());
     dispatch(addNewTeam())
-      .then(_ => {
+      .then(({ payload }) => {
+        darkToaster('✅', payload);
         dispatch(getProject(id))
           .then(_ => {
+            setDetectChanges(true);
             dispatch(resetRefresher());
           })
       });
   };
   const addTeamModal = (
-    <DialogBox isOpen={addTeamState} closeModal={() => setAddTeamState(!addTeamState)} headerTitle="Add team">
+    <DialogBox
+      isOpen={addTeamState}
+      closeModal={() => {
+        setDetectChanges(true);
+        setAddTeamState(!addTeamState)
+      }}
+      headerTitle="Add team"
+    >
       <div css={homeStyle.tags}>
         <p css={globals.form_label} className="">
           Team <span>*</span>
         </p>
-        <InputTags isSubmitting={isLoading} type="update" changes={setDetectChanges} />
+        <InputTags
+          type="update"
+          isSubmitting={isLoading}
+          changes={setDetectChanges}
+        />
       </div>
       <div className='flex gap-3'>
         <SubmitButton
           text="Cancel"
-          submitted={() => setAddTeamState(false)}
           isSubmitting={false}
+          submitted={() => setAddTeamState(false)}
           className="!text-slate-900 !bg-slate-300 hover:!bg-blue-600 hover:!text-slate-50" />
         <SubmitButton
           text="Save"
-          submitted={addTeamSubmit}
           isSubmitting={isLoading}
+          submitted={addTeamSubmit}
           isDisabled={detectChanges}
           className={`!text-slate-50 !bg-blue-600 hover:!bg-blue-600 opacity-60 hover:!opacity-100 ${detectChanges && "hover:!opacity-60 !cursor-not-allowed"}`} />
       </div>
@@ -169,51 +220,69 @@ const Overview: FC = (): JSX.Element => {
                     : <input
                       type="text"
                       name="title"
-                      value={editTitle || ""}
                       onChange={updateTitle}
+                      value={editTitle || ""}
+                      disabled={!can?.editProject}
                       placeholder='Title field should not be empty'
                       className='placeholder:text-[18px] text-4xl font-bold text-slate-900 truncate text-ellipsis max-w-[500px] mobile:max-w-[250px] border-none rounded-md pl-1' />
                 }
                 <span className='text-xl font-medium text-slate-900'>{moment(created_at).format('MMMM DD, YYYY')}</span>
               </div>
-              {
-                projectStateUpdate
-                  ? <div className='border border-slate-300 p-5 rounded-md h-[142px] w-full'>
-                    <LineSkeleton className='w-[100%]' />
-                    <LineSkeleton className='w-[80%]' />
-                    <LineSkeleton className='w-[50%]' />
-                    <LineSkeleton className='w-[30%]' />
-                    <LineSkeleton className='w-[20%]' /></div>
-                  : <textarea placeholder='No project description...' onChange={updateDescription} value={editDescription || ""} name="description" rows={5} className='text-sm text-slate-500 break-words border border-slate-300 p-5 rounded-md' />
+              {projectStateUpdate
+                ? <div className='border border-slate-300 p-5 rounded-md h-[142px] w-full'>
+                  <LineSkeleton className='w-[100%]' />
+                  <LineSkeleton className='w-[80%]' />
+                  <LineSkeleton className='w-[50%]' />
+                  <LineSkeleton className='w-[30%]' />
+                  <LineSkeleton className='w-[20%]' /></div>
+                :
+                <textarea
+                  placeholder='Description field should not be empty'
+                  name="description" rows={5}
+                  disabled={!can?.editProject}
+                  onChange={updateDescription}
+                  value={editDescription || ""}
+                  className='text-sm text-slate-500 break-words border border-slate-300 p-5 rounded-md'
+                />
               }
               <div className='flex w-full items-end justify-end'>
-                <SubmitButton
-                  text="Save"
-                  submitted={onSaveChanges}
-                  isSubmitting={saveChanges}
-                  isDisabled={editDescription?.length === 0 || editTitle?.length === 0}
-                  className="!w-[175px] mobile:!w-full !text-slate-600 !bg-slate-200 hover:!bg-blue-600 hover:!text-slate-50" />
+                {can?.editProject && (
+                  <SubmitButton
+                    text="Save"
+                    isDisabled={onClickSave}
+                    submitted={onSaveChanges}
+                    isSubmitting={saveChanges}
+                    className="!w-[175px] mobile:!w-full !text-slate-600 !bg-slate-200 hover:!bg-blue-600 hover:!text-slate-50"
+                  />
+                )}
               </div>
             </div>
 
             <div className='w-full flex flex-col gap-3'>
               <h1 className='text-lg font-bold'>Team</h1>
               <div className='grid grid-cols-4 gap-6 tablet:!grid-cols-2 mobile:!grid-cols-1'>
-                <div onClick={() => setAddTeamState(!addTeamState)} className='flex items-center gap-2 w-[200px] cursor-pointer'>
-                  <div className='w-[44px] h-[44px] flex justify-center items-center rounded-full border-2 border-dotted border-slate-600'>
-                    <Plus />
-                  </div>
-                  <button className='text-base font-semibold'>Add Team</button>
-                </div>
+                {
+                  can?.addTeam && (
+                    <div onClick={() => setAddTeamState(!addTeamState)} className='flex items-center gap-2 w-[200px] cursor-pointer'>
+                      <div className='w-[44px] h-[44px] flex justify-center items-center rounded-full border-2 border-dotted border-slate-600'>
+                        <Plus />
+                      </div>
+                      <button className='text-base font-semibold'>Add Team</button>
+                    </div>
+                  )
+                }
                 {
                   teamStateUpdate
                     ? <TeamTemplate data={null} loadingState={teamStateUpdate} />
                     : teams?.slice(0, teamLimit ? teams?.length : 11)
                       .map((team: any, index: number) => {
-                        return <TeamTemplate key={index} data={team} callBack={renameTeam} teamCount={teams?.length} />
+                        return <TeamTemplate key={index} data={team} callBack={renameTeam} teams={teams} />
                       })
                 }
-                {teamStateUpdate || teams?.slice(0, 12).length === 12 && <SeeMore set={setTeamLimit} what={teamLimit} />}
+                {
+                  teamStateUpdate || teams?.slice(0, 12).length === 12 &&
+                  <SeeMore set={setTeamLimit} what={teamLimit} />
+                }
               </div>
             </div>
 
@@ -223,12 +292,17 @@ const Overview: FC = (): JSX.Element => {
                 {
                   memberStateUpdate
                     ? <MembersTemplate data={null} loadingState={memberStateUpdate} />
-                    : members?.slice(0, membersLimit ? members?.length : 12)
+                    : members?.slice(0, membersLimit ? numberOfActiveMembers : 12)
                       .map((member: any, index: number) => {
-                        return <MembersTemplate key={index} data={member} />
+                        if (!member?.is_removed) {
+                          return <MembersTemplate key={index} data={member} />;
+                        };
                       })
                 }
-                {memberStateUpdate || members?.slice(0, 13).length === 13 && (<SeeMore set={setMembersLimit} what={membersLimit} />)}
+                {
+                  memberStateUpdate || numberOfActiveMembers === 13 &&
+                  <SeeMore set={setMembersLimit} what={membersLimit} />
+                }
               </div>
             </div>
           </div>

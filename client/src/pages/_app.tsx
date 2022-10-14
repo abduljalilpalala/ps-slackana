@@ -16,8 +16,16 @@ const MyApp = ({ Component, ...rest }: AppProps): JSX.Element => {
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
         </Head>
-        <NextProgress />
-        <Toaster />
+        <Toaster
+          position="top-right"
+          reverseOrder={false}
+          toastOptions={{
+            style: {
+              borderRadius: '10px',
+              background: '#2D3D63',
+              color: '#fff',
+            }
+          }} />
         <Component {...props.pageProps} />
       </Provider>
     </>

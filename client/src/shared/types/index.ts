@@ -16,12 +16,12 @@ export type User = {
   id?: number
   name: string
   email: string
+  notification: any
   avatar: {
     fileName: string
     url: string
   }
-  isloggedIn: number
-  notification: any
+  isLoggedIn: number
 }
 
 export type SectionFormFields = {
@@ -34,4 +34,4 @@ export type Section = {
   id?: number
   project_id?: number
   name: string
-}
+} 

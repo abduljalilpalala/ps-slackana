@@ -1,8 +1,9 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC } from 'react'
 import { Menu } from '@headlessui/react'
 import { ChevronDown } from 'react-feather'
 import { HiOutlineArchive } from 'react-icons/hi'
 
+import { darkToaster } from '~/utils/darkToaster'
 import MenuTransition from '~/components/templates/MenuTransition'
 import { styles } from '~/shared/twin/project-action-dropdown.styles'
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
@@ -11,18 +12,20 @@ import { archiveProject, getProject, unarchiveProject } from '~/redux/project/pr
 const ProjectActionDropdown: FC = (): JSX.Element => {
   const dispatch = useAppDispatch();
 
-  const { overviewProject } = useAppSelector((state) => state.project);
+  const { overviewProject, userPermission: can } = useAppSelector((state) => state.project);
   const { isArchived, id } = overviewProject || {};
 
   const onClick = () => {
     if (isArchived) {
       dispatch(unarchiveProject())
-        .then(_ => {
-          dispatch(getProject(id));
+        .then(({ payload }) => {
+          darkToaster('✅', payload);
+          dispatch(getProject(id))
         });
     } else {
       dispatch(archiveProject())
-        .then(_ => {
+        .then(({ payload }) => {
+          darkToaster('✅', payload);
           dispatch(getProject(id));
         });
     }
@@ -32,7 +35,7 @@ const ProjectActionDropdown: FC = (): JSX.Element => {
     <Menu as="div" className="relative -mb-1.5 inline-block text-left z-30">
       {({ open }) => (
         <>
-          <Menu.Button css={styles.menu_button({ open })}>
+          <Menu.Button disabled={!can?.archiveProject} css={styles.menu_button({ open })} className={!can?.archiveProject ? "hover:!cursor-not-allowed" : ""}>
             <ChevronDown />
           </Menu.Button>
           <MenuTransition>

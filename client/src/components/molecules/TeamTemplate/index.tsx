@@ -11,17 +11,22 @@ import {
   setTeamNewName,
   setRemoveTeamID
 } from '~/redux/project/projectSlice'
-import { useAppDispatch } from '~/hooks/reduxSelector'
+import ReactTooltip from 'react-tooltip'
+import { darkToaster } from '~/utils/darkToaster'
+import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
 import { dummyTeamIcon } from '~/shared/jsons/dummyTeamIcon'
 import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
 import ImageSkeleton from '~/components/atoms/Skeletons/ImageSkeleton'
 
-const TeamTemplate = ({ data, callBack, teamCount, loadingState }: any) => {
+const TeamTemplate = ({ data, callBack, teams, loadingState }: any) => {
+  const dispatch = useAppDispatch()
+  const { userPermission: can } = useAppSelector((state) => state.project);
+
   const router = useRouter()
   const { id: projectID } = router.query
-  const dispatch = useAppDispatch()
 
-  const { id: teamID, name, icon } = data || {}
+  const { id: teamID, name, icon, members } = data || {}
+  const isDisabled = members !== 0;
 
   const renameTeam = (): void => {
     callBack(teamID)
@@ -29,8 +34,9 @@ const TeamTemplate = ({ data, callBack, teamCount, loadingState }: any) => {
   }
 
   const deleteTeam = (): void => {
-    dispatch(teamRefresher())
-    dispatch(removeTeam()).then((_) => {
+    dispatch(teamRefresher());
+    dispatch(removeTeam()).then(({ payload }) => {
+      darkToaster('✅', payload);
       dispatch(getProject(projectID)).then((_) => {
         dispatch(resetRefresher())
       })
@@ -52,21 +58,21 @@ const TeamTemplate = ({ data, callBack, teamCount, loadingState }: any) => {
                     <ImageSkeleton className="!h-[44px] !w-[44px] rounded-full" />
                   </div>
                   <LineSkeleton className="!mt-[10px] !w-[90px]" />
-                </div>
-              </Menu>
+                </div >
+              </Menu >
             )
           })}
         </>
       ) : (
         <Menu as="div" className="relative inline-block text-left">
           <div>
-            <Menu.Button>
+            <Menu.Button disabled={!can?.removeTeam && !can?.editTeam}>
               <div
                 onClick={() => dispatch(setRemoveTeamID({ teamID, projectID }))}
                 className="flex w-[200px] items-center gap-2 truncate mobile:!w-full"
               >
                 <div className="flex max-h-[44px] max-w-[44px] items-center justify-center rounded-full border">
-                  <Image
+                  <img
                     src={icon?.url || dummyTeamIcon[7]}
                     alt="team-icon"
                     width={100}
@@ -74,7 +80,10 @@ const TeamTemplate = ({ data, callBack, teamCount, loadingState }: any) => {
                     className="rounded-full"
                   />
                 </div>
-                <span className="truncate text-base font-semibold">{name}</span>
+                <span
+                  data-tip={name.length >= 15 ? name : null}
+                  className="truncate text-base font-semibold">{name}</span>
+                <ReactTooltip />
               </div>
             </Menu.Button>
           </div>
@@ -89,31 +98,40 @@ const TeamTemplate = ({ data, callBack, teamCount, loadingState }: any) => {
           >
             <Menu.Items className="absolute right-0 z-30 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="px-1 py-1">
-                <Menu.Item>
-                  {({ active }) => (
-                    <button
-                      onClick={renameTeam}
-                      className={`${
-                        active ? 'bg-blue-600 text-white' : 'text-gray-900'
-                      } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                    >
-                      Rename
-                    </button>
-                  )}
-                </Menu.Item>
-                <Menu.Item>
-                  {({ active }) => (
-                    <button
-                      onClick={deleteTeam}
-                      disabled={teamCount === 1}
-                      className={`${teamCount === 1 && 'cursor-not-allowed opacity-60'} ${
-                        active ? 'bg-red-600 !text-white' : 'text-gray-900'
-                      } group flex w-full items-center rounded-md px-2 py-2 text-sm text-red-600`}
-                    >
-                      Remove Team
-                    </button>
-                  )}
-                </Menu.Item>
+                {
+                  can?.editTeam && (
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          onClick={renameTeam}
+                          className={`
+                      ${active ? 'bg-blue-600 text-white' : 'text-gray-900'} 
+                      group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                        >
+                          Rename
+                        </button>
+                      )}
+                    </Menu.Item>
+                  )
+                }
+                {
+                  can?.removeTeam && (
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          onClick={deleteTeam}
+                          disabled={isDisabled}
+                          className={`
+                      ${isDisabled && 'cursor-not-allowed opacity-60'} 
+                      ${active ? 'bg-red-600 !text-white' : 'text-gray-900'} 
+                      group flex w-full items-center rounded-md px-2 py-2 text-sm text-red-600`}
+                        >
+                          Remove Team
+                        </button>
+                      )}
+                    </Menu.Item>
+                  )
+                }
               </div>
             </Menu.Items>
           </Transition>

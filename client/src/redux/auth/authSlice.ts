@@ -11,7 +11,7 @@ import { catchError } from '~/utils/handleAxiosError'
 import authService from './authService'
 
 type InitialState = {
-  user: User | null
+  user: any
   isError: boolean
   isSuccess: boolean
   isLoading: boolean
@@ -91,6 +91,7 @@ export const authSlice = createSlice({
       })
       .addCase(signUp.fulfilled, (state, action: PayloadAction<User>) => {
         state.isSuccess = true
+        state.isLoading = false
         state.user = action.payload
         state.error = {
           status: 0,
@@ -114,6 +115,7 @@ export const authSlice = createSlice({
       })
       .addCase(signIn.fulfilled, (state, action: PayloadAction<User>) => {
         state.isSuccess = true
+        state.isLoading = false
         state.user = action.payload
         state.error = {
           status: 0,
@@ -132,6 +134,7 @@ export const authSlice = createSlice({
       })
       .addCase(signOut.fulfilled, (state) => {
         state.isSuccess = true
+        state.isLoading = false
         state.user = null
         state.error = {
           status: 0,
