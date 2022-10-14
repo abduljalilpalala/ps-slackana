@@ -17,11 +17,14 @@ const ProjectHead: FC = (): JSX.Element => {
   const { id } = router.query
   const [addModal, setAddModal] = useState<boolean>(false);
 
-  const { overviewProject, isLoading, projectDescription: { title } } = useAppSelector((state) => state.project);
-  const { members, icon, id: projectID } = overviewProject || {};
-  const hotReload = id == projectID;
+  const {
+    isLoading,
+    overviewProject,
+    projectDescription: { title },
+  } = useAppSelector((state) => state.project);
 
-  const membersIcon = [members?.slice(0, 3)?.map((member: any) => { return member.user.avatar.url })];
+  const { members, icon, id: projectID, numberOfActiveMembers } = overviewProject || {};
+  const hotReload = id == projectID;
 
   const tabs = [
     {
@@ -50,13 +53,13 @@ const ProjectHead: FC = (): JSX.Element => {
             isLoading
               ? !hotReload
                 ? <ImageSkeleton className='!max-w-[44px] !min-w-[44px] !max-h-[44px] !min-h-[44px] !rounded-md' />
-                : <Image
+                : <img
                   src={icon?.url || "/images/image-dummy.png"}
                   alt="team-icon"
                   width={44}
                   height={44}
                 />
-              : <Image
+              : <img
                 src={icon?.url || "/images/image-dummy.png"}
                 alt="team-icon"
                 width={44}
@@ -91,13 +94,17 @@ const ProjectHead: FC = (): JSX.Element => {
         <button onClick={() => setAddModal(!addModal)} type="button" className="group" css={styles.btn_members}>
           <div className="hidden lg:block">
             <section>
-              {membersIcon.map((icon: string, index: number) => {
-                return <img key={index} src={icon || "/images/team/qa.png"} alt="team-icon" />
-              })}
+              {
+                members
+                  ? members?.slice(0, 3).map((icon: { user: { avatar: { url: string } }, is_removed: boolean }, index: number) => {
+                    if (!icon?.is_removed) return <img key={index} src={icon?.user?.avatar?.url || "/images/team/qa.png"} alt="team-icon" />;
+                  })
+                  : [...Array(3)].map((_) => { return <img key={Math.random()} src={"/images/team/qa.png"} alt="team-icon" /> })
+              }
             </section>
           </div>
           <FaRegUser className="group-hover:text-slate-800" />
-          <h3 className="group-hover:text-slate-800">{members?.length}</h3>
+          <h3 className="group-hover:text-slate-800">{members ? numberOfActiveMembers : 3}</h3>
         </button>
       </header>
     </>

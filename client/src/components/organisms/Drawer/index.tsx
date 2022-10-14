@@ -1,21 +1,21 @@
 import Link from 'next/link'
 import { X } from 'react-feather'
 import { Hash } from 'react-feather'
-import React, { FC, useEffect, useState } from 'react'
 import { AiOutlineCaretDown } from 'react-icons/ai'
+import React, { FC, useEffect, useState } from 'react'
 
 import { useRouter } from 'next/router'
+import { isLoggedIn } from '~/utils/isLoggedIn'
 import Logo2Icon from '~/shared/icons/Logo2Icon'
 import { classNames } from '~/helpers/classNames'
 import { Link as ILink } from '~/shared/interfaces'
 import { links } from '~/shared/jsons/sidebarLinks'
 import { styles } from '~/shared/twin/drawer.styles'
 import { globals } from '~/shared/twin/globals.styles'
+import { filterProjects } from '~/redux/project/projectSlice'
 import UserMenuPopover from '~/components/molecules/UserMenuPopover'
 import { styles as sidebarStyles } from '~/shared/twin/sidebar.styles'
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
-import { isLoggedIn } from '~/utils/isLoggedIn'
-import { filterProjects } from '~/redux/project/projectSlice'
 
 type Props = {
   isOpenDrawer: boolean
@@ -28,7 +28,7 @@ const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element =>
   const [isOpen, setIsOpen] = useState<boolean>(true)
 
   const { user } = useAppSelector((state) => state.auth)
-  const { name, avatar, isloggedIn: status, email } = user || {}
+  const { name, avatar, isLoggedIn: status, email } = user || {}
 
   const handleOpen = (): void => setIsOpen(!isOpen)
   const { sidebarProject } = useAppSelector((state) => state.project)
@@ -110,8 +110,8 @@ const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element =>
                 <img src={avatar?.url} />
               </div>
               <div css={sidebarStyles.user_details}>
-                <h1>{name}</h1>
-                <span>{email}</span>
+                <h1 className='!truncate !max-w-[50px]'>{name}</h1>
+                <span className='!truncate !max-w-[50px]'>{email}</span>
               </div>
             </div>
             <UserMenuPopover />

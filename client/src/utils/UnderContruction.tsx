@@ -12,14 +12,12 @@ const UnderContruction: FC = (): JSX.Element => {
       </Head>
       <main css={styles.main}>
         <div>
-          <Image
+          <img
             src="/images/under-construction.png"
             alt="Cry Emoji Image"
             width={400}
             height={302}
-            blurDataURL="/images/emoji.png"
             placeholder="blur"
-            layout="intrinsic"
           />
         </div>
         <section css={styles.section}>

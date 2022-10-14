@@ -24,7 +24,7 @@ const Sidebar: FC<Props> = ({ isOpenSidebar }): JSX.Element => {
   const [isOpenProject, setIsOpenProject] = useState<boolean>(true)
 
   const { user } = useAppSelector((state) => state.auth)
-  const { name, avatar, isloggedIn: status, email } = user || {}
+  const { name, avatar, isLoggedIn: status, email } = user || {}
 
   const handleOpenProject = (): void => setIsOpenProject(!isOpenProject)
   const { sidebarProject, isLoading } = useAppSelector((state) => state.project);
@@ -102,11 +102,11 @@ const Sidebar: FC<Props> = ({ isOpenSidebar }): JSX.Element => {
         <footer css={styles.footer}>
           <div css={styles.user_wrapper}>
             <div css={globals.avatar} className={isLoggedIn(status)} >
-              <img src={avatar?.url} />
+              <img src={avatar?.url} className="max-w-[25px] min-w-[25px] max-h-6 min-h-6" />
             </div>
             <div css={styles.user_details}>
-              <h1>{name}</h1>
-              <span>{email}</span>
+              <h1 className='truncate max-w-[150px]'>{name}</h1>
+              <span className='truncate max-w-[150px]'>{email}</span>
             </div>
           </div>
           <UserMenuPopover />

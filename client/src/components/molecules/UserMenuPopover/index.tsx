@@ -2,18 +2,18 @@ import { FC, useState } from 'react'
 import { Popover } from '@headlessui/react'
 import { MoreHorizontal, ChevronDown } from 'react-feather'
 
-import { globals } from '~/shared/twin/globals.styles'
-import { styles } from '~/shared/twin/user-menu-popover.styles'
-import PopoverTransition from '~/components/templates/PopoverTransition'
-import SettingsModal from "~/components/organisms/SettingsModal";
-import { useAppSelector } from '~/hooks/reduxSelector'
 import { isLoggedIn } from '~/utils/isLoggedIn'
 import { useAuthMethods } from '~/hooks/authMethods'
+import { globals } from '~/shared/twin/globals.styles'
+import { useAppSelector } from '~/hooks/reduxSelector'
+import { styles } from '~/shared/twin/user-menu-popover.styles'
+import SettingsModal from "~/components/organisms/SettingsModal";
+import PopoverTransition from '~/components/templates/PopoverTransition'
 
 const UserMenuPopover: FC = (): JSX.Element => {
   const { handleAuthSignOut } = useAuthMethods()
   const { user } = useAppSelector((state) => state.auth)
-  const { name, avatar, isloggedIn: status, email } = user || {}
+  const { name, avatar, isLoggedIn: status, email } = user || {}
   const [settingsModal, setSettingsModal] = useState<boolean>(false);
 
   return (
@@ -33,8 +33,8 @@ const UserMenuPopover: FC = (): JSX.Element => {
                       <img src={avatar?.url} />
                     </div>
                     <div>
-                      <h1>{name}</h1>
-                      <span>{email}</span>
+                      <h1 className='!truncate !max-w-[150px]'>{name}</h1>
+                      <span className='!truncate !max-w-[150px]'>{email}</span>
                     </div>
                   </div>
                 </div>

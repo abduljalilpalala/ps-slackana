@@ -56,7 +56,7 @@ const ProjectTemplate = ({ data, isLoading }: ProjectTemplateType): JSX.Element 
             <ReactTooltip />
             <Link href={`/team/${id}/overview`}>
               <a>
-                <Image
+                <img
                   src={icon?.url || "/image/404.png"}
                   alt="team-icon"
                   width={100}

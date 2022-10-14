@@ -20,8 +20,8 @@ class UserResource extends JsonResource
       'email' => $this->email,
       'avatar' => new AvatarResource($this->whenLoaded('avatar')),
       'projects' => ProjectResource::collection($this->whenLoaded('projects')),
-      'notification'=> NotificationResource::collection($this->whenLoaded('notificationSettings')),
-      'isloggedIn' => $this->is_logged_in,
+      'notification' => NotificationResource::collection($this->whenLoaded('notificationSettings')),
+      'isLoggedIn' => $this->is_logged_in,
       'created_at' => $this->created_at,
       'updated_at' => $this->updated_at,
     ];

@@ -1,20 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Image from 'next/image';
 
-import SubmitButton from "~/components/atoms/SubmitButton";
+import {
+  uploadPhoto,
+  updatePassword,
+  updateNotification,
+  updateProfileDetails,
+} from "~/redux/setting/settingSlice";
+import toast from "react-hot-toast";
 import TaskIcon from "~/shared/icons/TaskIcon";
+import { darkToaster } from "~/utils/darkToaster";
+import { Password, Profile } from "./SettingsType";
 import { globals } from "~/shared/twin/globals.styles";
 import CalendarIcon from "~/shared/icons/CalendarIcon";
 import DialogBox from "~/components/templates/DialogBox";
-import SwitchToggle from "~/components/atoms/SwitchToggle";
-import { styles as settingsStyle } from '~/shared/twin/settings-modal.style';
-import { useAppDispatch, useAppSelector } from "~/hooks/reduxSelector";
-import { removePhoto, updateNotification, updatePassword, updateProfileDetails, uploadPhoto } from "~/redux/setting/settingSlice";
-import { filterProjects, getProject, memberRefresher, resetRefresher } from "~/redux/project/projectSlice";
+import { getProject } from "~/redux/project/projectSlice";
 import { hydrateUserState } from "~/redux/auth/authSlice";
+import SwitchToggle from "~/components/atoms/SwitchToggle";
+import SubmitButton from "~/components/atoms/SubmitButton";
+import { useAppDispatch, useAppSelector } from "~/hooks/reduxSelector";
+import { styles as settingsStyle } from '~/shared/twin/settings-modal.style';
 
 const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
   const dispatch = useAppDispatch();
+
+  const [active, setActive] = useState<string>("Profile");
+  const onClick = (e: any): void => {
+    const value = e.target.innerText;
+    setActive(value);
+  }
 
   const { auth: { user, isLoading: userLoading }, setting, project } = useAppSelector((state) => state) || {};
   const { name, email, avatar, id, notification } = user || {};
@@ -25,71 +39,72 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
   const { currentPassword, newConfirmedPassword, newPassword } = content || {};
   const isError = status === 422;
 
-  const [nameState, setNameState] = useState<any>(name);
-  const nameOnChange = (e: any) => {
-    const value = e.target.value;
-    setNameState(value);
-  }
-
-  const [emailState, setEmailState] = useState<any>(email);
-  const emailOnChange = (e: any) => {
-    const value = e.target.value;
-    setEmailState(value);
-  }
-
-  const [active, setActive] = useState<string>("Profile");
-  const onClick = (e: any): void => {
-    const value = e.target.innerText;
-    setActive(value);
-  }
-
-  const menuList = ["Profile", "Security", "Notification"];
-  const modalMenu = menuList.map((menu: string, index: number) => {
-    return <button key={index} onClick={onClick} css={`${settingsStyle.inactive} ${active === menu && settingsStyle.active}`}>{menu}</button>
+  const [profileData, setProfileData] = useState<Profile>({
+    fullName: name,
+    email: email
   });
+  const { fullName: nameState, email: emailState } = profileData;
+  const onProfileChange = (e: any) => {
+    const value = e.target.value;
+    const name = e.target.name;
+    setProfileData((prev) => ({ ...prev, [name]: value }));
+  }
 
-  const [passwordData, setPasswordData] = useState<{ currentPassword: string, newPassword: string, newConfirmedPassword: string }>({
+  const [passwordData, setPasswordData] = useState<Password>({
     currentPassword: "",
     newPassword: "",
     newConfirmedPassword: ""
   });
-  const onPasswordChange = (e: any): void => {
+  const onPasswordChange = (e: { target: { value: string, name: string } }): void => {
     const value = e.target.value;
     const name = e.target.name;
-
     setPasswordData((prev: any) => ({ ...prev, [name]: value }))
   }
 
   const uploadImage = (e: any): void => {
     const files = e.target.files[0];
-
-    dispatch(uploadPhoto(files))
-      .then(((_: any) => {
-        dispatch(hydrateUserState());
-        dispatch(getProject(projectID));
-      }));
+    toast.promise(
+      dispatch(uploadPhoto(files))
+        .then(((_: any) => {
+          dispatch(hydrateUserState());
+          dispatch(getProject(projectID));
+        })),
+      {
+        loading: 'Uploading...',
+        success: "Photo uploaded successfully!",
+        error: "Something went wrong.",
+      }
+    );
   }
 
   const onSubmit = (component: string, value?: boolean): void => {
     switch (component) {
       case "profile":
         dispatch(updateProfileDetails({ id, name: nameState, email: emailState }))
-          .then((_: any) => {
-            isError || close(false);
-            console.log("toastify here");
-          });
+          .then((res: any) => {
+            if (res?.payload?.status === 422) {
+              return darkToaster("❗", "Email was already exist.")
+            }
+            dispatch(hydrateUserState());
+            dispatch(getProject(projectID));
+            darkToaster("✅", "Profile updated successfully!")
+          })
         break;
+
       case "security":
         dispatch(updatePassword(passwordData))
-          .then((_: any) => {
-            isError || close(false);
-            console.log("toastify here");
+          .then((res: any) => {
+            if (res?.payload?.status === 422) {
+              return darkToaster("❗", "Please resolve the error/s.")
+            }
+            darkToaster("✅", "Password updated successfully!")
           });
         break;
+
       case "notification":
         dispatch(updateNotification({ id, status: value }))
           .then((_: any) => {
-            console.log("toastify here");
+            darkToaster("✅", value ? "You can now receive notifications!" : "Your notification was muted!")
           });
         break;
 
@@ -99,6 +114,21 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
     }
   }
 
+  const menuList = ["Profile", "Security", "Notification"];
+  const modalMenu = menuList.map((menu: string, index: number) => {
+    return (
+      <button
+        key={index}
+        onClick={onClick}
+        css={`
+          ${settingsStyle.inactive} 
+          ${active === menu && settingsStyle.active}
+        `}>
+        {menu}
+      </button>
+    )
+  });
+
   const activeComponent = (component: string) => {
     switch (component) {
       case "Profile": {
@@ -107,12 +137,10 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
             <div className="flex flex-col gap-4">
               <p className="text-slate-800 text-px-12 text-left">Your photo</p>
               <div css={settingsStyle.uploadContainer}>
-                <Image
-                  src={userLoading ? '/images/avatar.png' : avatar?.url || '/images/team/qa.png'}
+                <img
+                  src={avatar?.url || '/images/team/qa.png'}
                   alt="team-icon"
-                  width={88}
-                  height={88}
-                  className="rounded-full"
+                  className="rounded-full max-h-[88px] min-h-[88px] max-w-[88px] min-w-[88px]"
                 />
                 <div className="flex flex-col gap-3">
                   <input disabled={userLoading} onChange={uploadImage} type="file" className="hidden" id="upload" accept="image/png, image/gif, image/jpeg" />
@@ -136,7 +164,7 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
                   disabled={isLoading}
                   placeholder="john doe"
                   value={nameState || ""}
-                  onChange={nameOnChange}
+                  onChange={onProfileChange}
                   style={{ border: `${content?.name ? "1px solid red" : ""}` }}
                 />
                 {isError && <span className="text-sm text-red-600 float-left">{content?.name}</span>}
@@ -152,7 +180,7 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
                   disabled={isLoading}
                   placeholder="name@company.com"
                   value={emailState || ""}
-                  onChange={emailOnChange}
+                  onChange={onProfileChange}
                   style={{ border: `${content?.email ? "1px solid red" : ""}` }}
                 />
                 {isError && <span className="text-sm text-red-600 float-left">{content?.email}</span>}
@@ -162,6 +190,7 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
           </>
         )
       }
+
       case "Security": {
         return (
           <div className="flex flex-col gap-9">
@@ -179,8 +208,8 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
                   onChange={onPasswordChange}
                 />
                 {isError && <div className="flex flex-col justify-start w-full text-left">
-                  {currentPassword?.map((error: string) => {
-                    return <span className="text-sm text-red-600 float-left mt-[3px]">{currentPassword.length >= 2 && "*"} {error}</span>
+                  {currentPassword?.map((error: string, index: number) => {
+                    return <span key={index} className="text-sm text-red-600 float-left mt-[3px]">{currentPassword.length >= 2 && "*"} {error}</span>
                   })}
                 </div>}
               </div>
@@ -217,6 +246,7 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
           </div>
         );
       }
+
       case "Notification": {
         const switchState = (value: boolean) => {
           onSubmit("notification", value);

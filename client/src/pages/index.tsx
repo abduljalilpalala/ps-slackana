@@ -11,6 +11,7 @@ import getDate from '~/utils/getDate'
 import { Add } from '~/shared/icons/AddIcon'
 import getGreetings from '~/utils/getGreetings'
 import SeeMore from '~/components/atoms/SeeMore'
+import { darkToaster } from '~/utils/darkToaster'
 import { globals } from '~/shared/twin/globals.styles'
 import { ThreeDot } from '~/shared/icons/ThreeDotIcon'
 import Layout from '~/components/templates/HomeLayout'
@@ -26,6 +27,7 @@ const Index: NextPage = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const [limit, setLimit] = useState<boolean>(false)
   const [newProjectModal, setNewProjectModal] = useState<boolean>(false)
+  const [preventStateReload, setPreventStateReload] = useState<boolean>(false); // Implement later
 
   const {
     auth: { user },
@@ -43,7 +45,10 @@ const Index: NextPage = (): JSX.Element => {
 
   const onCreateProject = (): void => {
     setNewProjectModal(false);
-    dispatch(createProject(newProject));
+    dispatch(createProject(newProject))
+      .then(({ payload }) => {
+        darkToaster('✅', payload);
+      });
   }
 
   const [isTitleDisabled, setIsTitleDisabled] = useState<boolean>(true);
@@ -62,10 +67,12 @@ const Index: NextPage = (): JSX.Element => {
 
   const projectList = isLoading
     ? <ProjectTemplate data={null} isLoading={isLoading} />
-    : project?.slice(0, limit ? project?.length : 12)
-      .map((data: any, index: number) => {
-        return <ProjectTemplate data={data} key={index} isLoading={isLoading} />
-      })
+    : project?.length === 0
+      ? <h1 className="col-span-3 text-center text-slate-600">No available project.</h1>
+      : project?.slice(0, limit ? project?.length : 12)
+        .map((data: any, index: number) => {
+          return <ProjectTemplate data={data} key={index} isLoading={isLoading} />
+        });
 
   const addNewProject = (
     <DialogBox isOpen={true} closeModal={() => setNewProjectModal(false)} headerTitle="New project">

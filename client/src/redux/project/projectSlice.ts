@@ -13,6 +13,7 @@ type InitialState = {
   project: any
   sidebarProject: any
   overviewProject: any
+  userPermission: any
   newProject: {
     title: string,
     description: string,
@@ -55,6 +56,7 @@ type InitialState = {
 const initialState: InitialState = {
   project: null,
   sidebarProject: null,
+  userPermission: null,
   newProject: {
     title: "",
     description: "",
@@ -313,6 +315,10 @@ export const projectSlice = createSlice({
     setFilter: (state, { payload }) => {
       state.filter = payload;
     },
+
+    setUserPermission: (state, { payload }) => {
+      state.userPermission = payload;
+    }
   },
   extraReducers: (builder: ActionReducerMapBuilder<any>) => {
     builder
@@ -522,6 +528,7 @@ export const {
   memberRefresher,
   projectRefresher,
   setEditProjectID,
+  setUserPermission,
   setEditProjectTitle,
   setProjectDescription,
   setEditProjectDescription,

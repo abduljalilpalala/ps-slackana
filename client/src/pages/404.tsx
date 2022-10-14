@@ -18,14 +18,12 @@ const NotFound: NextPage = (): JSX.Element => {
           <header css={styles.header}>
             <span css={tw`-mr-6`}>4</span>
             <div>
-              <Image
+              <img
                 src="/images/404.png"
                 alt="Cry Emoji Image"
                 width={192}
                 height={192}
-                blurDataURL="/images/emoji.png"
                 placeholder="blur"
-                layout="intrinsic"
               />
             </div>
             <span css={tw`-ml-8`}>4</span>

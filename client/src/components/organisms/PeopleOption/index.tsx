@@ -1,45 +1,44 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 
 import { CheckIcon } from '~/shared/icons/CheckIcon';
 import { styles as homeStyle } from '~/shared/twin/home-content.style'
 
-const PeopleOption = ({ children, callback, data, className }: any) => {
-  const [editTeam, setEditTeam] = useState<boolean>(false);
-  const [teamData, setTeamData] = useState<number[]>([]);
-  const teams = [
-    "Backend",
-    "Frontend",
-    "QA",
-    "Designer",
-  ];
+const PeopleOption = ({ children, callback, data, className, reset }: any) => {
+  const [selectedTeamData, setSelectedTeamData] = useState<number[]>([]);
 
-  const onSelect = (index: number): void => {
-    callback(data[index]);
-  }
+  const selectEditTeam = (team: { id: number, name: string }) => {
+    const { id } = team || {};
+    const removeSelected = selectedTeamData.filter((_: any, i: number) => selectedTeamData[i] !== id);
+    const addSelected = (prev: number[]) => ([...prev, id]);
 
-  const selectEditTeam = (index: number) => {
-    console.log('edit teams', index);
-
-    if (teamData.includes(index)) {
-      setTeamData(teamData.filter((x, i) => teamData[i] !== index));
+    if (selectedTeamData.includes(id)) {
+      setSelectedTeamData(removeSelected);
+      callback(removeSelected);
     } else {
-      setTeamData((prev: number[]) => ([...prev, index]));
+      setSelectedTeamData(addSelected);
+      callback(addSelected);
     }
   }
 
-  const dropDownMenu = teams.map((team: string, index: number) => {
-    const isTeamMember = teamData.includes(index);
+  useEffect(() => {
+    if (reset) {
+      setSelectedTeamData([]);
+    }
+  }, [reset])
+
+  const dropDownMenu = data?.map((team: { id: number, name: string }, index: number) => {
+    const isTeamMember = selectedTeamData.includes(team.id);
 
     return (
       <button
         key={index}
-        onClick={() => selectEditTeam(index)}
+        onClick={() => selectEditTeam(team)}
         className={`${isTeamMember ? 'bg-blue-600 text-slate-50' : 'text-gray-900'} hover:bg-blue-600  group flex w-full items-center rounded-md text-sm`}
       >
         <div className={`flex w-full h-full flex-row gap-2 items-center justify-start ${isTeamMember ? "text-slate-50" : "text-slate-400 "} hover:!text-slate-50 px-2 py-2`}>
           {isTeamMember ? <CheckIcon /> : <div className='w-[10px]'></div>}
-          {team}
+          {team?.name}
         </div>
       </button>
     )
@@ -59,7 +58,7 @@ const PeopleOption = ({ children, callback, data, className }: any) => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items css={homeStyle.dropDownMenu}>
+        <Menu.Items css={homeStyle.dropDownMenu} >
           {dropDownMenu}
         </Menu.Items>
       </Transition>

@@ -35,7 +35,7 @@ class Project extends Model implements HasMedia
 
   public function members()
   {
-    return $this->hasMany(ProjectMember::class);
+    return $this->hasMany(ProjectMember::class)->where('is_removed', 0);
   }
 
   public function role()
@@ -46,5 +46,10 @@ class Project extends Model implements HasMedia
   public function sections()
   {
     return $this->hasMany(Section::class);
+  }
+
+  public function noOfActiveMembers()
+  {
+    return $this->members()->where('is_removed', 0)->count();
   }
 }
