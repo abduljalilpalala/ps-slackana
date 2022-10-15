@@ -105,6 +105,42 @@ export const removeMember = createAsyncThunk(
   }
 );
 
+export const leaveProject = createAsyncThunk(
+  'project/leaveProjectStatus',
+  async (projectID: any, thunkAPI) => {
+
+    try {
+      return await memberService.leaveProject(projectID);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(catchError(error))
+    }
+  }
+);
+
+export const setAsTeamLead = createAsyncThunk(
+  'project/setAsTeamLeadStatus',
+  async (teamLeadData: any, thunkAPI) => {
+
+    try {
+      return await memberService.setAsTeamLead(teamLeadData);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(catchError(error))
+    }
+  }
+);
+
+export const setAsMVP = createAsyncThunk(
+  'project/setAsMVPStatus',
+  async (mvpData: any, thunkAPI) => {
+
+    try {
+      return await memberService.setAsMVP(mvpData);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(catchError(error))
+    }
+  }
+);
+
 export const memberSlice = createSlice({
   name: 'member',
   initialState,
@@ -245,6 +281,60 @@ export const memberSlice = createSlice({
         }
       })
       .addCase(removeMember.rejected, (state, action: PayloadAction<any>) => {
+        state.isError = true
+        state.isSuccess = false
+        state.isLoading = false
+        state.error = action.payload
+        state.user = null
+      })
+      // Leave Project
+      .addCase(leaveProject.pending, (state) => { 
+        state.isLoading = true;
+      })
+      .addCase(leaveProject.fulfilled, (state) => {
+        state.isLoading = false;
+        state.error = {
+          status: 0,
+          content: null
+        }
+      })
+      .addCase(leaveProject.rejected, (state, action: PayloadAction<any>) => {
+        state.isError = true
+        state.isSuccess = false
+        state.isLoading = false
+        state.error = action.payload
+        state.user = null
+      })
+      // Set as Team Lead
+      .addCase(setAsTeamLead.pending, (state) => { 
+        state.isLoading = true;
+      })
+      .addCase(setAsTeamLead.fulfilled, (state) => {
+        state.isLoading = false;
+        state.error = {
+          status: 0,
+          content: null
+        }
+      })
+      .addCase(setAsTeamLead.rejected, (state, action: PayloadAction<any>) => {
+        state.isError = true
+        state.isSuccess = false
+        state.isLoading = false
+        state.error = action.payload
+        state.user = null
+      })
+      // Set as MVP
+      .addCase(setAsMVP.pending, (state) => { 
+        state.isLoading = true;
+      })
+      .addCase(setAsMVP.fulfilled, (state) => {
+        state.isLoading = false;
+        state.error = {
+          status: 0,
+          content: null
+        }
+      })
+      .addCase(setAsMVP.rejected, (state, action: PayloadAction<any>) => {
         state.isError = true
         state.isSuccess = false
         state.isLoading = false
