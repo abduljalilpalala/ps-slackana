@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { FaRegUser } from 'react-icons/fa'
 import React, { FC, useState } from 'react'

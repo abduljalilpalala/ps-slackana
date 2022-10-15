@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Image from 'next/image'
 
 import toast from "react-hot-toast";
 import { ThreeDot } from "~/shared/icons/ThreeDotIcon";

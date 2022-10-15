@@ -60,6 +60,9 @@ class ProjectController extends Controller
   public function update(UpdateProjectRequest $request, Project $project)
   {
     $project->update($request->validated());
-    return response()->noContent();
+    return response()->json([
+      'project' => $project,
+      'message' => "Project updated successfully!"
+    ]);
   }
 }

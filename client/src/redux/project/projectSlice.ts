@@ -50,6 +50,7 @@ type InitialState = {
   isError: boolean
   isSuccess: boolean
   isLoading: boolean
+  isSidebarLoading: boolean
   error: AxiosResponseError
 };
 
@@ -99,6 +100,7 @@ const initialState: InitialState = {
   isError: false,
   isSuccess: false,
   isLoading: false,
+  isSidebarLoading: false,
   error: {
     status: 0,
     content: null
@@ -325,9 +327,11 @@ export const projectSlice = createSlice({
       // Get Projects
       .addCase(getSidebarProjects.pending, (state) => {
         state.isLoading = true;
+        state.isSidebarLoading = true;
       })
       .addCase(getSidebarProjects.fulfilled, (state, action: PayloadAction<any>) => {
         state.isLoading = false;
+        state.isSidebarLoading = false;
         state.sidebarProject = action.payload;
         state.error = {
           status: 0,
@@ -344,9 +348,11 @@ export const projectSlice = createSlice({
       // Get Filtered Projects
       .addCase(filterProjects.pending, (state) => {
         state.isLoading = true;
+        state.isSidebarLoading = true;
       })
       .addCase(filterProjects.fulfilled, (state, action: PayloadAction<any>) => {
-        state.isLoading = false;
+        state.isLoading = false; 
+        state.isSidebarLoading = false;
         state.project = action.payload;
         state.error = {
           status: 0,
@@ -362,10 +368,12 @@ export const projectSlice = createSlice({
       })
       // Get Project
       .addCase(getProject.pending, (state) => {
-        state.isLoading = true;
+        // state.isLoading = true;
+        state.isSidebarLoading = true;
       })
       .addCase(getProject.fulfilled, (state, action: PayloadAction<any>) => {
-        state.isLoading = false;
+        // state.isLoading = false;  
+        state.isSidebarLoading = false;
         state.overviewProject = action.payload;
         state.error = {
           status: 0,
@@ -426,9 +434,11 @@ export const projectSlice = createSlice({
       // Update Project Details
       .addCase(updateProjectDetails.pending, (state) => {
         state.isLoading = true;
+        state.isSidebarLoading = true;
       })
-      .addCase(updateProjectDetails.fulfilled, (state) => {
+      .addCase(updateProjectDetails.fulfilled, (state) => {  
         state.isLoading = false;
+        state.isSidebarLoading = false;  
         state.error = {
           status: 0,
           content: null

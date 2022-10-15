@@ -1,4 +1,5 @@
 import { NextPage } from 'next'
+import toast from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 
 import {
@@ -11,13 +12,11 @@ import getDate from '~/utils/getDate'
 import { Add } from '~/shared/icons/AddIcon'
 import getGreetings from '~/utils/getGreetings'
 import SeeMore from '~/components/atoms/SeeMore'
-import { darkToaster } from '~/utils/darkToaster'
 import { globals } from '~/shared/twin/globals.styles'
 import { ThreeDot } from '~/shared/icons/ThreeDotIcon'
 import Layout from '~/components/templates/HomeLayout'
 import InputTags from '~/components/molecules/InputTags'
 import DialogBox from '~/components/templates/DialogBox'
-import { styles } from '~/shared/twin/home-content.style'
 import SubmitButton from '~/components/atoms/SubmitButton'
 import DropDown from '~/components/organisms/DropDownFilter'
 import ProjectTemplate from '~/components/templates/ProjectTemplate'
@@ -40,7 +39,6 @@ const Index: NextPage = (): JSX.Element => {
   useEffect(() => {
     if (isLoading) {
       setLimit(false);
-      dispatch(filterProjects());
     }
   }, [filter, isLoading])
 
@@ -48,11 +46,18 @@ const Index: NextPage = (): JSX.Element => {
     setPreventStateReload(true);
     setNewProjectModal(false);
 
-    dispatch(createProject(newProject))
-      .then(({ payload }) => {
-        darkToaster('✅', payload);
-        setPreventStateReload(false);
-      });
+    toast.promise(
+      dispatch(createProject(newProject))
+        .then((_) => {
+          dispatch(filterProjects());
+          setPreventStateReload(false);
+        }),
+      {
+        loading: 'Creating new project...',
+        success: `New Project created successfully!`,
+        error: "Error on creating project!",
+      }
+    )
   }
 
   const [isTitleDisabled, setIsTitleDisabled] = useState<boolean>(true);
@@ -133,10 +138,10 @@ const Index: NextPage = (): JSX.Element => {
     <Layout metaTitle="Home">
       {newProjectModal && addNewProject}
       <div className="default-scrollbar grid w-full h-screen overflow-y-scroll p-10">
-        <div className="!max-w-[900px] flex flex-col items-center justify-center gap-16 md:container mobile:!pb-20 mobile:!gap-10">
-          <div className="flex flex-col items-center justify-center gap-5">
+        <div className="!max-w-[900px] !min-w-[300px] w-full flex flex-col items-center justify-center gap-16 md:container mobile:!pb-20 mobile:!gap-10">
+          <div className="flex w-full flex-col items-center justify-center gap-5  !min-w-[300px]">
             <p className="text-sm">{getDate('today')}</p>
-            <h1 className="text-center text-3xl">{getGreetings()}, {name}</h1>
+            <h1 className="text-center text-3xl break-words	 break-normal !w-full">{getGreetings()}, {name}</h1>
           </div>
 
           <div className="w-full">
@@ -161,8 +166,8 @@ const Index: NextPage = (): JSX.Element => {
 
             <div className="grid h-px-400 grid-cols-3 col-span-1	gap-6 overflow-y-scroll rounded-b-lg border-x border-b border-slate-300 px-7 py-10 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-slate-400 scrollbar-thumb-rounded-md tablet:grid-cols-2 mobile:grid-cols-1">
               {projectList}
-              {project?.slice(0, 13).length === 13 &&
-                preventStateReload || <SeeMore set={setLimit} what={limit} />}
+              {project?.slice(0, 13).length === 13 ?
+                preventStateReload || <SeeMore set={setLimit} what={limit} /> : null}
 
               {project?.length <= 12 && [...Array(12 - project?.length)].map(_ => {
                 return <div data-name="spacer" key={Math.random()}></div>;

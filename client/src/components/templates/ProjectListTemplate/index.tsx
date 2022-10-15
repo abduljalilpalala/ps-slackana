@@ -1,5 +1,4 @@
 import React from 'react'
-import Image from 'next/image'
 import { ProjectStatus } from '~/shared/icons/ProjectStatus'
 
 type ProjectTemplateType = {

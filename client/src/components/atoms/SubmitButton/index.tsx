@@ -4,7 +4,7 @@ import { Spinner } from "~/shared/icons/SpinnerIcon";
 import { styles } from '~/shared/twin/auth.styles'
 
 type Props = {
-  submitted: () => void;
+  submitted: (value: any) => void;
   isSubmitting: boolean;
   text?: string;
   className?: string;

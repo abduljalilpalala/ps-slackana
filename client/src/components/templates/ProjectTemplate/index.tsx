@@ -1,7 +1,6 @@
 import React from "react";
 import Link from 'next/link'
 import moment from "moment";
-import Image from 'next/image'
 
 import ReactTooltip from 'react-tooltip';
 import statusChecker from "~/utils/statusChecker";
@@ -48,7 +47,7 @@ const ProjectTemplate = ({ data, isLoading }: ProjectTemplateType): JSX.Element 
                 </div>
               </div>)
           })}
-          <LineSkeleton className="!w-[100px]" />
+          <LineSkeleton className="!w-[100px] !h-[15px] !rounded-md" />
         </>
         :
         <div className={`flex flex-row gap-3 h-px-48 ${isArchived && 'opacity-60'}`}>

@@ -110,8 +110,8 @@ const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element =>
                 <img src={avatar?.url} />
               </div>
               <div css={sidebarStyles.user_details}>
-                <h1 className='!truncate !max-w-[50px]'>{name}</h1>
-                <span className='!truncate !max-w-[50px]'>{email}</span>
+                <h1 className='!truncate !max-w-[150px]'>{name}</h1>
+                <span className='!truncate !max-w-[150px]'>{email}</span>
               </div>
             </div>
             <UserMenuPopover />
