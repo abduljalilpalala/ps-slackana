@@ -17,6 +17,7 @@ import { ThreeDot } from '~/shared/icons/ThreeDotIcon'
 import Layout from '~/components/templates/HomeLayout'
 import InputTags from '~/components/molecules/InputTags'
 import DialogBox from '~/components/templates/DialogBox'
+import { styles } from '~/shared/twin/home-content.style'
 import SubmitButton from '~/components/atoms/SubmitButton'
 import DropDown from '~/components/organisms/DropDownFilter'
 import ProjectTemplate from '~/components/templates/ProjectTemplate'
@@ -25,9 +26,9 @@ import { useAppSelector, useAppDispatch } from '~/hooks/reduxSelector'
 
 const Index: NextPage = (): JSX.Element => {
   const dispatch = useAppDispatch();
-  const [limit, setLimit] = useState<boolean>(false)
-  const [newProjectModal, setNewProjectModal] = useState<boolean>(false)
-  const [preventStateReload, setPreventStateReload] = useState<boolean>(false); // Implement later
+  const [limit, setLimit] = useState<boolean>(false);
+  const [newProjectModal, setNewProjectModal] = useState<boolean>(false);
+  const [preventStateReload, setPreventStateReload] = useState<boolean>(false);
 
   const {
     auth: { user },
@@ -44,10 +45,13 @@ const Index: NextPage = (): JSX.Element => {
   }, [filter, isLoading])
 
   const onCreateProject = (): void => {
+    setPreventStateReload(true);
     setNewProjectModal(false);
+
     dispatch(createProject(newProject))
       .then(({ payload }) => {
         darkToaster('✅', payload);
+        setPreventStateReload(false);
       });
   }
 
@@ -65,13 +69,13 @@ const Index: NextPage = (): JSX.Element => {
     }
   }
 
-  const projectList = isLoading
-    ? <ProjectTemplate data={null} isLoading={isLoading} />
+  const projectList = preventStateReload
+    ? <ProjectTemplate data={null} isLoading={preventStateReload} />
     : project?.length === 0
       ? <h1 className="col-span-3 text-center text-slate-600">No available project.</h1>
       : project?.slice(0, limit ? project?.length : 12)
         .map((data: any, index: number) => {
-          return <ProjectTemplate data={data} key={index} isLoading={isLoading} />
+          return <ProjectTemplate data={data} key={index} isLoading={preventStateReload} />
         });
 
   const addNewProject = (
@@ -157,14 +161,12 @@ const Index: NextPage = (): JSX.Element => {
 
             <div className="grid h-px-400 grid-cols-3 col-span-1	gap-6 overflow-y-scroll rounded-b-lg border-x border-b border-slate-300 px-7 py-10 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-slate-400 scrollbar-thumb-rounded-md tablet:grid-cols-2 mobile:grid-cols-1">
               {projectList}
+              {project?.slice(0, 13).length === 13 &&
+                preventStateReload || <SeeMore set={setLimit} what={limit} />}
 
               {project?.length <= 12 && [...Array(12 - project?.length)].map(_ => {
                 return <div data-name="spacer" key={Math.random()}></div>;
               })}
-
-              {project?.slice(0, 13).length === 13 && (
-                isLoading || <SeeMore set={setLimit} what={limit} />
-              )}
             </div>
           </div>
         </div>

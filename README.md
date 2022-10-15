@@ -5,14 +5,20 @@
 We want slack and asana in one. For us it is kinda a hassle to switch between asana and slack at the same time. It would also be best that Developer Leads/Team leads can create a team with their members and members can also make their task list/todo list so that their team leads can view what his/her members are doing.
 
 ## 🔗 Links
-http://slackana-client.vercel.app/
+
+- Client :: https://slackana-client.vercel.app/sign-in
+- Server :: https://slackana-api.herokuapp.com/
 
 ## Developers
-- [@AJ](https://github.com/abduljalilpalala) 
-- [@John](https://github.com/pong-sun) 
-- [@Joshua](https://github.com/jsvelte) 
+
+- [@AJ](https://github.com/abduljalilpalala)
+- [@RJ](https://github.com/rogeliojohnoliverio)
+- [@John](https://github.com/johnpaul-sun)
+- [@Joshua](https://github.com/jsvelte)
+
 ## Quality Assurance
-- [@Neilmar](https://github.com/#)
+
+- [@Neilmar](https://github.com/NielmarLaurente)
 - [@Kent](https://github.com/ipilikent)
 
 # Installation
@@ -21,9 +27,9 @@ Clone my-project with github
 
 ```bash
   $ git clone https://github.com/abduljalilpalala/ps-slackana.git
-  
+
   or
-  
+
   $ git clone git@github.com:abduljalilpalala/ps-slackana.git
 ```
 
@@ -54,6 +60,7 @@ Make sure to create a Database based on the DB_DATABASE value.
 After cloning the project
 
 Go to the project directory
+
 ```bash
   $ cd ps-slackana
 ```
@@ -61,22 +68,24 @@ Go to the project directory
 # Commands for running the Front End
 
 From the Root folder install dependencies for the Front End
+
 ```bash
-  $ cd api
+  $ cd client
   $ npm install
-  
+
   or
-  
-  $ cd api
+
+  $ cd client
   $ yarn
 ```
 
 Start the Front End Server
+
 ```bash
   $ npm run start
-  
+
   or
-  
+
   $ yarn dev
 ```
 
@@ -104,9 +113,9 @@ Start the Back End Server
 
 ```bash
   $ php artisan serve
-  
+
   or
-  
+
   $ php artisan serve --host=localhost
 ```
 
@@ -123,9 +132,11 @@ Start the Back End Server
 **Server:** Laravel, MySQL
 
 ## Feedback
+
 If you have any feedback, please reach out to us, link provided above.
 
 For support, email support@slackana.com or join our Slack channel.
 
 ## Appendix
+
 Any additional information goes here

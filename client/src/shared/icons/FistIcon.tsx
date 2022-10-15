@@ -7,6 +7,8 @@ export interface FistIcon {
 export const FistIcon: React.FC<FistIcon> = ({ color = "#FFC107" }): JSX.Element => {
   return (
     <svg
+      height="15"
+      width="12"
       viewBox="0 0 338 405"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -32,6 +34,5 @@ export const FistIcon: React.FC<FistIcon> = ({ color = "#FFC107" }): JSX.Element
         fill={color}
       />
     </svg>
-
   )
 }
