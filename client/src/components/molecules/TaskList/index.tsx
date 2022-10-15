@@ -35,10 +35,10 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
   const { members, isMemberLoading, filterMembersName } = useMemberMethods(parseInt(id as string))
   const [updateAssigneeModal, setUpdateAssigneeModal] = useState<boolean>(false)
   const [updateAssignee, setUpdateAssignee] = useState<any>(null)
-  const { useHandleUpdateTaskDueDate, useHandleUpdateTaskAssignee } = useTaskMethods(
-    parseInt(id as string)
-  )
   const { permissions } = useProjectMethods(parseInt(id as string))
+  const [isTaskCompleted, setIsTaskCompleted] = useState<any>(false)
+  const { useHandleUpdateTaskDueDate, useHandleUpdateTaskAssignee, useHandleCompleteTask } =
+    useTaskMethods(parseInt(id as string))
 
   const { task_id } = router.query
 
@@ -57,6 +57,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
     setUpdateAssignee(task?.assignee)
     setDueDate(task?.due_date)
     setSelectedDueDate(task?.due_date ? new Date(task?.due_date) : null)
+    setIsTaskCompleted(task?.is_completed)
   }, [task])
 
   const handleSetDueDate = (date: Date) => {
@@ -64,6 +65,10 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
     let value = date ? moment(new Date(date)).format('YYYY-MM-DD') : null
     setDueDate(value)
     useHandleUpdateTaskDueDate(task?.id, value)
+  }
+  const handleTaskStatus = () => {
+    setIsTaskCompleted(!isTaskCompleted)
+    useHandleCompleteTask(task?.id)
   }
   const onSearchChange = (e: any): void => {
     const value = e.target.value
@@ -147,13 +152,14 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
     >
       <div className="ml-4 flex items-center">
         <button
+          onClick={handleTaskStatus}
           className={`
             absolute top-2.5 bg-white  transition duration-150
             ease-in-out focus:text-green-600 focus:outline-none hover:text-green-600
-            ${task.is_completed ? 'text-green-600' : 'text-slate-500'}
+            ${isTaskCompleted ? 'text-green-600' : 'text-slate-500'}
           `}
         >
-          {task.is_completed ? (
+          {isTaskCompleted ? (
             <BsCheckCircleFill className="h-4 w-4" />
           ) : (
             <BsCheckCircle className="h-4 w-4" />
@@ -192,6 +198,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
                     >
                       <Menu.Item>
                         <button
+                          onClick={() => handleRemoveTask(task?.section_id, task?.id)}
                           className={classNames(
                             'flex w-full items-center space-x-3 py-2 px-4 text-sm font-medium text-slate-900',
                             'transition duration-150 ease-in-out hover:bg-slate-100 active:bg-slate-500 active:text-white'
