@@ -10,7 +10,6 @@ import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector';
 import { editMemberTeam, filterMembers } from '~/redux/member/memberSlice';
 
 const MemberOption = ({
-  roleID,
   isLast,
   children,
   callback,
@@ -26,24 +25,24 @@ const MemberOption = ({
   const { project, auth } = useAppSelector((state) => state);
   const { user: userAuth } = auth || {};
   const { id: authID } = userAuth || {};
-  const { overviewProject, userPermission: can } = project || {};
+  const { overviewProject } = project || {};
+  const { teams, user, is_mvp, role: { id: roleID } } = data || {};
   const { teams: projectTeams, id: projectID, role: userRole } = overviewProject || {};
 
   const dropDownOptions: string[] = [
-    "Set as Team Lead",
-    "Set as MVP",
+    `${roleID === 2 ? "Remove as Team Lead" : "Set as Team Lead"}`,
+    `${is_mvp ? "Remove as MVP" : "Set as MVP"}`,
     "Edit Team",
     "Leave Project",
     "Remove member"
   ]
 
-  const { teams, user } = data || {};
-  const { id: userID } = user || {};
   const teamList = projectTeams?.map((team: any) => { return team?.id });
   const currentTeam = teams?.map((team: any) => { return team?.id });
+  const { id: userID } = user || {};
 
-  const dropDownOption = (index: number): void => {
-    callback(index, filterData); // for option selection
+  const dropDownOption = (index: number, value: string = ""): void => {
+    callback(index, value); // for option selection
   }
 
   const selectEditTeam = (teamID: any, isUseEffect: boolean = false) => {
@@ -110,22 +109,26 @@ const MemberOption = ({
   )
 
   const dropDownMenu = dropDownOptions?.map((option: string, index: number) => {
+    const isTeamLead = roleID === 2 && index === 0;
     const isLoggedInUser = authID === userID;
-    const projectOwner = userRole === 1;
-    const teamLeader = userRole === 2;
-    const member = userRole === 3;
+    const isMVP = is_mvp && index === 1;
 
     // Member drop down menu
+    const member = userRole === 3;
     if (member && index !== 3) return; // Remain 'leave' button on self hover
 
     // Team Leader drop down menu
+    const teamLeader = userRole === 2;
     if (teamLeader && !isLoggedInUser && index === 3) return; // Remain 'leave' button on self hover
     if (teamLeader && isLoggedInUser && index === 4) return; // Remove 'remove member' button on self hover
     if (teamLeader && roleID === 1 && index === 4) return; // Remove 'remove member' button on Project Owner hover 
 
     // Project Owner drop down menu
+    const projectOwner = userRole === 1;
     if (projectOwner && index === 3) return; // Remove 'leave' button on self hover
+    if (projectOwner && isLoggedInUser && index === 0) return; // Remove 'set as team lead' button on self hover
     if (projectOwner && isLoggedInUser && index === 4) return; // Remove 'remove member' button on self hover
+
 
     return option === "Edit Team"
       ?
@@ -150,13 +153,14 @@ const MemberOption = ({
       <div className="px-1 py-1 " key={index}>
         <Menu.Item>
           <button
-            onClick={() => dropDownOption(index)}
-            className=" text-gray-900  hover:bg-blue-600  group flex w-full items-center rounded-md text-sm"
+            onClick={() => dropDownOption(index, option)}
+            className={`${isTeamLead && "bg-blue-600" || isMVP && "bg-blue-600"} text-gray-900 hover:bg-blue-600 group flex w-full items-center rounded-md text-sm`}
           >
             <div className={`
-              flex w-full h-full flex-row gap-2 pl-[10px] items-center justify-start 
-              ${option === "Leave Project" || option === "Remove member" ? "text-red-700" : "text-slate-400"} 
               hover:!text-slate-50 px-2 py-2
+              flex w-full h-full flex-row gap-1 pl-[10px] items-center justify-start 
+              ${isTeamLead && "!text-slate-50" || isMVP && "!text-slate-50"}
+              ${option === "Leave Project" || option === "Remove member" ? "text-red-700" : "text-slate-400"} 
             `}>
               {option}
             </div>
