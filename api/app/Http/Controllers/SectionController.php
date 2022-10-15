@@ -15,7 +15,9 @@ class SectionController extends Controller
   public function index(Project $project)
   {
     if($this->hasRole($project)){
-      return SectionResource::collection($project->sections()->with(['tasks.project_member.user.avatar','tasks.project_member.role','tasks.project_member.teams'])->get());
+      return SectionResource::collection($project->sections()->with(['tasks'=>function($query){
+        $query->with(['project_member.user.avatar','project_member.role','project_member.teams'])->orderBy('position','DESC');
+      }])->get());
     }
     return $this->unauthorizedAccess();
   }

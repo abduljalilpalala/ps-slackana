@@ -1,104 +1,114 @@
-import { axios } from '~/shared/lib/axios';
+import { axios } from '~/shared/lib/axios'
 
 const getAllUsers = async (projectID: any): Promise<any> => {
-  const response = await axios.get(`/api/user?projectId=${projectID}`);
+  const response = await axios.get(`/api/user?projectId=${projectID}`)
 
   if (response.status === 200 || 204) {
-    return response.data;
+    return response.data
   }
-  return "Something went wrong"
-};
+  return 'Something went wrong'
+}
 
 const filterAllUser = async (searchData: any): Promise<any> => {
-  const {projectID, searchValue} = searchData;
-  const response = await axios.get(`/api/user?search=${searchValue}&projectId=${projectID}`);
+  const { projectID, searchValue } = searchData
+  const response = await axios.get(`/api/user?search=${searchValue}&projectId=${projectID}`)
 
   if (response.status === 200 || 204) {
-    return response.data;
+    return response.data
   }
-  return "Something went wrong"
-};
+  return 'Something went wrong'
+}
 
 const getMembers = async (projectID: any): Promise<any> => {
-  const response = await axios.get(`/api/project/${projectID}/member`);
+  const response = await axios.get(`/api/project/${projectID}/member`)
 
   if (response.status === 200 || 204) {
-    return response.data;
+    return response.data
   }
-  return "Something went wrong"
-};
+  return 'Something went wrong'
+}
 
 const filterMembers = async (filterData: any): Promise<any> => {
-  const { projectID, teamID } = filterData;
-  const response = await axios.get(`/api/project/${projectID}/member?filter=${teamID}`);
+  const { projectID, teamID } = filterData
+  const response = await axios.get(`/api/project/${projectID}/member?filter=${teamID}`)
 
   if (response.status === 200 || 204) {
-    return response.data;
+    return response.data
   }
-  return "Something went wrong"
-};
+  return 'Something went wrong'
+}
+
+const filterMembersByName = async (filterData: any): Promise<any> => {
+  const { projectID, name } = filterData
+  const response = await axios.get(`/api/project/${projectID}/member?search=${name}`)
+
+  if (response.status === 200 || 204) {
+    return response.data
+  }
+  return 'Something went wrong'
+}
 
 const addNewMember = async (memberData: any): Promise<any> => {
-  const { user_id, teams, project_id } = memberData;
+  const { user_id, teams, project_id } = memberData
 
-  const response = await axios.post(`/api/project/${project_id}/member`, { user_id, teams });
+  const response = await axios.post(`/api/project/${project_id}/member`, { user_id, teams })
 
   if (response.status === 200 || 204) {
-    return "New member was added to the project!";
+    return 'New member was added to the project!'
   }
-  return "Something went wrong"
-};
+  return 'Something went wrong'
+}
 
 const editMemberTeam = async (updateMemberData: any): Promise<any> => {
-  const { userID, projectID, teams } = updateMemberData;
+  const { userID, projectID, teams } = updateMemberData
 
-  const response = await axios.put(`/api/project/${projectID}/member/${userID}`, {teams});
+  const response = await axios.put(`/api/project/${projectID}/member/${userID}`, { teams })
 
   if (response.status === 200 || 204) {
-    return "Team updated successfully!";
+    return 'Team updated successfully!'
   }
-  return "Something went wrong"
-}; 
+  return 'Something went wrong'
+}
 
 const removeMember = async (removeMemberData: any): Promise<any> => {
-  const { userID, projectID } = removeMemberData;
+  const { userID, projectID } = removeMemberData
 
-  const response = await axios.delete(`/api/project/${projectID}/member/${userID}`);
-
-  if (response.status === 200 || 204) {
-    return "Member removed successfully!";
-  }
-  return "Something went wrong"
-}; 
-
-const leaveProject = async (projectID: any): Promise<any> => {  
-  const response = await axios.delete(`/api/project/${projectID}/leave`);
+  const response = await axios.delete(`/api/project/${projectID}/member/${userID}`)
 
   if (response.status === 200 || 204) {
-    return "Leave project successfully!";
+    return 'Member removed successfully!'
   }
-  return "Something went wrong"
-}; 
+  return 'Something went wrong'
+}
 
-const setAsTeamLead = async (teamLeadData: any): Promise<any> => {  
-  const {projectID, userID} = teamLeadData;
-  const response = await axios.post(`/api/project/${projectID}/team-lead`,{ user_id:userID });
+const leaveProject = async (projectID: any): Promise<any> => {
+  const response = await axios.delete(`/api/project/${projectID}/leave`)
 
   if (response.status === 200 || 204) {
-    return "Successfully set as Team Lead!";
+    return 'Leave project successfully!'
   }
-  return "Something went wrong"
-}; 
+  return 'Something went wrong'
+}
 
-const setAsMVP = async (mvpData: any): Promise<any> => {  
-  const {projectID, userID} = mvpData;
-  const response = await axios.put(`/api/project/${projectID}/mvp`,{ user_id:userID });
+const setAsTeamLead = async (teamLeadData: any): Promise<any> => {
+  const { projectID, userID } = teamLeadData
+  const response = await axios.post(`/api/project/${projectID}/team-lead`, { user_id: userID })
 
   if (response.status === 200 || 204) {
-    return "Successfully set as Team Lead!";
+    return 'Successfully set as Team Lead!'
   }
-  return "Something went wrong"
-}; 
+  return 'Something went wrong'
+}
+
+const setAsMVP = async (mvpData: any): Promise<any> => {
+  const { projectID, userID } = mvpData
+  const response = await axios.put(`/api/project/${projectID}/mvp`, { user_id: userID })
+
+  if (response.status === 200 || 204) {
+    return 'Successfully set as Team Lead!'
+  }
+  return 'Something went wrong'
+}
 
 const memberService = {
   setAsMVP,
@@ -111,6 +121,7 @@ const memberService = {
   filterMembers,
   setAsTeamLead,
   editMemberTeam,
-};
+  filterMembersByName
+}
 
 export default memberService

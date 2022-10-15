@@ -25,6 +25,8 @@ class StoreTaskRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
+            'project_member_id' => ['nullable', 'integer', 'exists:project_members,id'],
+            'due_date' => ['nullable', 'date'],
         ];
     }
 }

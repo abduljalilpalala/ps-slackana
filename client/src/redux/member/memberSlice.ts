@@ -2,12 +2,12 @@ import {
   createSlice,
   PayloadAction,
   createAsyncThunk,
-  ActionReducerMapBuilder,
-} from '@reduxjs/toolkit';
+  ActionReducerMapBuilder
+} from '@reduxjs/toolkit'
 
-import memberService from './memberService';
-import { InitialState } from './memberType';
-import { catchError } from '~/utils/handleAxiosError';
+import memberService from './memberService'
+import { InitialState } from './memberType'
+import { catchError } from '~/utils/handleAxiosError'
 
 const initialState: InitialState = {
   member: null,
@@ -19,91 +19,95 @@ const initialState: InitialState = {
     status: 0,
     content: null
   }
-};
+}
 
 export const getAllUsers = createAsyncThunk(
   'project/getAllUsersStatus',
   async (projectID: any, thunkAPI) => {
-
     try {
-      return await memberService.getAllUsers(projectID);
+      return await memberService.getAllUsers(projectID)
     } catch (error: any) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
   }
-);
+)
 
 export const filterAllUser = createAsyncThunk(
   'project/filterAllUserStatus',
   async (searchData: any, thunkAPI) => {
-
     try {
-      return await memberService.filterAllUser(searchData);
+      return await memberService.filterAllUser(searchData)
     } catch (error: any) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
   }
-);
+)
 
 export const getMembers = createAsyncThunk(
   'project/getMembersStatus',
   async (projectID: any, thunkAPI) => {
-
     try {
-      return await memberService.getMembers(projectID);
+      return await memberService.getMembers(projectID)
     } catch (error: any) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
   }
-);
+)
 
 export const filterMembers = createAsyncThunk(
   'project/filterMembersStatus',
   async (filterData: any, thunkAPI) => {
-
     try {
-      return await memberService.filterMembers(filterData);
+      return await memberService.filterMembers(filterData)
     } catch (error: any) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
   }
-);
+)
+
+export const filterMembersByName = createAsyncThunk(
+  'project/filterMembersByNameStatus',
+  async (filterData: any, thunkAPI) => {
+    try {
+      return await memberService.filterMembersByName(filterData)
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(catchError(error))
+    }
+  }
+)
 
 export const addNewMember = createAsyncThunk(
   'project/addNewMemberStatus',
   async (memberData: any, thunkAPI) => {
-
     try {
-      return await memberService.addNewMember(memberData);
+      return await memberService.addNewMember(memberData)
     } catch (error: any) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
   }
-);
+)
 
 export const editMemberTeam = createAsyncThunk(
   'project/editMemberTeamStatus',
   async (updateMemberData: any, thunkAPI) => {
-
     try {
-      return await memberService.editMemberTeam(updateMemberData);
+      return await memberService.editMemberTeam(updateMemberData)
     } catch (error: any) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
   }
-);
+)
 
 export const removeMember = createAsyncThunk(
   'project/removeMemberStatus',
   async (removeMemberData: any, thunkAPI) => {
-
     try {
-      return await memberService.removeMember(removeMemberData);
+      return await memberService.removeMember(removeMemberData)
     } catch (error: any) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
   }
-);
+)
 
 export const leaveProject = createAsyncThunk(
   'project/leaveProjectStatus',
@@ -159,11 +163,11 @@ export const memberSlice = createSlice({
     builder
       // Get All Users
       .addCase(getAllUsers.pending, (state) => {
-        state.isLoading = true;
+        state.isLoading = true
       })
       .addCase(getAllUsers.fulfilled, (state, action: PayloadAction<any>) => {
-        state.isLoading = false;
-        state.userList = action.payload;
+        state.isLoading = false
+        state.userList = action.payload
         state.error = {
           status: 0,
           content: null
@@ -178,11 +182,11 @@ export const memberSlice = createSlice({
       })
       // Filter All Users
       .addCase(filterAllUser.pending, (state) => {
-        state.isLoading = true;
+        state.isLoading = true
       })
       .addCase(filterAllUser.fulfilled, (state, action: PayloadAction<any>) => {
-        state.isLoading = false;
-        state.userList = action.payload;
+        state.isLoading = false
+        state.userList = action.payload
         state.error = {
           status: 0,
           content: null
@@ -196,12 +200,12 @@ export const memberSlice = createSlice({
         state.user = null
       })
       // Get Members
-      .addCase(getMembers.pending, (state) => { 
+      .addCase(getMembers.pending, (state) => {
         // state.isLoading = true;
       })
       .addCase(getMembers.fulfilled, (state, action: PayloadAction<any>) => {
-        state.isLoading = false;
-        state.member = action.payload;
+        state.isLoading = false
+        state.member = action.payload
         state.error = {
           status: 0,
           content: null
@@ -218,12 +222,12 @@ export const memberSlice = createSlice({
       .addCase(filterMembers.pending, (state) => {
         // state.isLoading = true;
       })
-      .addCase(filterMembers.fulfilled, (state, action: PayloadAction<any>) => {  
-        state.isLoading = false; 
-        state.member = action.payload;
+      .addCase(filterMembers.fulfilled, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.member = action.payload
         state.error = {
           status: 0,
-          content: null 
+          content: null
         }
       })
       .addCase(filterMembers.rejected, (state, action: PayloadAction<any>) => {
@@ -233,12 +237,31 @@ export const memberSlice = createSlice({
         state.error = action.payload
         state.user = null
       })
+      // Filter Members By Name
+      .addCase(filterMembersByName.pending, (state) => {
+        // state.isLoading = true;
+      })
+      .addCase(filterMembersByName.fulfilled, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.member = action.payload
+        state.error = {
+          status: 0,
+          content: null
+        }
+      })
+      .addCase(filterMembersByName.rejected, (state, action: PayloadAction<any>) => {
+        state.isError = true
+        state.isSuccess = false
+        state.isLoading = false
+        state.error = action.payload
+        state.user = null
+      })
       // Add New Member
       .addCase(addNewMember.pending, (state) => {
-        state.isLoading = true;
+        state.isLoading = true
       })
       .addCase(addNewMember.fulfilled, (state) => {
-        state.isLoading = false;
+        state.isLoading = false
         state.error = {
           status: 0,
           content: null
@@ -252,11 +275,11 @@ export const memberSlice = createSlice({
         state.user = null
       })
       // Edit Member
-      .addCase(editMemberTeam.pending, (state) => { 
+      .addCase(editMemberTeam.pending, (state) => {
         // state.isLoading = true;
       })
       .addCase(editMemberTeam.fulfilled, (state) => {
-        state.isLoading = false;
+        state.isLoading = false
         state.error = {
           status: 0,
           content: null
@@ -270,11 +293,11 @@ export const memberSlice = createSlice({
         state.user = null
       })
       // Remove Member
-      .addCase(removeMember.pending, (state) => { 
-        state.isLoading = true;
+      .addCase(removeMember.pending, (state) => {
+        state.isLoading = true
       })
       .addCase(removeMember.fulfilled, (state) => {
-        state.isLoading = false;
+        state.isLoading = false
         state.error = {
           status: 0,
           content: null
@@ -344,7 +367,5 @@ export const memberSlice = createSlice({
   }
 })
 
-export const {
-  reset,
-} = memberSlice.actions
+export const { reset } = memberSlice.actions
 export default memberSlice.reducer

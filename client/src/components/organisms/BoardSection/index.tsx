@@ -5,6 +5,8 @@ import { MoreHorizontal, Edit3, Trash } from 'react-feather'
 
 import { classNames } from '~/helpers/classNames'
 import MenuTransition from '~/components/templates/MenuTransition'
+import { useProjectMethods } from '~/hooks/projectMethods'
+import { useRouter } from 'next/router'
 
 type Props = {
   children: ReactNode
@@ -30,6 +32,9 @@ const BoardSection: FC<Props> = (props): JSX.Element => {
   } = props
   const inputElement = useRef<any>()
   const onClickRenameSection = (): void => inputElement.current.focus()
+  const router = useRouter()
+  const { id: projectID } = router.query
+  const { permissions } = useProjectMethods(parseInt(projectID as string))
   let isBlur = true
 
   const handleUpdateSection = (e: any, id: number) => {
@@ -67,12 +72,14 @@ const BoardSection: FC<Props> = (props): JSX.Element => {
         <div className="flex items-center justify-center space-x-1">
           {canRemovePermission && canRenamePermission && (
             <>
-              <button
-                className="rounded p-0.5 text-blue-600 transition duration-75 ease-in-out hover:bg-slate-200"
-                onClick={() => handleShowAddTask(id)}
-              >
-                <Plus className="h-5 w-5" />
-              </button>
+              {permissions?.createTask && (
+                <button
+                  className="rounded p-0.5 text-blue-600 transition duration-75 ease-in-out hover:bg-slate-200"
+                  onClick={() => handleShowAddTask(id)}
+                >
+                  <Plus className="h-5 w-5" />
+                </button>
+              )}
               <Menu as="div" className="relative z-20 mt-1 inline-block items-center text-left">
                 {({ open }) => (
                   <>

@@ -3,8 +3,9 @@ import { NextPage } from 'next'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
-import { getProject } from '~/redux/project/projectSlice'
+import { getProject, setEditProjectTitle } from '~/redux/project/projectSlice'
 import AddSection from '~/components/molecules/AddSection'
 import BoardSection from '~/components/organisms/BoardSection'
 import BoardWrapper from '~/components/templates/BoardWrapper'
@@ -24,29 +25,31 @@ import {
   setRemoveSectionData,
   setRenameSectionData
 } from '~/redux/section/sectionSlice'
-import { tasks } from '~/shared/jsons/dummyTasks'
 import AddTask from '~/components/molecules/AddTask'
 import TaskList from '~/components/molecules/TaskList'
 import TaskSlider from '~/components/organisms/TaskSlider'
+import { useTaskMethods } from '~/hooks/taskMethods'
 
 const Board: NextPage = (): JSX.Element => {
   const router = useRouter()
   const { id } = router.query
+  const { useHandleCreateTask, useHandleRemoveTask } = useTaskMethods(parseInt(id as string))
   const dispatch = useAppDispatch()
   const [newTaskDueDate, setNewTaskDueDate] = useState('')
   const [currentBoardId, setCurrentBoardId] = useState<any>(null)
   const [showAddSection, setShowAddSection] = useState(true)
   const [assigneeModal, setAssigneeModal] = useState<boolean>(false)
-  const [assignee, setAssignee] = useState({})
+  const [assignee, setAssignee] = useState<any>({})
 
   const [updateAssigneeModal, setUpdateAssigneeModal] = useState<boolean>(false)
-  const [updateAssignee, setUpdateAssignee] = useState({})
-  const [updateTaskDueDate, setUpdateTaskDueDate] = useState('')
 
   const {
     sections: boards,
     refresher: { sectionsStateUpdate, sectionUpdate }
   } = useAppSelector((state) => state.section)
+  const {
+    overviewProject: { title }
+  } = useAppSelector((state) => state.project)
   const { overviewProject: project } = useAppSelector((state) => state.project)
 
   useEffect(() => {
@@ -57,6 +60,9 @@ const Board: NextPage = (): JSX.Element => {
       dispatch(resetRefresher())
     })
   }, [id])
+  useEffect(() => {
+    dispatch(setEditProjectTitle(title))
+  }, [title])
 
   const canCreatePermission = project?.can?.createSection
   const canRenamePermission = project?.can?.renameSection
@@ -170,24 +176,25 @@ const Board: NextPage = (): JSX.Element => {
   const handleSaveTask = async (taskName: any): Promise<void> => {
     if (assigneeModal) return
     const task = {
-      taskName,
-      dueDate: newTaskDueDate ? moment(new Date(newTaskDueDate)).format('MMM D') : '',
-      assignee
+      name: taskName,
+      due_date: newTaskDueDate ? moment(new Date(newTaskDueDate)).format('YYYY-MM-DD') : null,
+      project_member_id: assignee?.id
     }
-
-    console.log(task)
-    toast.success('Successfully Saved!')
-    setCurrentBoardId('')
-    setNewTaskDueDate('')
-    setAssignee({})
+    useHandleCreateTask(parseInt(currentBoardId as string), task, () => {
+      setCurrentBoardId('')
+      setNewTaskDueDate('')
+      setAssignee({})
+    })
   }
-
+  const handleRemoveTask = async (section_id: any, task_id: any): Promise<void> => {
+    useHandleRemoveTask(section_id, task_id)
+  }
   const handleAssigneeToggle = () => setAssigneeModal(!assigneeModal)
 
   const handleUpdateAssigneeToggle = () => setUpdateAssigneeModal(!updateAssigneeModal)
 
-  const loadingSkeleton = (
-    <section className="group-board w-full max-w-[18rem] flex-shrink-0 space-x-4">
+  const loadingSkeleton = () => (
+    <section key={uuidv4()} className="group-board w-full max-w-[18rem] flex-shrink-0 space-x-4">
       <header className="ml-4 flex flex-col items-center justify-between py-2">
         <LineSkeleton className="h-5 w-[95%]" />
       </header>
@@ -238,24 +245,23 @@ const Board: NextPage = (): JSX.Element => {
                       }}
                     />
                   )}
-                  {tasks.map((task: any, i: number) => (
-                    <TaskList
-                      key={task.id}
-                      task={task}
-                      updateAssignee={updateAssignee}
-                      updateAssigneeModal={updateAssigneeModal}
-                      updateTaskDueDate={updateTaskDueDate}
-                      setUpdateTaskDueDate={setUpdateTaskDueDate}
-                      setUpdateAssignee={setUpdateAssignee}
-                      actions={{
-                        handleUpdateAssigneeToggle
-                      }}
-                    />
-                  ))}
+                  {board.tasks?.length ? (
+                    board.tasks.map((task: any, i: number) => (
+                      <TaskList
+                        key={task.id}
+                        task={task}
+                        actions={{
+                          handleRemoveTask
+                        }}
+                      />
+                    ))
+                  ) : (
+                    <p className="text-center text-sm text-slate-600">No current task</p>
+                  )}
                 </BoardSection>
               )
             })
-          : Array.from(Array(4).keys()).map(() => loadingSkeleton)}
+          : [...Array(4)].map(() => loadingSkeleton())}
         <AddSection
           showAddSection={showAddSection}
           permissions={{ canCreatePermission }}
@@ -266,7 +272,7 @@ const Board: NextPage = (): JSX.Element => {
             onChangeSection,
             onClickOutSection
           }}
-          loadingSkeleton={loadingSkeleton}
+          loadingSkeleton={loadingSkeleton()}
         />
         <TaskSlider />
       </BoardWrapper>
