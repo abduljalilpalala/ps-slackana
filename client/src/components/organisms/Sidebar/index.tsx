@@ -27,13 +27,13 @@ const Sidebar: FC<Props> = ({ isOpenSidebar }): JSX.Element => {
   const { name, avatar, isLoggedIn: status, email } = user || {}
 
   const handleOpenProject = (): void => setIsOpenProject(!isOpenProject)
-  const { sidebarProject, isLoading } = useAppSelector((state) => state.project);
+  const { sidebarProject, isSidebarLoading } = useAppSelector((state) => state.project);
 
   useEffect(() => {
-    if (isLoading) {
+    if (isSidebarLoading) {
       dispatch(getSidebarProjects());
     }
-  }, [isLoading])
+  }, [isSidebarLoading])
 
   return (
     <aside

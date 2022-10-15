@@ -28,7 +28,7 @@ const createProject = async (project: any): Promise<any> => {
   const response = await axios.post('/api/project', project);
 
   if (response.status === 200 || 204) {
-    return "New team created successfully!";
+    return "New Project created successfully!";
   }
   return "Something went wrong!"
 };
@@ -46,11 +46,7 @@ const updateProjectDetails = async (projectData: any): Promise<any> => {
   const { id } = projectData;
 
   const response = await axios.put(`/api/project/${id}`, projectData);
-
-  if (response.status === 200 || 204) {
-    return "Project description successfully updated!";
-  }
-  return "Something went wrong"
+  return response.data;
 };
 const addNewTeam = async (overviewTeamData: any): Promise<any> => {
   const { projectID, teamData } = overviewTeamData;

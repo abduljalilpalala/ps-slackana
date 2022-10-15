@@ -31,6 +31,7 @@ import MembersTemplate from '~/components/molecules/MembersTemplate'
 import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
 import { styles as homeStyle } from '~/shared/twin/home-content.style'
+import projectService from '~/redux/project/projectService'
 
 const Overview: FC = (): JSX.Element => {
   const router = useRouter();
@@ -67,10 +68,13 @@ const Overview: FC = (): JSX.Element => {
     setTeamLimit(false);
     dispatch(startRefresher());
     dispatch(setEditProjectID(id));
+    dispatch(getProject(id)).then(_ => { dispatch(resetRefresher()) });
+  }, [id])
+
+  useEffect(() => {
     dispatch(setEditProjectTitle(title));
     dispatch(setEditProjectDescription(description));
-    dispatch(getProject(id)).then(_ => { dispatch(resetRefresher()) });
-  }, [id, title])
+  }, [title, description])
 
   useEffect(() => {
     if (memberStateUpdate) {
@@ -85,27 +89,25 @@ const Overview: FC = (): JSX.Element => {
     dispatch(setUserPermission(userPermission));
   }, [reloadPermission, memberStateUpdate, id, title])
 
-  const [onClickSave, setOnClickSave] = useState<boolean>(true);
   const updateTitle = (e: any) => {
     const value = e.target.value;
-    setOnClickSave(false);
     dispatch(setEditProjectTitle(value));
   };
   const updateDescription = (e: any) => {
     const value = e.target.value;
-    setOnClickSave(false);
     dispatch(setEditProjectDescription(value));
   };
-  const [saveChanges, setSaveChanges] = useState<boolean>(false);
+
   const onSaveChanges = () => {
-    setSaveChanges(true);
-    setOnClickSave(true);
+    dispatch(setEditProjectTitle(editTitle));
+    dispatch(setEditProjectDescription(editDescription));
+
     dispatch(projectRefresher());
     dispatch(updateProjectDetails())
       .then(({ payload }) => {
-        setSaveChanges(false);
         dispatch(resetRefresher());
-        darkToaster('✅', payload);
+        dispatch(getProject(id));
+        darkToaster('✅', payload?.message);
       });
   };
 
@@ -222,11 +224,15 @@ const Overview: FC = (): JSX.Element => {
                       name="title"
                       onChange={updateTitle}
                       value={editTitle || ""}
+                      onBlur={() => {
+                        if (editTitle?.length === 0) return dispatch(setEditProjectTitle(title));
+                        if (editTitle !== title) return onSaveChanges();
+                      }}
                       disabled={!can?.editProject}
                       placeholder='Title field should not be empty'
                       className='placeholder:text-[18px] text-4xl font-bold text-slate-900 truncate text-ellipsis max-w-[500px] mobile:max-w-[250px] border-none rounded-md pl-1' />
                 }
-                <span className='text-xl font-medium text-slate-900'>{moment(created_at).format('MMMM DD, YYYY')}</span>
+                <span className='text-xl font-medium text-slate-900 mb-[12px]'>{moment(created_at).format('MMMM DD, YYYY')}</span>
               </div>
               {projectStateUpdate
                 ? <div className='border border-slate-300 p-5 rounded-md h-[142px] w-full'>
@@ -242,20 +248,14 @@ const Overview: FC = (): JSX.Element => {
                   disabled={!can?.editProject}
                   onChange={updateDescription}
                   value={editDescription || ""}
+                  onBlur={() => {
+                    if (editDescription?.length === 0) return dispatch(setEditProjectDescription(description));
+                    if (editDescription !== description) return onSaveChanges();
+                  }}
                   className='text-sm text-slate-500 break-words border border-slate-300 p-5 rounded-md'
                 />
               }
-              <div className='flex w-full items-end justify-end'>
-                {can?.editProject && (
-                  <SubmitButton
-                    text="Save"
-                    isDisabled={onClickSave}
-                    submitted={onSaveChanges}
-                    isSubmitting={saveChanges}
-                    className="!w-[175px] mobile:!w-full !text-slate-600 !bg-slate-200 hover:!bg-blue-600 hover:!text-slate-50"
-                  />
-                )}
-              </div>
+
             </div>
 
             <div className='w-full flex flex-col gap-3'>

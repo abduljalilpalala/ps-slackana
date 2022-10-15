@@ -1,5 +1,4 @@
 import React from "react";
-import Image from 'next/image'
 
 import ImageSkeleton from "~/components/atoms/Skeletons/ImageSkeleton";
 import LineSkeleton from "~/components/atoms/Skeletons/LineSkeleton";

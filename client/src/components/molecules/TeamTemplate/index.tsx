@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import React, { Fragment } from 'react'
 import { useRouter } from 'next/router'
 import { Menu, Transition } from '@headlessui/react'

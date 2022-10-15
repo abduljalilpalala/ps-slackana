@@ -1,5 +1,4 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import React, { FC } from 'react'
 
 import { styles } from '~/shared/twin/under-construction.styles'

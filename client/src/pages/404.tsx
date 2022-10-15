@@ -1,7 +1,6 @@
 import tw from 'twin.macro'
 import Head from 'next/head'
 import Link from 'next/link'
-import Image from 'next/image'
 import { NextPage } from 'next'
 
 import { styles } from '~/shared/twin/404.styles'

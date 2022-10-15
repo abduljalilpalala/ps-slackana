@@ -16,6 +16,7 @@ const MyApp = ({ Component, ...rest }: AppProps): JSX.Element => {
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
         </Head>
+        <NextProgress />
         <Toaster
           position="top-right"
           reverseOrder={false}
