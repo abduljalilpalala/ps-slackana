@@ -23,7 +23,7 @@ type ProjectTemplateType = {
     isArchived: number;
     id: number;
   } | null,
-  isLoading: any;
+  isLoading?: boolean;
 }
 
 const ProjectTemplate = ({ data, isLoading }: ProjectTemplateType): JSX.Element => {

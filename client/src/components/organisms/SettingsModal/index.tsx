@@ -20,6 +20,7 @@ import SwitchToggle from "~/components/atoms/SwitchToggle";
 import SubmitButton from "~/components/atoms/SubmitButton";
 import { useAppDispatch, useAppSelector } from "~/hooks/reduxSelector";
 import { styles as settingsStyle } from '~/shared/twin/settings-modal.style';
+import ReactTooltip from "react-tooltip";
 
 const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
   const dispatch = useAppDispatch();
@@ -147,7 +148,8 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
                   <label css={settingsStyle.upload} htmlFor="upload" className={`flex justify-center items-center cursor-pointer ${userLoading && "!bg-gray-500 !cursor-not-allowed"}`} >
                     {userLoading ? 'Loading...' : "Upload photo"}
                   </label>
-                  <button css={settingsStyle.remove} disabled={true} className="hover:!text-slate-900 bg-slate-500 opacity-50 cursor-not-allowed">Remove photo</button>
+                  <button data-tip="Under development" css={settingsStyle.remove} className="hover:!text-slate-900 bg-slate-500 opacity-50 cursor-not-allowed">Remove photo</button>
+                  <ReactTooltip />
                 </div>
               </div>
               <p className="text-slate-600 text-px-12 text-left">Photos help your teammates recognize you in Slackana</p>

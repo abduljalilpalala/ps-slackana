@@ -14,7 +14,7 @@ import LineSkeleton from "~/components/atoms/Skeletons/LineSkeleton";
 import ImageSkeleton from "~/components/atoms/Skeletons/ImageSkeleton";
 import { useAppDispatch, useAppSelector } from "~/hooks/reduxSelector";
 import { getProject, memberRefresher } from '~/redux/project/projectSlice';
-import { getAllUsers, removeMember, filterMembers } from "~/redux/member/memberSlice";
+import { getAllUsers, removeMember, filterMembers, leaveProject, setAsTeamLead, setAsMVP } from "~/redux/member/memberSlice";
 
 const MemberList = ({
   data,
@@ -48,8 +48,47 @@ const MemberList = ({
     dispatch(getAllUsers(projectID));
   }
 
-  const dropDownOption = (value: any) => {
-    switch (value) {
+  const dropDownOption = (index: number, value: string) => {
+    switch (index) {
+      case 0: {
+        dispatch(memberRefresher())
+        return toast.promise(
+          dispatch(setAsTeamLead({ projectID, userID: currentUserID })).then((_) => {
+            stateRefresh();
+          }),
+          {
+            loading: 'Updating user role...',
+            success: `Successfully ${value}!`,
+            error: "Error on assigning as Team Lead!",
+          }
+        );
+      }
+      case 1: {
+        dispatch(memberRefresher())
+        return toast.promise(
+          dispatch(setAsMVP({ projectID, userID: currentUserID })).then((_) => {
+            stateRefresh();
+          }),
+          {
+            loading: 'Updating user role...',
+            success: `Successfully ${value}!`,
+            error: "Error on assigning as Team Lead!",
+          }
+        );
+      }
+      case 3: {
+        dispatch(memberRefresher())
+        return toast.promise(
+          dispatch(leaveProject(projectID)).then((_) => {
+            stateRefresh();
+          }),
+          {
+            loading: 'Leaving project...',
+            success: "You leave this project successfully!",
+            error: "Error on leaving project!",
+          }
+        );
+      }
       case 4: {
         dispatch(memberRefresher())
         return toast.promise(
@@ -79,7 +118,6 @@ const MemberList = ({
             filterData={filterData}
             callback={dropDownOption}
             closeOption={setOptionState}
-            roleID={roleID}
             isLast={isLast}>
             <div className='hover:bg-slate-100 rotate-90 z-0 mb-[3px] cursor-pointer w-[26px] h-[26px] flex items-center justify-center rounded-[3px] border border-slate-500'>
               <ThreeDot />
@@ -145,8 +183,8 @@ const MemberList = ({
                     [1, 2].map((id: number) => {
                       return roleID === id ? (
                         <div key={id} className="bg-slate-100 rounded-full max-w-[15px] max-h-[15px] ">
-                          {id === 1 && <CrownIcon />}
-                          {id === 2 && <FistIcon />}
+                          {roleID === 1 && <CrownIcon />}
+                          {roleID === 2 && <FistIcon />}
                         </div>
                       ) : null
                     })
