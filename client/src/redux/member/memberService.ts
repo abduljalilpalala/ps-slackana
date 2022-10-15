@@ -71,13 +71,45 @@ const removeMember = async (removeMemberData: any): Promise<any> => {
   return "Something went wrong"
 }; 
 
+const leaveProject = async (projectID: any): Promise<any> => {  
+  const response = await axios.delete(`/api/project/${projectID}/leave`);
+
+  if (response.status === 200 || 204) {
+    return "Leave project successfully!";
+  }
+  return "Something went wrong"
+}; 
+
+const setAsTeamLead = async (teamLeadData: any): Promise<any> => {  
+  const {projectID, userID} = teamLeadData;
+  const response = await axios.post(`/api/project/${projectID}/team-lead`,{ user_id:userID });
+
+  if (response.status === 200 || 204) {
+    return "Successfully set as Team Lead!";
+  }
+  return "Something went wrong"
+}; 
+
+const setAsMVP = async (mvpData: any): Promise<any> => {  
+  const {projectID, userID} = mvpData;
+  const response = await axios.put(`/api/project/${projectID}/mvp`,{ user_id:userID });
+
+  if (response.status === 200 || 204) {
+    return "Successfully set as Team Lead!";
+  }
+  return "Something went wrong"
+}; 
+
 const memberService = {
+  setAsMVP,
   getMembers,
   getAllUsers,
   addNewMember,
   removeMember,
+  leaveProject,
   filterAllUser,
   filterMembers,
+  setAsTeamLead,
   editMemberTeam,
 };
 
