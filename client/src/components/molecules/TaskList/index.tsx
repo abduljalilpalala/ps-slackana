@@ -35,7 +35,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
   const { members, isMemberLoading, filterMembersName } = useMemberMethods(parseInt(id as string))
   const [updateAssigneeModal, setUpdateAssigneeModal] = useState<boolean>(false)
   const [updateAssignee, setUpdateAssignee] = useState<any>(null)
-  const { permissions } = useProjectMethods(parseInt(id as string))
+  const { permissions, canComplete } = useProjectMethods(parseInt(id as string))
   const [isTaskCompleted, setIsTaskCompleted] = useState<any>(false)
   const { useHandleUpdateTaskDueDate, useHandleUpdateTaskAssignee, useHandleCompleteTask } =
     useTaskMethods(parseInt(id as string))
@@ -141,7 +141,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
       </div>
     </DialogBox>
   )
-
+  let completeTask = !permissions?.setTaskAsCompleted || !canComplete(task?.assignee?.id)
   return (
     <div
       className={`
@@ -152,8 +152,10 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
     >
       <div className="ml-4 flex items-center">
         <button
+          disabled={completeTask}
           onClick={handleTaskStatus}
           className={`
+            ${completeTask && 'cursor-not-allowed '}
             absolute top-2.5 bg-white  transition duration-150
             ease-in-out focus:text-green-600 focus:outline-none hover:text-green-600
             ${isTaskCompleted ? 'text-green-600' : 'text-slate-500'}

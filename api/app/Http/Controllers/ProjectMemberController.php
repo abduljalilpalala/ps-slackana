@@ -7,6 +7,7 @@ use App\Http\Requests\StoreProjectMemberRequest;
 use App\Http\Requests\UpdateProjectMemberRequest;
 use App\Http\Resources\MemberResource;
 use App\Models\Project;
+use App\Models\ProjectMember;
 use App\Models\User;
 
 class ProjectMemberController extends Controller
@@ -26,10 +27,13 @@ class ProjectMemberController extends Controller
 
   public function store(StoreProjectMemberRequest $request, Project $project)
   {
-    $member = $project->members()->updateOrCreate(
-      ['project_id' => $project->id, 'user_id' => intval($request->user_id)],
-      ['is_removed' => 0, 'role_id' => RoleEnum::MEMBER->value]
-    );
+    $member = ProjectMember::updateOrCreate([
+      'user_id' => $request->user_id,
+      'project_id' => $project->id,
+    ],[
+      'is_removed' => 0,
+      'role_id' => RoleEnum::MEMBER->value
+    ]);
     $member->teams()->sync($request->teams);
 
     return response()->noContent();

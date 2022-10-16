@@ -16,8 +16,9 @@ class CompleteTaskController extends Controller
     $member = ProjectMember::where([
       ['project_id', '=', $project->id],
       ['user_id', '=', auth()->user()->id],
+      ['is_removed', '=', 0],
     ])->first();
-
+    
     if($this->isProjectOwner($project) || $this->isTeamLeader($project)){
       $task->update([
         'is_completed' => !($task->is_completed)
