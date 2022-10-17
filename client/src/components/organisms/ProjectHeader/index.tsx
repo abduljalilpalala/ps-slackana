@@ -1,29 +1,72 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FaRegUser } from 'react-icons/fa'
-import React, { FC, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 
-import { useAppSelector } from '~/hooks/reduxSelector'
+import {
+  getProject,
+  resetRefresher,
+  startRefresher,
+  setEditProjectID,
+  setUserPermission,
+  setEditProjectTitle,
+  setEditProjectDescription,
+} from '~/redux/project/projectSlice'
 import { styles } from '~/shared/twin/project-header.styles'
 import AddMemberModal from '~/components/organisms/AddMemberModal'
 import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
 import ImageSkeleton from '~/components/atoms/Skeletons/ImageSkeleton'
+import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
 import ProjectActionDropdown from '~/components/molecules/ProjectActionDropdown'
 import ProjectStatusDropdown from '~/components/molecules/ProjectStatusDropdown'
 
 const ProjectHead: FC = (): JSX.Element => {
   const router = useRouter()
   const { id } = router.query
+  const dispatch = useAppDispatch();
   const [addModal, setAddModal] = useState<boolean>(false);
 
   const {
     isLoading,
+    refresher,
     overviewProject,
-    projectDescription: { title },
   } = useAppSelector((state) => state.project);
 
-  const { members, icon, id: projectID, numberOfActiveMembers } = overviewProject || {};
+  const {
+    icon,
+    members,
+    description,
+    id: projectID,
+    can: userPermission,
+    title: projectTitle,
+    numberOfActiveMembers,
+  } = overviewProject || {};
+  const { memberStateUpdate } = refresher || {};
   const hotReload = id == projectID;
+
+  useEffect(() => {
+    dispatch(startRefresher());
+    dispatch(setEditProjectID(id));
+    dispatch(getProject(id)).then(_ => { dispatch(resetRefresher()) });
+  }, [id])
+
+  useEffect(() => {
+    dispatch(setEditProjectTitle(projectTitle));
+    dispatch(setEditProjectDescription(description));
+  }, [projectTitle, description])
+
+  useEffect(() => {
+    if (memberStateUpdate) {
+      dispatch(getProject(id))
+        .then(_ => {
+          dispatch(resetRefresher());
+        });
+    }
+  }, [memberStateUpdate])
+
+  useEffect(() => {
+    dispatch(setUserPermission(userPermission));
+  }, [isLoading, memberStateUpdate]);
 
   const tabs = [
     {
@@ -71,8 +114,8 @@ const ProjectHead: FC = (): JSX.Element => {
                 isLoading
                   ? !hotReload
                     ? <LineSkeleton className='w-[150px] !rounded-md !h-[12px] !mt-[8px]' />
-                    : <h1>{title}</h1>
-                  : <h1>{title}</h1>
+                    : <h1>{projectTitle}</h1>
+                  : <h1>{projectTitle}</h1>
               }
               <div className='flex justify-center items-center gap-3'>
                 <ProjectActionDropdown />

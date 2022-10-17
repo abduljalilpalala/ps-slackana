@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-
 import toast from "react-hot-toast";
+
 import { ThreeDot } from "~/shared/icons/ThreeDotIcon";
-import { addNewMember } from "~/redux/member/memberSlice";
 import { ActiveStatus } from "~/shared/icons/ActiveStatus";
 import PeopleOption from "~/components/organisms/PeopleOption";
-import { memberRefresher } from "~/redux/project/projectSlice";
 import AddPeopleButton from "~/components/atoms/AddPeopleButton";
 import LineSkeleton from "~/components/atoms/Skeletons/LineSkeleton";
+import { addNewMember, getAllUsers } from "~/redux/member/memberSlice";
 import ImageSkeleton from "~/components/atoms/Skeletons/ImageSkeleton";
 import { useAppDispatch, useAppSelector } from "~/hooks/reduxSelector";
+import { getProject, memberRefresher } from "~/redux/project/projectSlice";
 
 const PeopleList = ({ data, className, isLoading }: any) => {
   const dispatch = useAppDispatch();
@@ -22,15 +22,20 @@ const PeopleList = ({ data, className, isLoading }: any) => {
   const { overviewProject } = project || {};
   const { id: projectID, teams: projectTeams } = overviewProject || {};
 
+  const stateRefresh = () => {
+    dispatch(getProject(projectID));
+    dispatch(getAllUsers(projectID));
+  }
+
   const addPeople = () => {
+    setResetTeam(true);
     const newTeamData = { teams: selectedTeam, user_id: id, project_id: projectID };
 
-    setResetTeam(true);
-    setSelectedTeam([]);
     dispatch(memberRefresher());
     toast.promise(
       dispatch(addNewMember(newTeamData)).then((_) => {
         setResetTeam(false);
+        setSelectedTeam([]);
       }),
       {
         loading: 'Adding member...',
@@ -107,3 +112,7 @@ const PeopleList = ({ data, className, isLoading }: any) => {
 };
 
 export default PeopleList;
+function stateRefresh() {
+  throw new Error("Function not implemented.");
+}
+

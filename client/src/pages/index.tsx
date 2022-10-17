@@ -26,6 +26,7 @@ import { useAppSelector, useAppDispatch } from '~/hooks/reduxSelector'
 const Index: NextPage = (): JSX.Element => {
   const dispatch = useAppDispatch();
   const [limit, setLimit] = useState<boolean>(false);
+  const [isTitleDisabled, setIsTitleDisabled] = useState<boolean>(true);
   const [newProjectModal, setNewProjectModal] = useState<boolean>(false);
   const [preventStateReload, setPreventStateReload] = useState<boolean>(false);
 
@@ -44,13 +45,15 @@ const Index: NextPage = (): JSX.Element => {
 
   const onCreateProject = (): void => {
     setPreventStateReload(true);
+    setIsTitleDisabled(true);
     setNewProjectModal(false);
 
     toast.promise(
       dispatch(createProject(newProject))
         .then((_) => {
-          dispatch(filterProjects());
-          setPreventStateReload(false);
+          dispatch(filterProjects()).then((_) => {
+            setPreventStateReload(false);
+          });
         }),
       {
         loading: 'Creating new project...',
@@ -60,11 +63,10 @@ const Index: NextPage = (): JSX.Element => {
     )
   }
 
-  const [isTitleDisabled, setIsTitleDisabled] = useState<boolean>(true);
   const onChange = (e: any): void => {
     const value = e.target.value;
     const name = e.target.name;
-    const isDisable = value.length === 0;
+    const isDisable = value.length <= 0;
 
     if (name === "title") {
       dispatch(setProjectTitle(value));
