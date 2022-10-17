@@ -12,7 +12,10 @@ const ProjectLayout: FC<Props> = ({ metaTitle, children }): JSX.Element => {
   return (
     <Layout metaTitle={metaTitle}>
       <ProjectHeader />
-      <div className="relative">{children}</div>
+      <div className="relative flex h-full min-h-screen flex-col justify-between">
+        {children}
+        <span className="mb-[102px]"></span>
+      </div>
     </Layout>
   )
 }

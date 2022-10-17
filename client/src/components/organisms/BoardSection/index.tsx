@@ -55,8 +55,13 @@ const BoardSection: FC<Props> = (props): JSX.Element => {
   }
 
   return (
-    <section className="group-board w-full max-w-[18rem] flex-shrink-0 pl-3">
-      <header className="flex flex-shrink-0 items-center justify-between py-1">
+    <section className="group-board w-full max-w-[18rem] flex-shrink-0 overflow-y-auto pl-3">
+      <header
+        className={`
+          sticky top-0 flex flex-shrink-0 items-center justify-between bg-slate-50 py-1
+          ${!router.query.task_id ? 'z-20' : 'z-10'}
+        `}
+      >
         <div className="pr-2">
           <input
             type="text"
@@ -133,7 +138,7 @@ const BoardSection: FC<Props> = (props): JSX.Element => {
           )}
         </div>
       </header>
-      <main className="h-[75vh] min-h-[75vh] space-y-2 overflow-y-auto rounded-lg border bg-white px-4 py-4 group-board-hover:shadow-sm">
+      <main className="min-h-[92%] flex-1 space-y-2 overflow-hidden rounded-lg border bg-white px-4 py-4 group-board-hover:shadow-sm">
         {children}
       </main>
     </section>
