@@ -37,7 +37,7 @@ export const styles = {
   ],
   a: ({ router, id, slug }: LinkProps) => [
     tw`
-      border-b-[3px] pb-0.5 text-sm font-normal py-1.5
+      border-b-[3px] pb-0.5 text-sm font-normal py-1
       transition duration-150 ease-out cursor-pointer
     `,
     router.asPath.includes(`/team/${id}/${slug}`)

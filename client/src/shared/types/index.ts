@@ -70,3 +70,7 @@ export type Task = {
   created_at: string
   updated_at: string
 }
+
+export type ChatMessageValues = {
+  message: string
+}
