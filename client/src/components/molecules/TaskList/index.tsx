@@ -145,9 +145,10 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
   return (
     <div
       className={`
-        group-task relative flex w-full cursor-pointer flex-col justify-between rounded-md
-        border bg-white transition duration-75 ease-in-out focus-within:border-slate-400
+        group-task relative flex w-full cursor-pointer flex-col justify-between rounded-md border
+        bg-white transition duration-75 ease-in-out focus-within:border-slate-400
       focus:border-slate-400 focus:outline-none focus:ring-slate-400 hover:border-slate-400
+       ${isTaskCompleted && 'hover:border-slate-300'}
       `}
     >
       <div className="ml-4 flex items-center">
@@ -158,7 +159,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
             ${completeTask && 'cursor-not-allowed '}
             absolute top-2.5 bg-white  transition duration-150
             ease-in-out focus:text-green-600 focus:outline-none hover:text-green-600
-            ${isTaskCompleted ? 'text-green-600' : 'text-slate-500'}
+            ${isTaskCompleted ? 'text-green-600 opacity-60' : 'text-slate-500'}
           `}
         >
           {isTaskCompleted ? (
@@ -171,6 +172,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
           className={`
             flex-1 cursor-pointer select-none resize-none overflow-hidden
             border-none bg-transparent pl-6 text-sm font-medium focus:ring-0
+            ${isTaskCompleted ? 'opacity-60' : ''}
           `}
           defaultValue={task.name}
           disabled={true}
@@ -184,8 +186,9 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
                 <>
                   <Menu.Button
                     className={`
-                    rounded-lg border p-2 text-slate-600 opacity-0  hover:border-slate-300 hover:bg-slate-100
-                    active:scale-95 group-task-hover:opacity-100 group-task-focus:opacity-100
+                    group-task-focus:opacity-100, rounded-lg border p-2 text-slate-600  opacity-0 hover:border-slate-300
+                    hover:bg-slate-100 active:scale-95 group-task-hover:opacity-100
+                    ${isTaskCompleted ? 'opacity-60' : ''}
                   ${open ? 'border-slate-300 bg-slate-100' : 'border-slate-200'}
               `}
                   >
