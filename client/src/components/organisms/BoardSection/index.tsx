@@ -40,6 +40,7 @@ const BoardSection: FC<Props> = (props): JSX.Element => {
   const handleUpdateSection = (e: any, id: number) => {
     if (e.key === 'Enter' || e.keyCode === 13) {
       isBlur = false
+      if (e.target.value === name) return
       updateSection(e, id)
       e.target.blur()
     }
@@ -50,6 +51,7 @@ const BoardSection: FC<Props> = (props): JSX.Element => {
       if (e.target.value.length === 0) {
         e.target.value = 'Untitled Section'
       }
+      if (e.target.value === name) return
       updateSection(e, id)
     }
   }
