@@ -19,7 +19,17 @@ import handleImageError from '~/helpers/handleImageError'
 
 type Props = {
   task: any
+  isTaskSliderOpen: any
+  updateTaskSliderAssignee: any
+  updateTaskSliderDueDate: any
+  isTaskSliderCompleted: any
+  taskID: any
   actions: {
+    setIsTaskSliderOpen: (e: any) => void
+    setTaskID: (e: any) => void
+    setUpdateTaskSliderAssignee: (e: any) => void
+    setUpdateTaskSliderDueDate: (e: any) => void
+    setIsTaskSliderCompleted: (e: any) => void
     handleRemoveTask: (section_id: any, task_id: any) => void
   }
 }
@@ -27,7 +37,19 @@ type Props = {
 const TaskList: React.FC<Props> = (props): JSX.Element => {
   const {
     task,
-    actions: { handleRemoveTask }
+    isTaskSliderOpen,
+    updateTaskSliderAssignee,
+    updateTaskSliderDueDate,
+    isTaskSliderCompleted,
+    taskID,
+    actions: {
+      handleRemoveTask,
+      setIsTaskSliderOpen,
+      setTaskID,
+      setIsTaskSliderCompleted,
+      setUpdateTaskSliderAssignee,
+      setUpdateTaskSliderDueDate
+    }
   } = props
   const router = useRouter()
   const { id } = router.query
@@ -39,8 +61,14 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
   const [updateAssignee, setUpdateAssignee] = useState<any>(null)
   const { permissions, canComplete } = useProjectMethods(parseInt(id as string))
   const [isTaskCompleted, setIsTaskCompleted] = useState<any>(false)
-  const { useHandleUpdateTaskDueDate, useHandleUpdateTaskAssignee, useHandleCompleteTask } =
-    useTaskMethods(parseInt(id as string))
+  const [taskName, setTaskName] = useState<any>('')
+  const {
+    useHandleUpdateTaskDueDate,
+    useHandleUpdateTaskAssignee,
+    useHandleCompleteTask,
+    useHandleUpdateTaskName,
+    useHandleGetTaskWithoutLoading
+  } = useTaskMethods(parseInt(id as string))
 
   const { task_id } = router.query
 
@@ -60,7 +88,23 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
     setDueDate(task?.due_date)
     setSelectedDueDate(task?.due_date ? new Date(task?.due_date) : null)
     setIsTaskCompleted(task?.is_completed)
+    setTaskName(task?.name)
   }, [task])
+
+  useEffect(() => {
+    if (isTaskSliderOpen && parseInt(taskID) === parseInt(task?.id)) {
+      setUpdateAssignee(updateTaskSliderAssignee)
+      setDueDate(updateTaskSliderDueDate)
+      setSelectedDueDate(updateTaskSliderDueDate ? new Date(updateTaskSliderDueDate) : null)
+      setIsTaskCompleted(isTaskSliderCompleted)
+    }
+  }, [
+    setIsTaskSliderOpen,
+    updateTaskSliderAssignee,
+    updateTaskSliderDueDate,
+    isTaskSliderCompleted,
+    taskID
+  ])
 
   const handleSetDueDate = (date: Date) => {
     setSelectedDueDate(date)
@@ -86,20 +130,26 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
     filterMembersName(parseInt(id as string), value)
   }
 
+  let isBlur = true
   const onBlurUpdateTaskName = (e: any) => {
-    if (e.target.value.length === 0) {
-      return (e.target.value = task.name)
+    if (isBlur) {
+      if (e.target.value.length === 0) {
+        return (e.target.value = task?.name)
+      }
+      if (e.target.value === task?.name) return
+      useHandleUpdateTaskName(task?.section_id as number, task?.id as number, e.target.value)
+      inputElement.current.disabled = true
     }
-    console.log(`Save from onBlurUpdateTaskname`)
-    inputElement.current.disabled = true
   }
 
   const handleUpdateTaskName = (e: any, id: number) => {
     const keyCode = e.which || e.keyCode
 
-    if (keyCode == 13) {
+    if (keyCode === 13) {
       e.preventDefault()
-      console.log(`Save from handleUpdateTaskName ${id}`)
+      if (e.target.value === task?.name) return
+      useHandleUpdateTaskName(task?.section_id as number, task?.id as number, e.target.value)
+      isBlur = false
       inputElement.current.disabled = true
     }
   }
@@ -200,9 +250,12 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
             border-none bg-transparent px-0.5 text-sm font-medium focus:ring-0
             ${isTaskCompleted && 'opacity-60'}
           `}
-          defaultValue={task.name}
+          value={taskName}
+          defaultChecked={task?.name}
           disabled={true}
+          onFocus={(e) => (isBlur = true)}
           onBlur={onBlurUpdateTaskName}
+          onChange={(e) => setTaskName(e.target.value)}
           onKeyDown={(e) => handleUpdateTaskName(e, task.id)}
           placeholder="Write task name"
           ref={inputElement}
@@ -312,7 +365,13 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
           `}
         >
           <button
-            onClick={() => router.push(`/team/${router.query.id}/board?task_id=${task.id}`)}
+            onClick={() => {
+              setIsTaskSliderOpen(true)
+              setTaskID(task?.id)
+              setUpdateTaskSliderAssignee(updateAssignee)
+              setUpdateTaskSliderDueDate(selectedDueDate)
+              setIsTaskSliderCompleted(isTaskCompleted)
+            }}
             className="rounded-full p-1 text-slate-400 focus:bg-slate-200 focus:text-slate-900 hover:bg-slate-200 hover:text-slate-900 active:scale-95"
           >
             <Eye className="h-4 w-4 outline-none" />

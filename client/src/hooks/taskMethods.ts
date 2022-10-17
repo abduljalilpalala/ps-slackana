@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
@@ -6,19 +6,23 @@ import { getSections } from '~/redux/section/sectionSlice'
 import {
   completeTask,
   createTask,
+  getTask,
   removeTask,
   reorderTasks,
   resetRefresher,
+  resetUpdateTaskDetailsData,
   setAddNewTaskData,
   setCompleteTaskData,
   setProjectID,
   setRemoveTaskData,
   setSectionID,
   setUpdateTaskAssigneeData,
+  setUpdateTaskDetailsData,
   setUpdateTaskDueDateData,
   setUpdateTaskNameData,
   taskRefresher,
   updateTaskAssignee,
+  updateTaskDetails,
   updateTaskDueDate,
   updateTaskName
 } from '~/redux/task/taskSlice'
@@ -26,8 +30,10 @@ import {
 export const useTaskMethods = (projectID: number) => {
   const { task } = useAppSelector((state) => state)
   const {
+    taskData,
     refresher: { taskUpdate }
   } = task
+  const [isTaskLoading, setIsTaskLoading] = useState(false)
   const dispatch = useAppDispatch()
   useEffect(() => {
     dispatch(setProjectID({ project_id: projectID }))
@@ -120,6 +126,26 @@ export const useTaskMethods = (projectID: number) => {
     dispatch(setCompleteTaskData({ id }))
     dispatch(completeTask())
   }
+  const useHandleGetTask = async (task_id: number) => {
+    setIsTaskLoading(true)
+    dispatch(getTask(task_id)).then((_) => {
+      setIsTaskLoading(false)
+    })
+  }
+  const useHandleGetTaskWithoutLoading = async (task_id: number) => {
+    dispatch(getTask(task_id))
+  }
+  const useHandleUpdateTaskDetails = async (task_id: number, data: any) => {
+    dispatch(setUpdateTaskDetailsData({ id: task_id, ...data }))
+    toast.promise(dispatch(updateTaskDetails()), {
+      loading: 'Updating task details...',
+      success: 'Task details updated successfully!',
+      error: 'Error on updating task details!'
+    })
+  }
+  const useHandleRefetchTasks = async () => {
+    dispatch(getSections())
+  }
   return {
     useHandleCreateTask,
     useHandleRemoveTask,
@@ -128,6 +154,12 @@ export const useTaskMethods = (projectID: number) => {
     useHandleUpdateTaskAssignee,
     useHandleUpdateTaskName,
     useHandleCompleteTask,
-    taskUpdate
+    useHandleGetTask,
+    useHandleUpdateTaskDetails,
+    useHandleRefetchTasks,
+    useHandleGetTaskWithoutLoading,
+    taskUpdate,
+    isTaskLoading,
+    taskData
   }
 }

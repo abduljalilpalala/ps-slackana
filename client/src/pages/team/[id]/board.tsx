@@ -33,13 +33,20 @@ import { useTaskMethods } from '~/hooks/taskMethods'
 const Board: NextPage = (): JSX.Element => {
   const router = useRouter()
   const { id } = router.query
-  const { useHandleCreateTask, useHandleRemoveTask } = useTaskMethods(parseInt(id as string))
+  const { useHandleCreateTask, useHandleRemoveTask, useHandleGetTask } = useTaskMethods(
+    parseInt(id as string)
+  )
   const dispatch = useAppDispatch()
   const [newTaskDueDate, setNewTaskDueDate] = useState('')
   const [currentBoardId, setCurrentBoardId] = useState<any>(null)
   const [showAddSection, setShowAddSection] = useState(true)
   const [assigneeModal, setAssigneeModal] = useState<boolean>(false)
   const [assignee, setAssignee] = useState<any>({})
+  const [updateAssignee, setUpdateAssignee] = useState<any>(null)
+  const [updateTaskDueDate, setUpdateTaskDueDate] = useState<any>('')
+  const [isTaskCompleted, setIsTaskCompleted] = useState<any>(false)
+  const [isTaskSliderOpen, setIsTaskSliderOpen] = useState<any>(false)
+  const [taskID, setTaskID] = useState<any>(0)
 
   const [updateAssigneeModal, setUpdateAssigneeModal] = useState<boolean>(false)
 
@@ -60,10 +67,12 @@ const Board: NextPage = (): JSX.Element => {
       dispatch(resetRefresher())
     })
   }, [id])
-  useEffect(() => {
-    dispatch(setEditProjectTitle(title))
-  }, [title])
 
+  useEffect(() => {
+    if (isTaskSliderOpen) {
+      router.push(`/team/${router.query.id}/board?task_id=${taskID}`)
+    }
+  }, [isTaskSliderOpen, taskID])
   const canCreatePermission = project?.can?.createSection
   const canRenamePermission = project?.can?.renameSection
   const canRemovePermission = project?.can?.removeSection
@@ -250,7 +259,17 @@ const Board: NextPage = (): JSX.Element => {
                       <TaskList
                         key={task.id}
                         task={task}
+                        isTaskSliderOpen={isTaskSliderOpen}
+                        updateTaskSliderAssignee={updateAssignee}
+                        updateTaskSliderDueDate={updateTaskDueDate}
+                        isTaskSliderCompleted={isTaskCompleted}
+                        taskID={taskID}
                         actions={{
+                          setTaskID,
+                          setIsTaskSliderOpen,
+                          setUpdateTaskSliderAssignee: setUpdateAssignee,
+                          setUpdateTaskSliderDueDate: setUpdateTaskDueDate,
+                          setIsTaskSliderCompleted: setIsTaskCompleted,
                           handleRemoveTask
                         }}
                       />
@@ -274,7 +293,17 @@ const Board: NextPage = (): JSX.Element => {
           }}
           loadingSkeleton={loadingSkeleton()}
         />
-        <TaskSlider />
+        <TaskSlider
+          updateAssignee={updateAssignee}
+          updateTaskDueDate={updateTaskDueDate}
+          isTaskCompleted={isTaskCompleted}
+          actions={{
+            setTaskID,
+            setUpdateAssignee,
+            setUpdateTaskDueDate,
+            setIsTaskCompleted
+          }}
+        />
       </BoardWrapper>
     </ProjectLayout>
   )
