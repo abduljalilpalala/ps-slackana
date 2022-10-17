@@ -22,11 +22,6 @@ const PeopleList = ({ data, className, isLoading }: any) => {
   const { overviewProject } = project || {};
   const { id: projectID, teams: projectTeams } = overviewProject || {};
 
-  const stateRefresh = () => {
-    dispatch(getProject(projectID));
-    dispatch(getAllUsers(projectID));
-  }
-
   const addPeople = () => {
     setResetTeam(true);
     const newTeamData = { teams: selectedTeam, user_id: id, project_id: projectID };
@@ -34,8 +29,10 @@ const PeopleList = ({ data, className, isLoading }: any) => {
     dispatch(memberRefresher());
     toast.promise(
       dispatch(addNewMember(newTeamData)).then((_) => {
-        setResetTeam(false);
         setSelectedTeam([]);
+        setResetTeam(false);
+        dispatch(getProject(projectID));
+        dispatch(getAllUsers(projectID));
       }),
       {
         loading: 'Adding member...',
@@ -51,7 +48,7 @@ const PeopleList = ({ data, className, isLoading }: any) => {
 
   const moreOption = (
     <>
-      <AddPeopleButton onClick={addPeople} isSolid={false} isHeader={false} disabled={selectedTeam.length === 0} />
+      <AddPeopleButton onClick={addPeople} isSolid={false} isHeader={false} disabled={selectedTeam.length === 0 || resetTeam} />
       <PeopleOption data={projectTeams} callback={dropDownOption} reset={resetTeam}>
         <div className='hover:bg-slate-100 rotate-90 z-0 cursor-pointer w-[28px] h-[28px] flex items-center justify-center rounded-[3px] border border-slate-500 mb-[2px]'>
           <ThreeDot />

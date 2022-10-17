@@ -264,13 +264,13 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
                 </div>
                 <SwitchToggle value={switchState} className="mt-[3px]" state={notificationStatus ? true : false} />
               </div>
-              <div css={settingsStyle.disabled}>
+              {/* <div css={settingsStyle.disabled}>
                 <div className="flex flex-row gap-3">
                   <CalendarIcon />
                   <p css={settingsStyle.value}>Notifications for Google Meeting reminder</p>
                 </div>
                 <SwitchToggle value={switchState} className="mt-[3px]" state={false} isDisabled={true} />
-              </div>
+              </div> */}
             </div>
           </div>
         );
