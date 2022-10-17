@@ -221,7 +221,7 @@ const Overview: FC = (): JSX.Element => {
                     if (editDescription?.length === 0) return dispatch(setEditProjectDescription(description));
                     if (editDescription !== description) return onSaveChanges();
                   }}
-                  className='text-sm text-slate-500 break-words border border-slate-300 p-5 rounded-md'
+                  className='text-sm text-slate-500 break-words border border-slate-300 p-5 rounded-md resize-none'
                 />
               }
 
