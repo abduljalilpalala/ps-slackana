@@ -24,9 +24,10 @@ const MyApp = ({ Component, ...rest }: AppProps): JSX.Element => {
             style: {
               borderRadius: '10px',
               background: '#2D3D63',
-              color: '#fff',
+              color: '#fff'
             }
-          }} />
+          }}
+        />
         <Component {...props.pageProps} />
       </Provider>
     </>

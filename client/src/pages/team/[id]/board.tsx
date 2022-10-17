@@ -27,6 +27,7 @@ import {
 import { tasks } from '~/shared/jsons/dummyTasks'
 import AddTask from '~/components/molecules/AddTask'
 import TaskList from '~/components/molecules/TaskList'
+import TaskSlider from '~/components/organisms/TaskSlider'
 
 const Board: NextPage = (): JSX.Element => {
   const router = useRouter()
@@ -186,8 +187,8 @@ const Board: NextPage = (): JSX.Element => {
   const handleUpdateAssigneeToggle = () => setUpdateAssigneeModal(!updateAssigneeModal)
 
   const loadingSkeleton = (
-    <section className="group-board w-full max-w-[18rem] flex-shrink-0 ">
-      <header className="flex flex-col items-center justify-between py-2">
+    <section className="group-board w-full max-w-[18rem] flex-shrink-0 space-x-4">
+      <header className="ml-4 flex flex-col items-center justify-between py-2">
         <LineSkeleton className="h-5 w-[95%]" />
       </header>
       <main className="flex h-[75vh] min-h-[75vh] flex-col content-between space-y-2 overflow-y-auto rounded-lg border bg-white px-4 py-5 group-board-hover:shadow-sm">
@@ -267,6 +268,7 @@ const Board: NextPage = (): JSX.Element => {
           }}
           loadingSkeleton={loadingSkeleton}
         />
+        <TaskSlider />
       </BoardWrapper>
     </ProjectLayout>
   )
