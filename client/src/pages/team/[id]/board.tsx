@@ -55,7 +55,6 @@ const Board: NextPage = (): JSX.Element => {
   useEffect(() => {
     dispatch(sectionsRefresher())
     dispatch(getProject(id))
-    dispatch(setEditProjectTitle(title))
     dispatch(setProjectID({ project_id: parseInt(id as string) }))
     dispatch(getSections()).then((_) => {
       dispatch(resetRefresher())

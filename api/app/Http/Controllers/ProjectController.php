@@ -14,7 +14,7 @@ class ProjectController extends Controller
 {
   public function index(Request $request)
   {
-    $projects = User::find(auth()->user()->id)->projects()->withCount(['members'])->with(['icon', 'status']);
+    $projects = User::find(auth()->user()->id)->projects()->withCount(['members'])->with(['icon', 'status'])->wherePivot('is_removed', 0);
 
     if ($request->get('filter')) {
       if (intval($request->get('filter')) !== ProjectStatusEnum::ARCHIVED->value) {
