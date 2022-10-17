@@ -8,6 +8,10 @@ import ReactTextareaAutosize from 'react-textarea-autosize'
 import Tooltip from '~/components/templates/Tooltip'
 import { assignees } from '~/shared/jsons/assigneeData'
 import DialogBox from '~/components/templates/DialogBox'
+import { useRouter } from 'next/router'
+import { useMemberMethods } from '~/hooks/memberMethods'
+import { useTaskMethods } from '~/hooks/taskMethods'
+import PeopleList from '../PeopeList'
 
 type Props = {
   assignee: any
@@ -32,13 +36,29 @@ const AddTask: FC<Props> = (props): JSX.Element => {
     setAssignee,
     actions: { onClickEnterTask, onClickOutTask, onChangeTask, handleAssigneeToggle }
   } = props
+  const router = useRouter()
+  const { id } = router.query
+  const { members, isMemberLoading, filterMembersName } = useMemberMethods(parseInt(id as string))
+  const { taskUpdate } = useTaskMethods(parseInt(id as string))
 
   const handleSetAssignee = (id: number) => {
-    const getMember = assignees.find((member) => member.id === id)
+    const getMember = members.find((member: any) => member.id === id)
     setAssignee(getMember)
     handleAssigneeToggle()
   }
+  const onSearchChange = (e: any): void => {
+    const value = e.target.value
+    if (value.length === 0) {
+      filterMembersName(parseInt(id as string), value)
+    }
+  }
+  const onSearch = (e: any): void => {
+    const value = e.target.value
+    const isEnter = e.key === 'Enter' || e.keyCode === 13
 
+    if (!isEnter) return
+    filterMembersName(parseInt(id as string), value)
+  }
   const CustomCalendarButton = forwardRef(({ value, onClick }: any, ref: any) => (
     <button
       onClick={onClick}
@@ -51,7 +71,11 @@ const AddTask: FC<Props> = (props): JSX.Element => {
         `}
     >
       {value ? (
-        <p className="text-xs">{moment(new Date(value)).format('MMM D')}</p>
+        <p className="text-xs">
+          {moment().format('MMM D') === moment(new Date(value)).format('MMM D')
+            ? 'Today'
+            : moment(new Date(value)).format('MMM D')}
+        </p>
       ) : (
         <Calendar className="h-4 w-4" />
       )}
@@ -71,15 +95,23 @@ const AddTask: FC<Props> = (props): JSX.Element => {
             <Search color="#94A3B8" />
             <input
               type="text"
+              onChange={onSearchChange}
+              onKeyDown={onSearch}
               className="mr-5 w-full border-none text-slate-900 focus:ring-transparent"
               placeholder="Find members"
             />
           </div>
         </div>
         <div className="mb-3 h-[300px] overflow-y-scroll scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-slate-400 scrollbar-thumb-rounded-md">
-          {assignees.map((assignee) => (
-            <MemberList key={assignee.id} actions={{ handleSetAssignee }} {...assignee} />
-          ))}
+          {isMemberLoading ? (
+            <PeopleList isLoading={isMemberLoading} />
+          ) : members?.length === 0 ? (
+            <h1 className="text-px-18 mt-5 text-slate-600 opacity-60">No available data</h1>
+          ) : (
+            members?.map((member: any) => (
+              <MemberList key={member.id} actions={{ handleSetAssignee }} {...member} />
+            ))
+          )}
         </div>
       </div>
     </DialogBox>
@@ -109,6 +141,7 @@ const AddTask: FC<Props> = (props): JSX.Element => {
             flex-1 resize-none flex-wrap overflow-hidden border-none
             bg-transparent pl-6 text-sm font-medium focus:ring-0
           `}
+          disabled={taskUpdate}
           onKeyDown={onClickEnterTask}
           onChange={onChangeTask}
           placeholder="Write task name"
@@ -118,9 +151,9 @@ const AddTask: FC<Props> = (props): JSX.Element => {
       <div className="ml-4 flex items-center space-x-2.5 pb-2 transition duration-150 ease-in-out">
         <Tooltip text="Assignee">
           <>
-            {assignee.avatar_url ? (
+            {assignee.user?.avatar?.url ? (
               <button className="overflow-hidden rounded-full" onClick={handleAssigneeToggle}>
-                <img src={assignee.avatar_url} className="z-10 h-6 w-6 rounded-full" />
+                <img src={assignee.user?.avatar?.url} className="z-10 h-6 w-6 rounded-full" />
               </button>
             ) : (
               <button
@@ -140,7 +173,9 @@ const AddTask: FC<Props> = (props): JSX.Element => {
         <Tooltip text="Due Date">
           <DatePicker
             selected={newTaskDueDate}
-            onChange={(date: Date) => setNewTaskDueDate(date)}
+            onChange={(date: Date) => {
+              setNewTaskDueDate(date)
+            }}
             customInput={<CustomCalendarButton />}
           />
         </Tooltip>
@@ -149,7 +184,7 @@ const AddTask: FC<Props> = (props): JSX.Element => {
   )
 }
 
-const MemberList = ({ id, name, avatar_url, actions: { handleSetAssignee } }: any) => {
+const MemberList = ({ id, user, actions: { handleSetAssignee } }: any) => {
   return (
     <button
       onClick={() => handleSetAssignee(id)}
@@ -157,11 +192,11 @@ const MemberList = ({ id, name, avatar_url, actions: { handleSetAssignee } }: an
     >
       <div className="flex min-w-[150px] flex-row items-center justify-start gap-3 truncate text-ellipsis mobile:w-[75%]">
         <div className="flex items-center justify-center mobile:min-w-[36px]">
-          <img src={avatar_url} className="h-8 w-8 rounded-md" />
+          <img src={user?.avatar?.url} className="h-8 w-8 rounded-md" />
         </div>
         <div className="flex flex-col items-start justify-start">
           <div className="flex flex-row items-center gap-3">
-            <p className="text-[16px] font-medium tracking-tighter text-slate-900">{name}</p>
+            <p className="text-[16px] font-medium tracking-tighter text-slate-900">{user?.name}</p>
           </div>
         </div>
       </div>

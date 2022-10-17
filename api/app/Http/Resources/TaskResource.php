@@ -16,7 +16,8 @@ class TaskResource extends JsonResource
     {
       return [
         'id' => $this->id,
-        'member' => new MemberResource($this->whenLoaded('project_member')),
+        'section_id'=>$this->section_id,
+        'assignee' => new MemberResource($this->whenLoaded('project_member')),
         'name' => $this->name,
         'description' => $this->description,
         'is_completed' => $this->is_completed,

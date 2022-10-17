@@ -16,6 +16,11 @@ class ProjectMemberController extends Controller
     if (request('filter')) {
       return MemberResource::collection($project->teams()->where('id', request('filter'))->first()->members()->with(['role', 'user.avatar', 'teams'])->get());
     }
+    if(request('search')){
+      return MemberResource::collection($project->members()->whereHas('user', function($query){
+        $query->where('name', 'like', '%' . request('search') . '%');
+      } )->with(['user.avatar','role', 'teams'])->get());
+    }
     return MemberResource::collection($project->members()->with(['role', 'user.avatar', 'teams'])->get());
   }
 

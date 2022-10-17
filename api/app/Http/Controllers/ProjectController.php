@@ -48,6 +48,12 @@ class ProjectController extends Controller
 
     $project->teams()->createMany($request->teams);
 
+    $project->sections()->createMany([
+      ['name'=>'To Do'],
+      ['name'=>'In Progress'],
+      ['name'=>'Completed'],
+    ]);
+
     $member = $project->members()->create([
       'user_id' => auth()->user()->id, 'role_id' => RoleEnum::PROJECT_OWNER
     ]);
