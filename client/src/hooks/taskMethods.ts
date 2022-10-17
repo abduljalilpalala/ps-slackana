@@ -4,11 +4,13 @@ import toast from 'react-hot-toast'
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
 import { getSections } from '~/redux/section/sectionSlice'
 import {
+  completeTask,
   createTask,
   removeTask,
   reorderTasks,
   resetRefresher,
   setAddNewTaskData,
+  setCompleteTaskData,
   setProjectID,
   setRemoveTaskData,
   setSectionID,
@@ -24,14 +26,6 @@ import {
 export const useTaskMethods = (projectID: number) => {
   const { task } = useAppSelector((state) => state)
   const {
-    isLoading,
-    isSuccess,
-    isError,
-    error,
-    section_id,
-    project_id,
-    addNewTaskData,
-    removeTaskData,
     refresher: { taskUpdate }
   } = task
   const dispatch = useAppDispatch()
@@ -122,6 +116,10 @@ export const useTaskMethods = (projectID: number) => {
       }
     )
   }
+  const useHandleCompleteTask = async (id: number) => {
+    dispatch(setCompleteTaskData({ id }))
+    dispatch(completeTask())
+  }
   return {
     useHandleCreateTask,
     useHandleRemoveTask,
@@ -129,6 +127,7 @@ export const useTaskMethods = (projectID: number) => {
     useHandleUpdateTaskDueDate,
     useHandleUpdateTaskAssignee,
     useHandleUpdateTaskName,
+    useHandleCompleteTask,
     taskUpdate
   }
 }

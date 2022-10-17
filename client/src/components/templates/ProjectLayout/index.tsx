@@ -12,7 +12,7 @@ const ProjectLayout: FC<Props> = ({ metaTitle, children }): JSX.Element => {
   return (
     <Layout metaTitle={metaTitle}>
       <ProjectHeader />
-      {children}
+      <div className="relative">{children}</div>
     </Layout>
   )
 }

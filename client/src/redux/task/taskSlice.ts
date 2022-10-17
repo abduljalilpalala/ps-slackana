@@ -38,6 +38,9 @@ type InitialState = {
     id: number
     name: string
   }
+  completeTaskData: {
+    id: number
+  }
   isError: boolean
   isSuccess: boolean
   isLoading: boolean
@@ -80,6 +83,9 @@ const initialState: InitialState = {
   updateTaskNameData: {
     id: 0,
     name: ''
+  },
+  completeTaskData: {
+    id: 0
   },
   refresher: {
     tasksStateUpdate: false,
@@ -187,6 +193,16 @@ export const updateTaskName = createAsyncThunk('task/updateTaskNameStatus', asyn
     return thunkAPI.rejectWithValue(catchError(error))
   }
 })
+export const completeTask = createAsyncThunk('task/completeTaskStatus', async (_, thunkAPI) => {
+  const {
+    task: { project_id, completeTaskData }
+  }: any = thunkAPI.getState()
+  try {
+    return await taskService.completeTask(project_id, completeTaskData.id)
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(catchError(error))
+  }
+})
 
 export const taskSlice = createSlice({
   name: 'task',
@@ -235,6 +251,9 @@ export const taskSlice = createSlice({
     },
     setUpdateTaskNameData: (state, { payload }) => {
       state.updateTaskNameData = payload
+    },
+    setCompleteTaskData: (state, { payload }) => {
+      state.completeTaskData = payload
     }
   },
   extraReducers: (builder: ActionReducerMapBuilder<any>) => {
@@ -373,6 +392,25 @@ export const taskSlice = createSlice({
         state.isLoading = false
         state.error = action.payload
       })
+      // Complete Task
+      .addCase(completeTask.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(completeTask.fulfilled, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.isError = false
+        state.error = {
+          status: 0,
+          content: null
+        }
+      })
+      .addCase(completeTask.rejected, (state, action: PayloadAction<any>) => {
+        state.isError = true
+        state.isSuccess = false
+        state.isLoading = false
+        state.error = action.payload
+      })
   }
 })
 
@@ -388,6 +426,7 @@ export const {
   setRemoveTaskData,
   setUpdateTaskDueDateData,
   setUpdateTaskAssigneeData,
-  setUpdateTaskNameData
+  setUpdateTaskNameData,
+  setCompleteTaskData
 } = taskSlice.actions
 export default taskSlice.reducer
