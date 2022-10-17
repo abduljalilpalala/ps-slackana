@@ -44,6 +44,7 @@ APP_ENV=local
 APP_KEY= // Generate a new key
 APP_DEBUG=true
 APP_URL=http://localhost:8000
+FRONTEND_URL=http://localhost:3000
 
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1

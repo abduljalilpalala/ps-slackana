@@ -17,7 +17,7 @@ export const styles = {
   uploadContainer: [tw`flex flex-row justify-between items-center`],
   active: [tw`border-b border-[${slate_900}] text-[${slate_900}]`],
   inactive: [tw`text-[${slate_400}] outline-none`],
-  notification: [tw`flex flex-row justify-between items-start border-b border-[${slate_300}] pb-5`],
+  notification: [tw`flex flex-row justify-between items-start pb-5`],
   p: [tw`text-[${slate_900}] text-[15px] text-left mb-5`],
   disabled: [tw`flex flex-row justify-between items-start pt-3 opacity-50`],
   value: [tw`text-[${slate_900}] text-[15px] text-left`],
