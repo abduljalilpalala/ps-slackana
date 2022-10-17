@@ -3,9 +3,17 @@ import { toast } from "react-hot-toast";
 import React, { useState } from "react";
 import ReactTooltip from "react-tooltip";
 
-import { MemberListProps } from './MemberListType';
+import { 
+  getAllUsers, 
+  removeMember, 
+  filterMembers, 
+  leaveProject, 
+  setAsTeamLead, 
+  setAsMVP, 
+} from "~/redux/member/memberSlice";
 import { FistIcon } from "~/shared/icons/FistIcon";
 import { StarIcon } from '~/shared/icons/StarIcon';
+import { MemberListProps } from './MemberListType';
 import { CrownIcon } from "~/shared/icons/CrownIcon";
 import { ThreeDot } from "~/shared/icons/ThreeDotIcon";
 import { ActiveStatus } from "~/shared/icons/ActiveStatus";
@@ -14,7 +22,6 @@ import LineSkeleton from "~/components/atoms/Skeletons/LineSkeleton";
 import ImageSkeleton from "~/components/atoms/Skeletons/ImageSkeleton";
 import { useAppDispatch, useAppSelector } from "~/hooks/reduxSelector";
 import { getProject, memberRefresher } from '~/redux/project/projectSlice';
-import { getAllUsers, removeMember, filterMembers, leaveProject, setAsTeamLead, setAsMVP } from "~/redux/member/memberSlice";
 
 const MemberList = ({
   data,

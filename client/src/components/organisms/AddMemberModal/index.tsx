@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { ChevronDown, Search } from "react-feather";
 
+import {
+  getMembers,
+  getAllUsers,
+  filterAllUser,
+  filterMembers,
+} from "~/redux/member/memberSlice";
 import MemberFilter from "../MemberFilter";
 import DialogBox from "~/components/templates/DialogBox";
 import PeopleList from "~/components/molecules/PeopeList";
@@ -8,7 +14,6 @@ import MemberList from "~/components/molecules/MemberList";
 import { AddMemberFilterProps } from "./AddMemberFilterType";
 import AddPeopleButton from "~/components/atoms/AddPeopleButton";
 import { useAppDispatch, useAppSelector } from "~/hooks/reduxSelector";
-import { filterAllUser, filterMembers, getAllUsers, getMembers } from "~/redux/member/memberSlice";
 
 const AddMemberModal = ({ close }: AddMemberFilterProps) => {
   const dispatch = useAppDispatch();

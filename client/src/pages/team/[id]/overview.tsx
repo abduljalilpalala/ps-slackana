@@ -1,20 +1,17 @@
 import moment from 'moment'
 import { Plus } from 'react-feather'
 import { useRouter } from 'next/router'
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useState } from 'react'
 
 import {
   setID,
   addNewTeam,
   getProject,
   teamRefresher,
-  startRefresher,
   setTeamNewName,
   resetRefresher,
   renameTeamData,
-  setEditProjectID,
   projectRefresher,
-  setUserPermission,
   setEditProjectTitle,
   updateProjectDetails,
   setEditProjectDescription,
@@ -31,7 +28,6 @@ import MembersTemplate from '~/components/molecules/MembersTemplate'
 import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
 import { styles as homeStyle } from '~/shared/twin/home-content.style'
-import projectService from '~/redux/project/projectService'
 
 const Overview: FC = (): JSX.Element => {
   const router = useRouter();
@@ -44,9 +40,9 @@ const Overview: FC = (): JSX.Element => {
   const {
     isLoading,
     refresher,
-    userPermission: can,
     overviewProject,
     projectDescription,
+    userPermission: can,
     renameTeamData: getTeamData,
   } = useAppSelector((state) => state.project);
 
@@ -59,35 +55,8 @@ const Overview: FC = (): JSX.Element => {
     members,
     created_at,
     description,
-    can: userPermission,
     numberOfActiveMembers,
-    isLoading: reloadPermission,
   } = overviewProject || {};
-
-  useEffect(() => {
-    setTeamLimit(false);
-    dispatch(startRefresher());
-    dispatch(setEditProjectID(id));
-    dispatch(getProject(id)).then(_ => { dispatch(resetRefresher()) });
-  }, [id])
-
-  useEffect(() => {
-    dispatch(setEditProjectTitle(title));
-    dispatch(setEditProjectDescription(description));
-  }, [title, description])
-
-  useEffect(() => {
-    if (memberStateUpdate) {
-      dispatch(getProject(id))
-        .then(_ => {
-          dispatch(resetRefresher());
-        });
-    }
-  }, [memberStateUpdate])
-
-  useEffect(() => {
-    dispatch(setUserPermission(userPermission));
-  }, [reloadPermission, memberStateUpdate, id, title])
 
   const updateTitle = (e: any) => {
     const value = e.target.value;
@@ -300,7 +269,7 @@ const Overview: FC = (): JSX.Element => {
                       })
                 }
                 {
-                  memberStateUpdate || numberOfActiveMembers === 13 &&
+                  memberStateUpdate || numberOfActiveMembers >= 13 &&
                   <SeeMore set={setMembersLimit} what={membersLimit} />
                 }
               </div>

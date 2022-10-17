@@ -319,7 +319,7 @@ export const projectSlice = createSlice({
     },
 
     setUserPermission: (state, { payload }) => {
-      state.userPermission = payload;
+      state.userPermission = payload; 
     }
   },
   extraReducers: (builder: ActionReducerMapBuilder<any>) => {
@@ -372,9 +372,10 @@ export const projectSlice = createSlice({
         state.isSidebarLoading = true;
       })
       .addCase(getProject.fulfilled, (state, action: PayloadAction<any>) => {
-        // state.isLoading = false;  
+        // state.isLoading = false;   
         state.isSidebarLoading = false;
         state.overviewProject = action.payload;
+        state.userPermission = action.payload.can;
         state.error = {
           status: 0,
           content: null
