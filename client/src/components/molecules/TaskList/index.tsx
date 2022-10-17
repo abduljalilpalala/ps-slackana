@@ -1,10 +1,11 @@
 import moment from 'moment'
 import { forwardRef } from 'react'
 import { Menu } from '@headlessui/react'
-import { BsCheckCircle, BsCheckCircleFill } from 'react-icons/bs'
+import { useRouter } from 'next/router'
 import ReactDatePicker from 'react-datepicker'
 import ReactTextareaAutosize from 'react-textarea-autosize'
-import { Calendar, Search, User, MoreHorizontal, Edit3, Trash } from 'react-feather'
+import { BsCheckCircle, BsCheckCircleFill } from 'react-icons/bs'
+import { Calendar, Search, User, MoreHorizontal, Edit3, Trash, Eye } from 'react-feather'
 
 import { classNames } from '~/helpers/classNames'
 import Tooltip from '~/components/templates/Tooltip'
@@ -34,6 +35,10 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
     setUpdateAssignee,
     actions: { handleUpdateAssigneeToggle }
   } = props
+
+  const router = useRouter()
+
+  const { task_id } = router.query
 
   const handleSetAssignee = (id: number) => {
     const getMember = assignees.find((member) => member.id === id)
@@ -129,6 +134,9 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
                     active:scale-95 group-task-hover:opacity-100 group-task-focus:opacity-100
                   ${open ? 'border-slate-300 bg-slate-100' : 'border-slate-200'}
               `}
+                  onClick={() => {
+                    if (task_id) return
+                  }}
                 >
                   <MoreHorizontal className="h-4 w-4" />
                 </Menu.Button>
@@ -170,36 +178,54 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
           </Menu>
         </div>
       </div>
-      <div className="ml-4 flex items-center space-x-2.5 py-2 transition duration-150 ease-in-out">
-        <Tooltip text="Assignee">
-          <>
-            {task?.member?.user ? (
-              <button className="overflow-hidden rounded-full" onClick={handleUpdateAssigneeToggle}>
-                <img src={task?.member?.user.avatar.url} className="z-10 h-6 w-6 rounded-full" />
-              </button>
-            ) : (
-              <button
-                className={`
+      <div className="flex items-center justify-between px-4 py-2 transition duration-150 ease-in-out">
+        <div className="flex items-center space-x-2.5">
+          <Tooltip text="Assignee">
+            <>
+              {task?.member?.user ? (
+                <button
+                  className="overflow-hidden rounded-full"
+                  onClick={handleUpdateAssigneeToggle}
+                >
+                  <img src={task?.member?.user.avatar.url} className="z-10 h-6 w-6 rounded-full" />
+                </button>
+              ) : (
+                <button
+                  className={`
                   hover:border-slate rounded-full border-[1.5px] border-dashed border-slate-400 p-0.5
                 text-slate-400 transition duration-75 ease-in-out focus:border-slate-500
                 focus:text-slate-500 focus:outline-none hover:border-slate-500 hover:bg-white hover:text-slate-500
                 `}
-                onClick={handleUpdateAssigneeToggle}
-              >
-                <User className="h-4 w-4" />
-              </button>
-            )}
-            {updateAssigneeModal && addAssigneeComponent}
-          </>
-        </Tooltip>
-        <Tooltip text="Due Date">
-          <ReactDatePicker
-            selected={updateTaskDueDate}
-            onChange={(date: Date) => setUpdateTaskDueDate(date)}
-            value={task.due_date}
-            customInput={<CustomCalendarButton />}
-          />
-        </Tooltip>
+                  onClick={handleUpdateAssigneeToggle}
+                >
+                  <User className="h-4 w-4" />
+                </button>
+              )}
+              {updateAssigneeModal && addAssigneeComponent}
+            </>
+          </Tooltip>
+          <Tooltip text="Due Date">
+            <ReactDatePicker
+              selected={updateTaskDueDate}
+              onChange={(date: Date) => setUpdateTaskDueDate(date)}
+              value={task.due_date}
+              customInput={<CustomCalendarButton />}
+            />
+          </Tooltip>
+        </div>
+        <div
+          className={`
+            opacity-0 group-task-hover:opacity-100 group-task-focus:opacity-100
+            ${task_id == task.id && 'opacity-100'}
+          `}
+        >
+          <button
+            onClick={() => router.push(`/team/${router.query.id}/board?task_id=${task.id}`)}
+            className="rounded-full p-1 text-slate-400 focus:bg-slate-200 focus:text-slate-900 hover:bg-slate-200 hover:text-slate-900 active:scale-95"
+          >
+            <Eye className="h-4 w-4 outline-none" />
+          </button>
+        </div>
       </div>
     </div>
   )

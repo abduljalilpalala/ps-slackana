@@ -50,7 +50,7 @@ const BoardSection: FC<Props> = (props): JSX.Element => {
   }
 
   return (
-    <section className="group-board w-full max-w-[18rem] flex-shrink-0">
+    <section className="group-board w-full max-w-[18rem] flex-shrink-0 pl-3">
       <header className="flex flex-shrink-0 items-center justify-between py-1">
         <div className="pr-2">
           <input

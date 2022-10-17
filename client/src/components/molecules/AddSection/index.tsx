@@ -29,7 +29,7 @@ const AddSection: FC<Props> = (props): JSX.Element => {
   } = props
 
   return (
-    <section className="w-full max-w-[18rem] flex-shrink-0">
+    <section className="ml-4 w-full max-w-[18rem] flex-shrink-0">
       <header className="-mt-2 flex items-center justify-between py-2">
         {showAddSection && canCreatePermission && !sectionsStateUpdate && (
           <button
