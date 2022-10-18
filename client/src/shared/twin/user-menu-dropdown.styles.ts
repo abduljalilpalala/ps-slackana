@@ -15,7 +15,7 @@ export const styles = {
     tw`
       flex items-center space-x-3 px-4 py-2
       [> div]:(flex flex-col)
-      [> div > h1]:(text-sm font-medium text-gray-900 line-clamp-1)
+      [> div > h1]:(text-sm font-medium text-gray-900)
       [> div > p]:(text-xs font-normal text-gray-600)
     `
   ],
