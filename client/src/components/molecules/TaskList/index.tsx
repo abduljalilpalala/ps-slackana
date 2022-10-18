@@ -15,6 +15,7 @@ import DialogBox from '~/components/templates/DialogBox'
 import { useMemberMethods } from '~/hooks/memberMethods'
 import { useProjectMethods } from '~/hooks/projectMethods'
 import MenuTransition from '~/components/templates/MenuTransition'
+import handleImageError from '~/helpers/handleImageError'
 
 type Props = {
   task: any
@@ -274,6 +275,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
                 >
                   <img
                     src={updateAssignee?.user.avatar.url}
+                    onError={(e) => handleImageError(e, '/images/avatar.png')}
                     className="z-10 h-6 w-6 rounded-full"
                   />
                 </button>
@@ -329,7 +331,11 @@ const MemberList = ({ id, user, actions: { handleSetAssignee } }: any) => {
     >
       <div className="flex min-w-[150px] flex-row items-center justify-start gap-3 truncate text-ellipsis mobile:w-[75%]">
         <div className="flex items-center justify-center mobile:min-w-[36px]">
-          <img src={user?.avatar.url} className="h-8 w-8 rounded-md" />
+          <img
+            src={user?.avatar.url}
+            onError={(e) => handleImageError(e, '/images/avatar.png')}
+            className="h-8 w-8 rounded-md"
+          />
         </div>
         <div className="flex flex-col items-start justify-start">
           <div className="flex flex-row items-center gap-3">

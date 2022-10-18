@@ -20,6 +20,7 @@ import SubmitButton from "~/components/atoms/SubmitButton";
 import { useAppDispatch, useAppSelector } from "~/hooks/reduxSelector";
 import { styles as settingsStyle } from '~/shared/twin/settings-modal.style';
 import ReactTooltip from "react-tooltip";
+import handleImageError from "~/helpers/handleImageError";
 
 const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
   const dispatch = useAppDispatch();
@@ -138,7 +139,8 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
               <p className="text-slate-800 text-px-12 text-left">Your photo</p>
               <div css={settingsStyle.uploadContainer}>
                 <img
-                  src={avatar?.url || '/images/team/qa.png'}
+                  src={avatar?.url}
+                  onError={(e) => handleImageError(e, '/images/team/qa.png')}
                   alt="team-icon"
                   className="rounded-full max-h-[88px] min-h-[88px] max-w-[88px] min-w-[88px]"
                 />

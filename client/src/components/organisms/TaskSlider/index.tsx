@@ -11,6 +11,7 @@ import Tooltip from '~/components/templates/Tooltip'
 import { assignees } from '~/shared/jsons/assigneeData'
 import DialogBox from '~/components/templates/DialogBox'
 import MenuTransition from '~/components/templates/MenuTransition'
+import handleImageError from '~/helpers/handleImageError'
 
 type Props = {}
 
@@ -293,7 +294,11 @@ const MemberList = ({ id, name, avatar_url, actions: { handleSetAssignee } }: an
     >
       <div className="flex min-w-[150px] flex-row items-center justify-start gap-3 truncate text-ellipsis mobile:w-[75%]">
         <div className="flex items-center justify-center mobile:min-w-[36px]">
-          <img src={avatar_url} className="h-8 w-8 rounded-md" />
+          <img
+            src={avatar_url}
+            onError={(e) => handleImageError(e, '/images/team/qa.png')}
+            className="h-8 w-8 rounded-md"
+          />
         </div>
         <div className="flex flex-col items-start justify-start">
           <div className="flex flex-row items-center gap-3">

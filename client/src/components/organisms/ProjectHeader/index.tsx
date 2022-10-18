@@ -10,7 +10,7 @@ import {
   setEditProjectID,
   setUserPermission,
   setEditProjectTitle,
-  setEditProjectDescription,
+  setEditProjectDescription
 } from '~/redux/project/projectSlice'
 import { styles } from '~/shared/twin/project-header.styles'
 import AddMemberModal from '~/components/organisms/AddMemberModal'
@@ -19,18 +19,15 @@ import ImageSkeleton from '~/components/atoms/Skeletons/ImageSkeleton'
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
 import ProjectActionDropdown from '~/components/molecules/ProjectActionDropdown'
 import ProjectStatusDropdown from '~/components/molecules/ProjectStatusDropdown'
+import handleImageError from '~/helpers/handleImageError'
 
 const ProjectHead: FC = (): JSX.Element => {
   const router = useRouter()
   const { id } = router.query
-  const dispatch = useAppDispatch();
-  const [addModal, setAddModal] = useState<boolean>(false);
+  const dispatch = useAppDispatch()
+  const [addModal, setAddModal] = useState<boolean>(false)
 
-  const {
-    isLoading,
-    refresher,
-    overviewProject,
-  } = useAppSelector((state) => state.project);
+  const { isLoading, refresher, overviewProject } = useAppSelector((state) => state.project)
 
   const {
     icon,
@@ -39,34 +36,35 @@ const ProjectHead: FC = (): JSX.Element => {
     id: projectID,
     can: userPermission,
     title: projectTitle,
-    numberOfActiveMembers,
-  } = overviewProject || {};
-  const { memberStateUpdate } = refresher || {};
-  const hotReload = id == projectID;
+    numberOfActiveMembers
+  } = overviewProject || {}
+  const { memberStateUpdate } = refresher || {}
+  const hotReload = id == projectID
 
   useEffect(() => {
-    dispatch(startRefresher());
-    dispatch(setEditProjectID(id));
-    dispatch(getProject(id)).then(_ => { dispatch(resetRefresher()) });
+    dispatch(startRefresher())
+    dispatch(setEditProjectID(id))
+    dispatch(getProject(id)).then((_) => {
+      dispatch(resetRefresher())
+    })
   }, [id])
 
   useEffect(() => {
-    dispatch(setEditProjectTitle(projectTitle));
-    dispatch(setEditProjectDescription(description));
+    dispatch(setEditProjectTitle(projectTitle))
+    dispatch(setEditProjectDescription(description))
   }, [projectTitle, description])
 
   useEffect(() => {
     if (memberStateUpdate) {
-      dispatch(getProject(id))
-        .then(_ => {
-          dispatch(resetRefresher());
-        });
+      dispatch(getProject(id)).then((_) => {
+        dispatch(resetRefresher())
+      })
     }
   }, [memberStateUpdate])
 
   useEffect(() => {
-    dispatch(setUserPermission(userPermission));
-  }, [isLoading, memberStateUpdate]);
+    dispatch(setUserPermission(userPermission))
+  }, [isLoading, memberStateUpdate])
 
   const tabs = [
     {
@@ -91,33 +89,39 @@ const ProjectHead: FC = (): JSX.Element => {
       {addModal && <AddMemberModal close={() => setAddModal(false)} />}
       <header css={styles.header}>
         <section css={styles.section}>
-          {
-            isLoading
-              ? !hotReload
-                ? <ImageSkeleton className='!max-w-[44px] !min-w-[44px] !max-h-[44px] !min-h-[44px] !rounded-md' />
-                : <img
-                  src={icon?.url || "/images/image-dummy.png"}
-                  alt="team-icon"
-                  width={44}
-                  height={44}
-                />
-              : <img
-                src={icon?.url || "/images/image-dummy.png"}
+          {isLoading ? (
+            !hotReload ? (
+              <ImageSkeleton className="!max-h-[44px] !min-h-[44px] !min-w-[44px] !max-w-[44px] !rounded-md" />
+            ) : (
+              <img
+                src={icon?.url}
+                onError={(e) => handleImageError(e, '/images/image-dummy.png')}
                 alt="team-icon"
                 width={44}
                 height={44}
               />
-          }
+            )
+          ) : (
+            <img
+              src={icon?.url}
+              onError={(e) => handleImageError(e, '/images/image-dummy.png')}
+              alt="team-icon"
+              width={44}
+              height={44}
+            />
+          )}
           <nav css={styles.nav}>
-            <div css={styles.project_details} className="flex !justify-between h-[20px] mt-1">
-              {
-                isLoading
-                  ? !hotReload
-                    ? <LineSkeleton className='w-[150px] !rounded-md !h-[12px] !mt-[8px]' />
-                    : <h1>{projectTitle}</h1>
-                  : <h1>{projectTitle}</h1>
-              }
-              <div className='flex justify-center items-center gap-3'>
+            <div css={styles.project_details} className="mt-1 flex h-[20px] !justify-between">
+              {isLoading ? (
+                !hotReload ? (
+                  <LineSkeleton className="!mt-[8px] !h-[12px] w-[150px] !rounded-md" />
+                ) : (
+                  <h1>{projectTitle}</h1>
+                )
+              ) : (
+                <h1>{projectTitle}</h1>
+              )}
+              <div className="flex items-center justify-center gap-3">
                 <ProjectActionDropdown />
                 <ProjectStatusDropdown />
               </div>
@@ -133,16 +137,36 @@ const ProjectHead: FC = (): JSX.Element => {
             </ul>
           </nav>
         </section>
-        <button onClick={() => setAddModal(!addModal)} type="button" className="group" css={styles.btn_members}>
+        <button
+          onClick={() => setAddModal(!addModal)}
+          type="button"
+          className="group"
+          css={styles.btn_members}
+        >
           <div className="hidden lg:block">
             <section>
-              {
-                members
-                  ? members?.slice(0, 3).map((icon: { user: { avatar: { url: string } }, is_removed: boolean }, index: number) => {
-                    if (!icon?.is_removed) return <img key={index} src={icon?.user?.avatar?.url || "/images/team/qa.png"} alt="team-icon" />;
-                  })
-                  : [...Array(3)].map((_) => { return <img key={Math.random()} src={"/images/team/qa.png"} alt="team-icon" /> })
-              }
+              {members
+                ? members
+                    ?.slice(0, 3)
+                    .map(
+                      (
+                        icon: { user: { avatar: { url: string } }; is_removed: boolean },
+                        index: number
+                      ) => {
+                        if (!icon?.is_removed)
+                          return (
+                            <img
+                              key={index}
+                              src={icon?.user?.avatar?.url}
+                              onError={(e) => handleImageError(e, '/images/team/qa.png')}
+                              alt="team-icon"
+                            />
+                          )
+                      }
+                    )
+                : [...Array(3)].map((_) => {
+                    return <img key={Math.random()} src={'/images/team/qa.png'} alt="team-icon" />
+                  })}
             </section>
           </div>
           <FaRegUser className="group-hover:text-slate-800" />

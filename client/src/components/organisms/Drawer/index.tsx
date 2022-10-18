@@ -16,6 +16,7 @@ import { filterProjects } from '~/redux/project/projectSlice'
 import UserMenuPopover from '~/components/molecules/UserMenuPopover'
 import { styles as sidebarStyles } from '~/shared/twin/sidebar.styles'
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
+import handleImageError from '~/helpers/handleImageError'
 
 type Props = {
   isOpenDrawer: boolean
@@ -24,7 +25,7 @@ type Props = {
 
 const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element => {
   const router = useRouter()
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
   const [isOpen, setIsOpen] = useState<boolean>(true)
 
   const { user } = useAppSelector((state) => state.auth)
@@ -34,7 +35,7 @@ const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element =>
   const { sidebarProject } = useAppSelector((state) => state.project)
 
   useEffect(() => {
-    dispatch(filterProjects());
+    dispatch(filterProjects())
   }, [])
 
   return (
@@ -76,28 +77,36 @@ const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element =>
                   </div>
                   {isOpen && (
                     <ul>
-                      {sidebarProject?.map(({ id, title, isArchived }: { id: number, title: string, isArchived: number }, index: number) => (
-                        isArchived ? null : <li key={index} css={sidebarStyles.li} onClick={handleToggleDrawer}>
-                          <Link href={`/team/${id}/overview`}>
-                            <a
-                              className={classNames(
-                                router.asPath.includes(`/team/${id}`)
-                                  ? 'bg-blue-600 text-white'
-                                  : ' hover:bg-slate-700'
-                              )}
-                            >
-                              <div css={sidebarStyles.link}>
-                                <Hash />
-                                <span
-                                  className='truncate text-ellipsis max-w-[180px]'
+                      {sidebarProject?.map(
+                        (
+                          {
+                            id,
+                            title,
+                            isArchived
+                          }: { id: number; title: string; isArchived: number },
+                          index: number
+                        ) =>
+                          isArchived ? null : (
+                            <li key={index} css={sidebarStyles.li} onClick={handleToggleDrawer}>
+                              <Link href={`/team/${id}/overview`}>
+                                <a
+                                  className={classNames(
+                                    router.asPath.includes(`/team/${id}`)
+                                      ? 'bg-blue-600 text-white'
+                                      : ' hover:bg-slate-700'
+                                  )}
                                 >
-                                  {title}
-                                </span>
-                              </div>
-                            </a>
-                          </Link>
-                        </li>
-                      ))}
+                                  <div css={sidebarStyles.link}>
+                                    <Hash />
+                                    <span className="max-w-[180px] truncate text-ellipsis">
+                                      {title}
+                                    </span>
+                                  </div>
+                                </a>
+                              </Link>
+                            </li>
+                          )
+                      )}
                     </ul>
                   )}
                 </>
@@ -106,12 +115,12 @@ const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element =>
           </div>
           <div css={sidebarStyles.footer}>
             <div css={sidebarStyles.user_wrapper}>
-              <div css={globals.avatar} className={isLoggedIn(status)} >
-                <img src={avatar?.url} />
+              <div css={globals.avatar} className={isLoggedIn(status)}>
+                <img src={avatar?.url} onError={(e) => handleImageError(e, '/images/avatar.png')} />
               </div>
               <div css={sidebarStyles.user_details}>
-                <h1 className='!truncate !max-w-[150px]'>{name}</h1>
-                <span className='!truncate !max-w-[150px]'>{email}</span>
+                <h1 className="!max-w-[150px] !truncate">{name}</h1>
+                <span className="!max-w-[150px] !truncate">{email}</span>
               </div>
             </div>
             <UserMenuPopover />
