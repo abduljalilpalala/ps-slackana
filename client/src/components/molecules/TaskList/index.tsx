@@ -1,20 +1,20 @@
 import moment from 'moment'
-import { forwardRef, useEffect, useState } from 'react'
 import { Menu } from '@headlessui/react'
 import { useRouter } from 'next/router'
 import ReactDatePicker from 'react-datepicker'
 import ReactTextareaAutosize from 'react-textarea-autosize'
+import { forwardRef, useEffect, useRef, useState } from 'react'
 import { BsCheckCircle, BsCheckCircleFill } from 'react-icons/bs'
 import { Calendar, Search, User, MoreHorizontal, Edit3, Trash, Eye } from 'react-feather'
 
+import PeopleList from '../PeopeList'
 import { classNames } from '~/helpers/classNames'
 import Tooltip from '~/components/templates/Tooltip'
-import DialogBox from '~/components/templates/DialogBox'
-import MenuTransition from '~/components/templates/MenuTransition'
 import { useTaskMethods } from '~/hooks/taskMethods'
+import DialogBox from '~/components/templates/DialogBox'
 import { useMemberMethods } from '~/hooks/memberMethods'
-import PeopleList from '../PeopeList'
 import { useProjectMethods } from '~/hooks/projectMethods'
+import MenuTransition from '~/components/templates/MenuTransition'
 
 type Props = {
   task: any
@@ -30,6 +30,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
   } = props
   const router = useRouter()
   const { id } = router.query
+  const inputElement = useRef<any>()
   const [selectedDueDate, setSelectedDueDate] = useState<any>(null)
   const [dueDate, setDueDate] = useState<any>(null)
   const { members, isMemberLoading, filterMembersName } = useMemberMethods(parseInt(id as string))
@@ -82,6 +83,30 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
 
     if (!isEnter) return
     filterMembersName(parseInt(id as string), value)
+  }
+
+  const onBlurUpdateTaskName = (e: any) => {
+    if (e.target.value.length === 0) {
+      return (e.target.value = task.name)
+    }
+    console.log(`Save from onBlurUpdateTaskname`)
+    inputElement.current.disabled = true
+  }
+
+  const handleUpdateTaskName = (e: any, id: number) => {
+    const keyCode = e.which || e.keyCode
+
+    if (keyCode == 13) {
+      e.preventDefault()
+      console.log(`Save from handleUpdateTaskName ${id}`)
+      inputElement.current.disabled = true
+    }
+  }
+
+  const onClickRenameTask = (): void => {
+    inputElement.current.disabled = false
+    inputElement.current.select()
+    inputElement.current.focus()
   }
 
   const CustomCalendarButton = forwardRef(({ value, onClick }: any, ref: any) => (
@@ -170,14 +195,16 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
         </button>
         <ReactTextareaAutosize
           className={`
-            flex-1 cursor-pointer select-none resize-none overflow-hidden
-            border-none bg-transparent pl-6 text-sm font-medium focus:ring-0
-            ${isTaskCompleted ? 'opacity-60' : ''}
+            ml-3 flex-1 cursor-pointer select-none resize-none
+            overflow-hidden border-none bg-transparent text-sm font-medium focus:ring-0
+            ${isTaskCompleted && 'opacity-60'}
           `}
           defaultValue={task.name}
           disabled={true}
+          onBlur={onBlurUpdateTaskName}
+          onKeyDown={(e) => handleUpdateTaskName(e, task.id)}
           placeholder="Write task name"
-          autoFocus
+          ref={inputElement}
         />
         <div className="absolute right-2 top-2 opacity-0 group-task-hover:opacity-100 group-task-focus:opacity-100">
           {(permissions?.deleteTask || permissions?.renameTask) && (
@@ -203,7 +230,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
                     >
                       <Menu.Item>
                         <button
-                          onClick={() => handleRemoveTask(task?.section_id, task?.id)}
+                          onClick={onClickRenameTask}
                           className={classNames(
                             'flex w-full items-center space-x-3 py-2 px-4 text-sm font-medium text-slate-900',
                             'transition duration-150 ease-in-out hover:bg-slate-100 active:bg-slate-500 active:text-white'
