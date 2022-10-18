@@ -195,8 +195,8 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
         </button>
         <ReactTextareaAutosize
           className={`
-            ml-3 flex-1 cursor-pointer select-none resize-none
-            overflow-hidden border-none bg-transparent text-sm font-medium focus:ring-0
+            ml-5 flex-1 cursor-pointer select-none resize-none overflow-hidden
+            border-none bg-transparent px-0.5 text-sm font-medium focus:ring-0
             ${isTaskCompleted && 'opacity-60'}
           `}
           defaultValue={task.name}
