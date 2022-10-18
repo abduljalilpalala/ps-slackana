@@ -2,39 +2,166 @@ import moment from 'moment'
 import { useRouter } from 'next/router'
 import { Menu } from '@headlessui/react'
 import ReactDatePicker from 'react-datepicker'
-import React, { FC, forwardRef, useState } from 'react'
+import React, { FC, forwardRef, useEffect, useState } from 'react'
 import ReactTextareaAutosize from 'react-textarea-autosize'
-import { Check, MoreHorizontal, LogIn, Trash, Calendar, Search, X } from 'react-feather'
+import { Check, MoreHorizontal, LogIn, Trash, Calendar, Search, X, User } from 'react-feather'
 
 import { classNames } from '~/helpers/classNames'
 import Tooltip from '~/components/templates/Tooltip'
-import { assignees } from '~/shared/jsons/assigneeData'
 import DialogBox from '~/components/templates/DialogBox'
 import MenuTransition from '~/components/templates/MenuTransition'
 import handleImageError from '~/helpers/handleImageError'
+import { useTaskMethods } from '~/hooks/taskMethods'
+import { useMemberMethods } from '~/hooks/memberMethods'
+import PeopleList from '~/components/molecules/PeopeList'
+import BoxSkeleton from '~/components/atoms/Skeletons/BoxSkeleton'
+import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
+import ImageSkeleton from '~/components/atoms/Skeletons/ImageSkeleton'
+import { useProjectMethods } from '~/hooks/projectMethods'
 
-type Props = {}
+type Props = {
+  updateAssignee: any
+  updateTaskDueDate: any
+  isTaskCompleted: any
+  actions: {
+    setTaskID: (e: any) => void
+    setUpdateAssignee: (e: any) => void
+    setUpdateTaskDueDate: (e: any) => void
+    setIsTaskCompleted: (e: any) => void
+  }
+}
 
-const TaskSlider: FC<Props> = (): JSX.Element => {
+const TaskSlider: FC<Props> = (props): JSX.Element => {
+  const { updateAssignee, updateTaskDueDate, isTaskCompleted } = props
+  const { setTaskID, setUpdateAssignee, setUpdateTaskDueDate, setIsTaskCompleted } = props.actions
   const router = useRouter()
-  const { task_id } = router.query
-  const [assignee, setAssignee] = useState({})
-  const [updateAssignee, setUpdateAssignee] = useState({})
-  const [updateTaskDueDate, setUpdateTaskDueDate]: any = useState('')
+  const { id, task_id } = router.query
+  const [updateTaskName, setUpdateTaskName]: any = useState('')
+  const [updateDescription, setUpdateDescription]: any = useState('')
+  const [updateActualTime, setUpdateActualTime]: any = useState(0)
+  const [updateEstimatedTime, setUpdateEstimatedTime]: any = useState(0)
+  const [deleteTask, setDeleteTask]: any = useState(false)
   const [updateAssigneeModal, setUpdateAssigneeModal] = useState<boolean>(false)
+  const { members, isMemberLoading, filterMembersName } = useMemberMethods(parseInt(id as string))
+  const {
+    useHandleUpdateTaskDueDate,
+    useHandleUpdateTaskAssignee,
+    useHandleCompleteTask,
+    useHandleRefetchTasks,
+    useHandleUpdateTaskName,
+    useHandleUpdateTaskDetails,
+    useHandleRemoveTask,
+    useHandleGetTask,
+    useHandleGetTaskWithoutLoading,
+    taskData,
+    isTaskLoading
+  } = useTaskMethods(parseInt(id as string))
+  const { permissions, canComplete, getMemberFromProject } = useProjectMethods(
+    parseInt(id as string)
+  )
 
-  const [isTaskCompleted, setIsTaskCompleted] = useState(false)
+  useEffect(() => {
+    if (task_id) {
+      useHandleGetTask(parseInt(task_id as string))
+      setTaskID(task_id)
+    }
+  }, [task_id])
 
-  const handleTaskStatusToggle = () => setIsTaskCompleted(!isTaskCompleted)
+  useEffect(() => {
+    setUpdateAssignee(taskData?.assignee)
+    setUpdateTaskName(taskData?.name)
+    setUpdateTaskDueDate(taskData?.due_date ? new Date(taskData?.due_date) : null)
+    setIsTaskCompleted(taskData?.is_completed)
+    setUpdateDescription(taskData?.description ?? '')
+    setUpdateEstimatedTime(taskData?.estimated_time ?? 0)
+    setUpdateActualTime(taskData?.actual_time_finished ?? 0)
+    return () => {
+      setDeleteTask(false)
+    }
+  }, [taskData])
 
-  const handleUpdateAssigneeToggle = () => setUpdateAssigneeModal(!updateAssigneeModal)
-
-  const handleSetAssignee = (id: number) => {
-    const getMember: any = assignees.find((member) => member.id === id)
-    setUpdateAssignee(getMember)
-    handleUpdateAssigneeToggle()
+  const handleTaskStatusToggle = () => {
+    setIsTaskCompleted(!isTaskCompleted)
+    useHandleCompleteTask(parseInt(task_id as string))
+    useHandleRefetchTasks()
   }
 
+  const handleUpdateAssigneeToggle = () => {
+    setUpdateAssigneeModal(!updateAssigneeModal)
+    filterMembersName(parseInt(id as string), '')
+  }
+
+  const handleClearDueDate = () => {
+    setUpdateTaskDueDate(null)
+    useHandleUpdateTaskDueDate(parseInt(task_id as string), null)
+  }
+
+  const handleSetDueDate = (date: Date) => {
+    let value = date ? moment(new Date(date)).format('YYYY-MM-DD') : null
+    setUpdateTaskDueDate(date)
+    useHandleUpdateTaskDueDate(parseInt(task_id as string), value)
+  }
+
+  const handleSetAssignee = (id: number) => {
+    const getMember: any = members.find((member: any) => member.id === id)
+    setUpdateAssignee(getMember)
+    useHandleUpdateTaskAssignee(parseInt(task_id as string), getMember.id)
+    handleUpdateAssigneeToggle()
+  }
+  const onSearchChange = (e: any): void => {
+    const value = e.target.value
+    if (value.length === 0) {
+      filterMembersName(parseInt(id as string), value)
+    }
+  }
+  const onSearch = (e: any): void => {
+    const value = e.target.value
+    const isEnter = e.key === 'Enter' || e.keyCode === 13
+
+    if (!isEnter) return
+    filterMembersName(parseInt(id as string), value)
+  }
+  const handleSetName = (e: any) => {
+    const keyCode = e.which || e.keyCode
+    if (keyCode === 13 && !e.shiftKey) e.preventDefault()
+  }
+  const handleTaskNameOnBlur = (e: any) => {
+    if (e.target.value === taskData?.name) return
+    if (e.target.value === '') setUpdateTaskName((e.target.value = 'Untitled Task'))
+    useHandleUpdateTaskName(taskData?.section_id as number, taskData?.id as number, e.target.value)
+    useHandleGetTaskWithoutLoading(parseInt(task_id as string))
+  }
+  const handleEstimatedTimeOnBlur = (e: any) => {
+    if (parseInt(e.target.value) === (taskData?.estimated_time ?? 0)) return
+    useHandleUpdateTaskDetails(parseInt(task_id as string), {
+      estimated_time: e.target.value,
+      actual_time_finished: taskData?.actual_time_finished,
+      description: taskData?.description
+    })
+    useHandleGetTaskWithoutLoading(parseInt(task_id as string))
+  }
+  const handleActualTimeOnBlur = (e: any) => {
+    if (parseInt(e.target.value) === (taskData?.actual_time_finished ?? 0)) return
+    useHandleUpdateTaskDetails(parseInt(task_id as string), {
+      estimated_time: taskData?.estimated_time,
+      actual_time_finished: e.target.value,
+      description: taskData?.description
+    })
+    useHandleGetTaskWithoutLoading(parseInt(task_id as string))
+  }
+  const handleDescriptionOnBlur = (e: any) => {
+    if (e.target.value === (taskData?.description ?? '')) return
+    useHandleUpdateTaskDetails(parseInt(task_id as string), {
+      estimated_time: taskData?.estimated_time,
+      actual_time_finished: taskData?.actual_time_finished,
+      description: e.target.value
+    })
+    useHandleGetTaskWithoutLoading(parseInt(task_id as string))
+  }
+  const handleRemoveTask = async (): Promise<void> => {
+    setDeleteTask(true)
+    useHandleRemoveTask(taskData?.section_id as number, taskData?.id as number)
+  }
   const CustomCalendarButton = forwardRef(({ value, onClick }: any, ref: any) => (
     <div className="flex items-center space-x-2">
       <button
@@ -46,12 +173,13 @@ const TaskSlider: FC<Props> = (): JSX.Element => {
       </button>
       {value && (
         <span className="text-sm font-medium text-slate-600">
-          {moment(new Date(value)).format('MMM D')}
+          {moment().format('MMM D') === moment(new Date(value)).format('MMM D')
+            ? 'Today'
+            : moment(new Date(value)).format('MMM D')}
         </span>
       )}
     </div>
   ))
-
   const addAssigneeComponent = (
     <DialogBox
       isOpen={true}
@@ -65,20 +193,104 @@ const TaskSlider: FC<Props> = (): JSX.Element => {
             <Search color="#94A3B8" />
             <input
               type="text"
+              onChange={onSearchChange}
+              onKeyDown={onSearch}
               className="mr-5 w-full border-none text-slate-900 focus:ring-transparent"
               placeholder="Find members"
             />
           </div>
         </div>
         <div className="mb-3 h-[300px] overflow-y-scroll scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-slate-400 scrollbar-thumb-rounded-md">
-          {assignees.map((assignee) => (
-            <MemberList key={assignee.id} actions={{ handleSetAssignee }} {...assignee} />
-          ))}
+          {isMemberLoading ? (
+            <PeopleList isLoading={isMemberLoading} />
+          ) : members?.length === 0 ? (
+            <h1 className="text-px-18 mt-5 text-slate-600 opacity-60">No available data</h1>
+          ) : (
+            members?.map((member: any) => (
+              <MemberList key={member?.id} actions={{ handleSetAssignee }} {...member} />
+            ))
+          )}
         </div>
       </div>
     </DialogBox>
   )
-
+  const loadingTask = (
+    <section
+      className={`
+          fixed right-0 z-20 -mt-3 h-full w-full  max-w-[520px] flex-1 
+          flex-shrink-0  border-l border-slate-300 bg-white
+          text-slate-900 transition-all duration-300 ease-in-out
+          ${task_id ? 'translate-x-0' : 'translate-x-full'}
+      `}
+    >
+      <header className="sticky top-0 flex items-center justify-between border-b border-slate-300 bg-white py-3 px-5">
+        <BoxSkeleton className="flex h-4 w-[100px] items-center" />
+      </header>
+      <main className="flex h-full flex-col space-y-3 px-5 py-6">
+        <div className="">
+          <LineSkeleton className="h-[30px] w-full" />
+        </div>
+        <div className="flex flex-col space-y-6">
+          <section className="flex items-center">
+            <div className="w-full max-w-[130px]">
+              <LineSkeleton className="h-[10px] w-[100px]" />
+            </div>
+            <div className="flex w-full flex-1 flex-shrink-0 items-center space-x-3">
+              <Tooltip text="Assignee">
+                <ImageSkeleton className="max-h-[36px] max-w-[36px] rounded-md" />
+              </Tooltip>
+              <div className="flex flex-col text-sm">
+                <div className="flex items-center space-x-3">
+                  <LineSkeleton className="h-[10px] w-[100px]" />
+                  <span className="h-2 w-2 rounded-full bg-slate-400"></span>
+                  <LineSkeleton className="h-[10px] w-[100px]" />
+                </div>
+                <h2 className="leading-tight text-slate-500">
+                  <LineSkeleton className="h-[5px] w-[70px]" />
+                </h2>
+              </div>
+            </div>
+          </section>
+          <section className="flex items-center">
+            <div className="w-full max-w-[130px]">
+              <LineSkeleton className="h-[10px] w-[100px]" />
+            </div>
+            <div className="flex w-full flex-1 flex-shrink-0 items-center space-x-4">
+              <Tooltip text="Due Date">
+                <LineSkeleton className="h-[10px] w-[50px]" />
+              </Tooltip>
+              <span className="h-2 w-2 rounded-full bg-slate-400"></span>
+              <LineSkeleton className="h-[10px] w-[50px]" />
+            </div>
+          </section>
+          <section className="flex items-center">
+            <div className="w-full max-w-[130px]">
+              <LineSkeleton className="h-[10px] w-[100px]" />
+            </div>
+            <div className="flex w-full flex-1 flex-shrink-0 items-center space-x-4">
+              <LineSkeleton className="h-[10px] w-[200px]" />
+            </div>
+          </section>
+          <section className="flex items-center">
+            <div className="w-full max-w-[130px]">
+              <LineSkeleton className="h-[10px] w-[100px]" />
+            </div>
+            <div className="flex w-full flex-1 flex-shrink-0 items-center space-x-4">
+              <LineSkeleton className="h-[10px] w-[200px]" />
+            </div>
+          </section>
+          <section className="pt-8">
+            <LineSkeleton className="h-[10px] w-[100px]" />
+            <LineSkeleton className=" mt-10 h-[10px] w-96" />
+            <LineSkeleton className="h-[10px] w-80" />
+            <LineSkeleton className="h-[10px] w-64" />
+            <LineSkeleton className=" h-[10px] w-56" />
+          </section>
+        </div>
+      </main>
+    </section>
+  )
+  let completeTask = !permissions?.setTaskAsCompleted || !canComplete(updateAssignee?.id as number)
   return (
     <>
       {task_id && (
@@ -87,206 +299,252 @@ const TaskSlider: FC<Props> = (): JSX.Element => {
           onClick={() => router.push(`/team/${router.query.id}/board`)}
         ></section>
       )}
-      <section
-        className={`
-          default-scrollbar fixed right-0 z-20 -mt-3 h-full w-full  max-w-[520px] flex-1 
-          flex-shrink-0  border-l border-slate-300 bg-white
-          text-slate-900 transition-all duration-300 ease-in-out
-          ${task_id ? 'translate-x-0' : 'translate-x-full'}
-      `}
-      >
-        <header className="sticky top-0 flex items-center justify-between border-b border-slate-300 bg-white py-3 px-5">
-          <div>
-            <button
-              className={`
+      {isTaskLoading ? (
+        loadingTask
+      ) : (
+        <section
+          className={`
+            default-scrollbar fixed right-0 z-20 -mt-3 h-full w-full  max-w-[520px] flex-1 
+            flex-shrink-0  border-l border-slate-300 bg-white
+            text-slate-900 transition-all duration-300 ease-in-out
+            ${task_id ? 'translate-x-0' : 'translate-x-full'}
+          `}
+        >
+          <header className="sticky top-0 flex items-center justify-between border-b border-slate-300 bg-white py-3 px-5">
+            <div>
+              <button
+                disabled={deleteTask || completeTask}
+                className={`
+                ${completeTask && 'cursor-not-allowed '}
               flex items-center rounded-md border border-slate-300 px-1.5 py-1 text-xs font-medium text-slate-600
               outline-none transition duration-75 ease-in-out focus:border-green-500 focus:bg-green-50
             focus:text-green-600 hover:border-green-500 hover:bg-green-50 hover:text-green-600 active:scale-95
             ${isTaskCompleted && 'border-green-500 bg-green-50 text-green-600'}
           `}
-              onClick={handleTaskStatusToggle}
-            >
-              <Check className="mr-1 h-4 w-4" />
-              {isTaskCompleted ? 'Completed' : 'Mark complete'}
-            </button>
-          </div>
-          <div className="flex flex-shrink-0 items-center space-x-2">
-            <Menu as="div" className="relative z-20 inline-block items-center text-left">
-              {({ open }) => (
-                <>
-                  <Menu.Button
-                    className={`
+                onClick={handleTaskStatusToggle}
+              >
+                <Check className="mr-1 h-4 w-4" />
+                {isTaskCompleted ? 'Completed' : 'Mark complete'}
+              </button>
+            </div>
+            <div className="flex flex-shrink-0 items-center space-x-2">
+              {permissions?.deleteTask && (
+                <Menu as="div" className="relative z-20 inline-block items-center text-left">
+                  {({ open }) => (
+                    <>
+                      <Menu.Button
+                        className={`
                       rounded-md p-1.5 text-slate-500 outline-none transition duration-75 ease-in-out focus:bg-slate-200 
                     focus:text-slate-900 hover:bg-slate-200 hover:text-slate-900 active:scale-95
                         ${open ? 'bg-slate-200 text-slate-900' : ''}
                       `}
-                  >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Menu.Button>
-                  <MenuTransition>
-                    <Menu.Items
-                      className={classNames(
-                        'absolute right-0 mt-1 w-44 origin-top-right divide-y divide-gray-200 overflow-hidden',
-                        'rounded-md border border-slate-200 bg-white py-1 shadow-md focus:outline-none'
-                      )}
-                    >
-                      <Menu.Item>
-                        <button
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Menu.Button>
+                      <MenuTransition>
+                        <Menu.Items
                           className={classNames(
-                            'flex w-full items-center space-x-3 py-2 px-4 font-medium text-rose-600',
-                            'text-sm transition duration-150 ease-in-out hover:bg-rose-100 active:bg-rose-600 active:text-white'
+                            'absolute right-0 mt-1 w-44 origin-top-right divide-y divide-gray-200 overflow-hidden',
+                            'rounded-md border border-slate-200 bg-white py-1 shadow-md focus:outline-none'
                           )}
                         >
-                          <Trash className="mr-2 h-4 w-4" />
-                          Remove Task
-                        </button>
-                      </Menu.Item>
-                    </Menu.Items>
-                  </MenuTransition>
-                </>
+                          <Menu.Item>
+                            <button
+                              onClick={handleRemoveTask}
+                              className={classNames(
+                                'flex w-full items-center space-x-3 py-2 px-4 font-medium text-rose-600',
+                                'text-sm transition duration-150 ease-in-out hover:bg-rose-100 active:bg-rose-600 active:text-white'
+                              )}
+                            >
+                              <Trash className="mr-2 h-4 w-4" />
+                              Remove Task
+                            </button>
+                          </Menu.Item>
+                        </Menu.Items>
+                      </MenuTransition>
+                    </>
+                  )}
+                </Menu>
               )}
-            </Menu>
-            <button
-              onClick={() => router.push(`/team/${router.query.id}/board`)}
-              className="rounded-md p-1.5 text-slate-500 outline-none transition duration-75 ease-in-out focus:bg-slate-200 focus:text-slate-900 hover:bg-slate-200 hover:text-slate-900 active:scale-95"
-            >
-              <LogIn className="h-4 w-4" />
-            </button>
-          </div>
-        </header>
-        <div className="flex items-center justify-between bg-rose-50 py-2.5 px-4 text-sm text-rose-600">
-          <p className="flex items-center">
-            <Trash className="mr-2 h-4 w-4" />
-            This task is deleted.
-          </p>
-          <button className="mr-2 active:scale-95">
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-        <main className="flex h-full flex-col space-y-3 px-5 py-6">
-          <div className="-mx-3">
-            <ReactTextareaAutosize
-              defaultValue="[113] - [Markup] Create Task Modal"
-              className={`
+              <button
+                onClick={() => router.push(`/team/${router.query.id}/board`)}
+                className="rounded-md p-1.5 text-slate-500 outline-none transition duration-75 ease-in-out focus:bg-slate-200 focus:text-slate-900 hover:bg-slate-200 hover:text-slate-900 active:scale-95"
+              >
+                <LogIn className="h-4 w-4" />
+              </button>
+            </div>
+          </header>
+          {deleteTask && (
+            <div className="flex items-center justify-between bg-rose-50 py-2.5 px-4 text-sm text-rose-600">
+              <p className="flex items-center">
+                <Trash className="mr-2 h-4 w-4" />
+                This task is deleted.
+              </p>
+            </div>
+          )}
+          <main className="flex h-full flex-col space-y-3 px-5 py-6">
+            <div className="-mx-3">
+              <ReactTextareaAutosize
+                value={updateTaskName}
+                disabled={deleteTask || !permissions?.renameTask}
+                onKeyDown={handleSetName}
+                onBlur={handleTaskNameOnBlur}
+                onChange={(e) => setUpdateTaskName(e.target.value)}
+                className={`
                 w-full resize-none overflow-hidden rounded-lg border border-transparent text-xl font-semibold
                 outline-none ring-blue-600 transition duration-75 ease-in-out focus:ring-2 hover:border-slate-400
               `}
-            />
-          </div>
-          <div className="flex flex-col space-y-6">
-            {/**
-             * Assignee Field
-             * */}
-            <section className="flex items-center">
-              <div className="w-full max-w-[130px]">
-                <h1 className="text-sm font-medium">Assignee</h1>
-              </div>
-              <div className="flex w-full flex-1 flex-shrink-0 items-center space-x-3">
-                <Tooltip text="Assignee">
-                  <button
-                    onClick={handleUpdateAssigneeToggle}
-                    className="flex flex-shrink-0 cursor-pointer items-center overflow-hidden active:scale-95"
-                  >
-                    <img
-                      className="h-8 w-8 rounded-lg"
-                      src="https://ca.slack-edge.com/E028JVBUY4F-U03N1UNTGAY-5ef1b06f109b-512"
-                    />
-                  </button>
-                </Tooltip>
-                {updateAssigneeModal && addAssigneeComponent}
-                <div className="flex flex-col text-sm">
-                  <div className="flex items-center space-x-3">
-                    <h1 className="font-medium">Joshua Galit</h1>
-                    <span className="h-2 w-2 rounded-full bg-green-600"></span>
-                    <p className="text-slate-500">Developer</p>
-                  </div>
-                  <h2 className="leading-tight text-slate-500">Backend</h2>
+              />
+            </div>
+            <div className="flex flex-col space-y-6">
+              {/**
+               * Assignee Field
+               * */}
+              <section className="flex items-center">
+                <div className="w-full max-w-[130px]">
+                  <h1 className="text-sm font-medium">Assignee</h1>
                 </div>
-              </div>
-            </section>
-            {/**
-             * Due Date Field
-             * */}
-            <section className="flex items-center">
-              <div className="w-full max-w-[130px]">
-                <h1 className="text-sm font-medium">Due Date</h1>
-              </div>
-              <div className="flex w-full flex-1 flex-shrink-0 items-center space-x-4">
-                <Tooltip text="Due Date">
-                  <ReactDatePicker
-                    selected={updateTaskDueDate}
-                    onChange={(date: Date) => setUpdateTaskDueDate(date)}
-                    customInput={<CustomCalendarButton />}
+                <div className="flex w-full flex-1 flex-shrink-0 items-center space-x-3">
+                  <Tooltip text="Assignee">
+                    {updateAssignee?.user ? (
+                      <button
+                        disabled={deleteTask || !permissions?.assignTask}
+                        onClick={handleUpdateAssigneeToggle}
+                        className="flex flex-shrink-0 cursor-pointer items-center overflow-hidden active:scale-95"
+                      >
+                        <img
+                          className="h-8 w-8 rounded-lg"
+                          src={updateAssignee?.user?.avatar?.url}
+                        />
+                      </button>
+                    ) : (
+                      <button
+                        disabled={deleteTask || !permissions?.assignTask}
+                        className={`
+                      hover:border-slate rounded-full border-[1.5px] border-dashed border-slate-400 p-0.5
+                    text-slate-400 transition duration-75 ease-in-out focus:border-slate-500
+                    focus:text-slate-500 focus:outline-none hover:border-slate-500 hover:bg-white hover:text-slate-500
+                    `}
+                        onClick={handleUpdateAssigneeToggle}
+                      >
+                        <User className="h-4 w-4" />
+                      </button>
+                    )}
+                  </Tooltip>
+                  {updateAssigneeModal && addAssigneeComponent}
+                  {updateAssignee?.user && (
+                    <div className="flex flex-col text-sm">
+                      <div className="flex items-center space-x-3">
+                        <h1 className="font-medium">{updateAssignee?.user?.name}</h1>
+                        <span className="h-2 w-2 rounded-full bg-green-600"></span>
+                        <p className="text-slate-500">{updateAssignee?.role?.name}</p>
+                      </div>
+                      <h2 className="leading-tight text-slate-500">
+                        {updateAssignee?.teams
+                          ?.map((team: any) => {
+                            return team?.name
+                          })
+                          .join(' | ')}
+                      </h2>
+                    </div>
+                  )}
+                </div>
+              </section>
+              {/**
+               * Due Date Field
+               * */}
+              <section className="flex items-center">
+                <div className="w-full max-w-[130px]">
+                  <h1 className="text-sm font-medium">Due Date</h1>
+                </div>
+                <div className="flex w-full flex-1 flex-shrink-0 items-center space-x-4">
+                  <Tooltip text="Due Date">
+                    <ReactDatePicker
+                      disabled={deleteTask || !permissions?.assignDueDates}
+                      selected={updateTaskDueDate}
+                      onChange={handleSetDueDate}
+                      customInput={<CustomCalendarButton />}
+                    />
+                  </Tooltip>
+                  {updateTaskDueDate && (
+                    <button
+                      disabled={deleteTask || !permissions?.assignDueDates}
+                      onClick={handleClearDueDate}
+                      className="outline-none active:scale-95"
+                    >
+                      <Trash className="h-4 w-4 text-slate-900" />
+                    </button>
+                  )}
+                </div>
+              </section>
+              {/**
+               * Estimated Time Field
+               * */}
+              <section className="flex items-center">
+                <div className="w-full max-w-[130px]">
+                  <h1 className="text-sm font-medium">Estimated Time</h1>
+                </div>
+                <div className="flex w-full flex-1 flex-shrink-0 items-center space-x-4">
+                  <input
+                    type="number"
+                    disabled={deleteTask || !permissions?.renameTask}
+                    value={updateEstimatedTime}
+                    onBlur={handleEstimatedTimeOnBlur}
+                    onChange={(e) => setUpdateEstimatedTime(e.target.value)}
+                    className={`
+                  w-32 rounded border border-slate-300 py-1 px-2 outline-none transition duration-75
+                  ease-in-out focus:border-blue-600 hover:border-slate-400
+                `}
                   />
-                </Tooltip>
-                <button className="outline-none active:scale-95">
-                  <Trash className="h-4 w-4 text-slate-900" />
-                </button>
-              </div>
-            </section>
-            {/**
-             * Estimated Time Field
-             * */}
-            <section className="flex items-center">
-              <div className="w-full max-w-[130px]">
-                <h1 className="text-sm font-medium">Estimated Time</h1>
-              </div>
-              <div className="flex w-full flex-1 flex-shrink-0 items-center space-x-4">
-                <input
-                  type="number"
-                  className={`
+                </div>
+              </section>
+              {/**
+               * Actual Time Field
+               * */}
+              <section className="flex items-center">
+                <div className="w-full max-w-[130px]">
+                  <h1 className="text-sm font-medium">Actual Time</h1>
+                </div>
+                <div className="flex w-full flex-1 flex-shrink-0 items-center space-x-4">
+                  <input
+                    type="number"
+                    disabled={deleteTask || !permissions?.renameTask}
+                    value={updateActualTime}
+                    onBlur={handleActualTimeOnBlur}
+                    onChange={(e) => setUpdateActualTime(e.target.value)}
+                    className={`
                   w-32 rounded border border-slate-300 py-1 px-2 outline-none transition duration-75
                   ease-in-out focus:border-blue-600 hover:border-slate-400
                 `}
-                />
-              </div>
-            </section>
-            {/**
-             * Actual Time Field
-             * */}
-            <section className="flex items-center">
-              <div className="w-full max-w-[130px]">
-                <h1 className="text-sm font-medium">Actual Time</h1>
-              </div>
-              <div className="flex w-full flex-1 flex-shrink-0 items-center space-x-4">
-                <input
-                  type="number"
+                  />
+                </div>
+              </section>
+              {/**
+               * Details Field
+               * */}
+              <section className="pt-8">
+                <h1 className="text-sm font-medium">Details</h1>
+                <ReactTextareaAutosize
+                  value={updateDescription}
+                  disabled={deleteTask || !permissions?.renameTask}
+                  onBlur={handleDescriptionOnBlur}
+                  onChange={(e) => setUpdateDescription(e.target.value)}
                   className={`
-                  w-32 rounded border border-slate-300 py-1 px-2 outline-none transition duration-75
-                  ease-in-out focus:border-blue-600 hover:border-slate-400
-                `}
-                />
-              </div>
-            </section>
-            {/**
-             * Details Field
-             * */}
-            <section className="pt-8">
-              <h1 className="text-sm font-medium">Details</h1>
-              <ReactTextareaAutosize
-                className={`
                 mt-3 min-h-[110px] w-full resize-none overflow-hidden rounded-lg border border-slate-300
                 transition duration-75 ease-in-out placeholder:text-slate-400 hover:border-slate-400
               `}
-                placeholder="Descriptions"
-              />
-              {/* <div className="flex justify-end space-x-2 py-1">
-                <button className="rounded-lg bg-blue-600 py-1.5 px-14 text-sm text-white outline-none transition duration-75 ease-in-out hover:bg-blue-700 hover:shadow active:scale-95">
-                  Edit
-                </button>
-                <button className="rounded-lg bg-slate-300 py-1.5 px-14 text-sm text-slate-600 outline-none active:scale-95">
-                  Done
-                </button>
-              </div> */}
-            </section>
-          </div>
-        </main>
-      </section>
+                  placeholder="Descriptions"
+                />
+              </section>
+            </div>
+          </main>
+        </section>
+      )}
     </>
   )
 }
 
-const MemberList = ({ id, name, avatar_url, actions: { handleSetAssignee } }: any) => {
+const MemberList = ({ id, user, actions: { handleSetAssignee } }: any) => {
   return (
     <button
       onClick={() => handleSetAssignee(id)}
@@ -295,14 +553,14 @@ const MemberList = ({ id, name, avatar_url, actions: { handleSetAssignee } }: an
       <div className="flex min-w-[150px] flex-row items-center justify-start gap-3 truncate text-ellipsis mobile:w-[75%]">
         <div className="flex items-center justify-center mobile:min-w-[36px]">
           <img
-            src={avatar_url}
+            src={user?.avatar.url}
             onError={(e) => handleImageError(e, '/images/team/qa.png')}
             className="h-8 w-8 rounded-md"
           />
         </div>
         <div className="flex flex-col items-start justify-start">
           <div className="flex flex-row items-center gap-3">
-            <p className="text-[16px] font-medium tracking-tighter text-slate-900">{name}</p>
+            <p className="text-[16px] font-medium tracking-tighter text-slate-900">{user?.name}</p>
           </div>
         </div>
       </div>

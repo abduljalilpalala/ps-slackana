@@ -39,6 +39,7 @@ export type Section = {
 
 export type Task = {
   id?: number
+  section_id?: number
   assignee?: {
     id: number
     user?: {

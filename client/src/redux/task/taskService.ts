@@ -88,6 +88,22 @@ const completeTask = async (project_id: number, task_id: number): Promise<any> =
   }
   return 'Something went wrong'
 }
+const getTask = async (project_id: number, task_id: number): Promise<any> => {
+  const response = await axios.get(`/api/project/${project_id}/task/${task_id}/details`)
+
+  if (response.status === 200) {
+    return response.data
+  }
+  return 'Something went wrong'
+}
+const updateTaskDetails = async (project_id: number, task_id: number, data: any): Promise<any> => {
+  const response = await axios.put(`/api/project/${project_id}/task/${task_id}/details`, data)
+
+  if (response.status === 200) {
+    return response.data
+  }
+  return 'Something went wrong'
+}
 
 const taskService = {
   getTasks,
@@ -97,7 +113,9 @@ const taskService = {
   updateDueDate,
   updateAssignee,
   renameTask,
-  completeTask
+  completeTask,
+  getTask,
+  updateTaskDetails
 }
 
 export default taskService

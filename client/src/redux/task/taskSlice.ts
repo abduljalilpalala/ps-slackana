@@ -41,6 +41,12 @@ type InitialState = {
   completeTaskData: {
     id: number
   }
+  updateTaskDetailsData: {
+    id: number
+    description: string | null
+    estimated_time: number | null
+    actual_time_finished: number | null
+  }
   isError: boolean
   isSuccess: boolean
   isLoading: boolean
@@ -86,6 +92,12 @@ const initialState: InitialState = {
   },
   completeTaskData: {
     id: 0
+  },
+  updateTaskDetailsData: {
+    id: 0,
+    description: null,
+    estimated_time: null,
+    actual_time_finished: null
   },
   refresher: {
     tasksStateUpdate: false,
@@ -203,6 +215,31 @@ export const completeTask = createAsyncThunk('task/completeTaskStatus', async (_
     return thunkAPI.rejectWithValue(catchError(error))
   }
 })
+export const getTask = createAsyncThunk('task/getTaskStatus', async (task_id: number, thunkAPI) => {
+  const {
+    task: { project_id }
+  }: any = thunkAPI.getState()
+  try {
+    return await taskService.getTask(project_id, task_id)
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(catchError(error))
+  }
+})
+export const updateTaskDetails = createAsyncThunk(
+  'task/updateTaskDetailsStatus',
+  async (_, thunkAPI) => {
+    const {
+      task: { project_id, updateTaskDetailsData }
+    }: any = thunkAPI.getState()
+    try {
+      return await taskService.updateTaskDetails(project_id, updateTaskDetailsData.id, {
+        ...updateTaskDetailsData
+      })
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(catchError(error))
+    }
+  }
+)
 
 export const taskSlice = createSlice({
   name: 'task',
@@ -254,6 +291,14 @@ export const taskSlice = createSlice({
     },
     setCompleteTaskData: (state, { payload }) => {
       state.completeTaskData = payload
+    },
+    setUpdateTaskDetailsData: (state, { payload }) => {
+      state.updateTaskDetailsData = payload
+    },
+    resetUpdateTaskDetailsData: (state) => {
+      state.updateTaskDetailsData.description = null
+      state.updateTaskDetailsData.estimated_time = null
+      state.updateTaskDetailsData.actual_time_finished = null
     }
   },
   extraReducers: (builder: ActionReducerMapBuilder<any>) => {
@@ -411,6 +456,45 @@ export const taskSlice = createSlice({
         state.isLoading = false
         state.error = action.payload
       })
+      // Get Task
+      .addCase(getTask.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(getTask.fulfilled, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.isError = false
+        state.taskData = action.payload
+        state.error = {
+          status: 0,
+          content: null
+        }
+      })
+      .addCase(getTask.rejected, (state, action: PayloadAction<any>) => {
+        state.isError = true
+        state.isSuccess = false
+        state.isLoading = false
+        state.error = action.payload
+      })
+      // Update Task Details
+      .addCase(updateTaskDetails.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(updateTaskDetails.fulfilled, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.isError = false
+        state.error = {
+          status: 0,
+          content: null
+        }
+      })
+      .addCase(updateTaskDetails.rejected, (state, action: PayloadAction<any>) => {
+        state.isError = true
+        state.isSuccess = false
+        state.isLoading = false
+        state.error = action.payload
+      })
   }
 })
 
@@ -427,6 +511,8 @@ export const {
   setUpdateTaskDueDateData,
   setUpdateTaskAssigneeData,
   setUpdateTaskNameData,
-  setCompleteTaskData
+  setCompleteTaskData,
+  setUpdateTaskDetailsData,
+  resetUpdateTaskDetailsData
 } = taskSlice.actions
 export default taskSlice.reducer

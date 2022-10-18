@@ -46,6 +46,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/{project}/team-lead', [ProjectMemberStatusController::class, 'store']);
     Route::put('/{project}/mvp', [ProjectMemberStatusController::class, 'update']);
     Route::put('/{project}/task/{task}/details', [TaskDetailsController::class,'update']);
+    Route::get('/{project}/task/{task}/details', [TaskDetailsController::class,'show']);
     Route::put('/{project}/task/{task}/complete', [CompleteTaskController::class,'update']);
     Route::put('/{project}/task/{task}/due-date', [TaskDueDateController::class,'update']);
     Route::put('/{project}/task/{task}/assign', [TaskAssignmentController::class,'update']);
