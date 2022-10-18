@@ -14,29 +14,33 @@ const UserMenuDropDown: FC = (): JSX.Element => {
   const { handleAuthSignOut } = useAuthMethods()
   const { user } = useAppSelector((state) => state.auth)
   const { name, avatar, isLoggedIn: status, email } = user || {}
-  const [settingsModal, setSettingsModal] = useState<boolean>(false);
+  const [settingsModal, setSettingsModal] = useState<boolean>(false)
 
   return (
     <Menu as="div" className="relative z-40 inline-block text-left">
       {settingsModal && <SettingsModal close={setSettingsModal} />}
       <Menu.Button css={globals.avatar}>
-        <img src={avatar?.url} className="max-w-[25px] min-w-[25px] max-h-6 min-h-6" />
+        <img src={avatar?.url} className="min-h-6 max-h-6 min-w-[25px] max-w-[25px]" />
       </Menu.Button>
       <MenuTransition>
         <Menu.Items css={styles.menu_items}>
           <div css={styles.user_wrapper}>
-            <div css={globals.avatar} className={isLoggedIn(status)} >
-              <img src={avatar?.url} className="max-w-[25px] min-w-[25px] max-h-6 min-h-6" />
+            <div css={globals.avatar} className={isLoggedIn(status)}>
+              <img src={avatar?.url} className="min-h-6 max-h-6 min-w-[25px] max-w-[25px]" />
             </div>
             <div>
-              <h1 className='!truncate !max-w-[120px]'>{name}</h1>
-              <p className='!truncate !max-w-[120px]'>{email}</p>
+              <h1 className="!max-w-[120px] !truncate">{name}</h1>
+              <p className="!max-w-[120px] !truncate">{email}</p>
             </div>
           </div>
           <div>
             <Menu.Item>
               {({ active }) => (
-                <button onClick={() => setSettingsModal(!settingsModal)} css={styles.menu_item({ active })} className="group">
+                <button
+                  onClick={() => setSettingsModal(!settingsModal)}
+                  css={styles.menu_item({ active })}
+                  className="group"
+                >
                   <Settings className="mr-2 h-4 w-4" aria-hidden="true" />
                   Settings
                 </button>
