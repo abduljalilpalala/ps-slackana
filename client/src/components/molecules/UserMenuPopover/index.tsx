@@ -7,14 +7,15 @@ import { useAuthMethods } from '~/hooks/authMethods'
 import { globals } from '~/shared/twin/globals.styles'
 import { useAppSelector } from '~/hooks/reduxSelector'
 import { styles } from '~/shared/twin/user-menu-popover.styles'
-import SettingsModal from "~/components/organisms/SettingsModal";
+import SettingsModal from '~/components/organisms/SettingsModal'
 import PopoverTransition from '~/components/templates/PopoverTransition'
+import handleImageError from '~/helpers/handleImageError'
 
 const UserMenuPopover: FC = (): JSX.Element => {
   const { handleAuthSignOut } = useAuthMethods()
   const { user } = useAppSelector((state) => state.auth)
   const { name, avatar, isLoggedIn: status, email } = user || {}
-  const [settingsModal, setSettingsModal] = useState<boolean>(false);
+  const [settingsModal, setSettingsModal] = useState<boolean>(false)
 
   return (
     <Popover css={styles.popover}>
@@ -29,17 +30,24 @@ const UserMenuPopover: FC = (): JSX.Element => {
               <section css={styles.section}>
                 <div css={styles.user_wrapper}>
                   <div css={styles.user_details}>
-                    <div css={globals.avatar} className={isLoggedIn(status)} >
-                      <img src={avatar?.url} />
+                    <div css={globals.avatar} className={isLoggedIn(status)}>
+                      <img
+                        src={avatar?.url}
+                        onError={(e) => handleImageError(e, '/images/avatar.png')}
+                      />
                     </div>
                     <div>
-                      <h1 className='!truncate !max-w-[150px]'>{name}</h1>
-                      <span className='!truncate !max-w-[150px]'>{email}</span>
+                      <h1 className="!max-w-[150px] !truncate">{name}</h1>
+                      <span className="!max-w-[150px] !truncate">{email}</span>
                     </div>
                   </div>
                 </div>
-                <button onClick={() => setSettingsModal(!settingsModal)} type="button">Settings</button>
-                <button onClick={handleAuthSignOut} type="button">Log out</button>
+                <button onClick={() => setSettingsModal(!settingsModal)} type="button">
+                  Settings
+                </button>
+                <button onClick={handleAuthSignOut} type="button">
+                  Log out
+                </button>
               </section>
             </Popover.Panel>
           </PopoverTransition>

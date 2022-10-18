@@ -12,6 +12,7 @@ import { useRouter } from 'next/router'
 import { useMemberMethods } from '~/hooks/memberMethods'
 import { useTaskMethods } from '~/hooks/taskMethods'
 import PeopleList from '../PeopeList'
+import handleImageError from '~/helpers/handleImageError'
 
 type Props = {
   assignee: any
@@ -153,7 +154,11 @@ const AddTask: FC<Props> = (props): JSX.Element => {
           <>
             {assignee.user?.avatar?.url ? (
               <button className="overflow-hidden rounded-full" onClick={handleAssigneeToggle}>
-                <img src={assignee.user?.avatar?.url} className="z-10 h-6 w-6 rounded-full" />
+                <img
+                  src={assignee.user?.avatar?.url}
+                  onError={(e) => handleImageError(e, '/images/avatar.png')}
+                  className="z-10 h-6 w-6 rounded-full"
+                />
               </button>
             ) : (
               <button
@@ -192,7 +197,11 @@ const MemberList = ({ id, user, actions: { handleSetAssignee } }: any) => {
     >
       <div className="flex min-w-[150px] flex-row items-center justify-start gap-3 truncate text-ellipsis mobile:w-[75%]">
         <div className="flex items-center justify-center mobile:min-w-[36px]">
-          <img src={user?.avatar?.url} className="h-8 w-8 rounded-md" />
+          <img
+            src={user?.avatar?.url}
+            onError={(e) => handleImageError(e, '/images/avatar.png')}
+            className="h-8 w-8 rounded-md"
+          />
         </div>
         <div className="flex flex-col items-start justify-start">
           <div className="flex flex-row items-center gap-3">

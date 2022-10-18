@@ -10,6 +10,7 @@ import { addNewMember, getAllUsers } from "~/redux/member/memberSlice";
 import ImageSkeleton from "~/components/atoms/Skeletons/ImageSkeleton";
 import { useAppDispatch, useAppSelector } from "~/hooks/reduxSelector";
 import { getProject, memberRefresher } from "~/redux/project/projectSlice";
+import handleImageError from "~/helpers/handleImageError";
 
 const PeopleList = ({ data, className, isLoading }: any) => {
   const dispatch = useAppDispatch();
@@ -87,7 +88,8 @@ const PeopleList = ({ data, className, isLoading }: any) => {
             <div className="flex flex-row gap-3 items-center justify-start min-w-[150px] mobile:w-[75%] truncate text-ellipsis">
               <div className="mobile:min-w-[36px] flex items-center justify-center">
                 <img
-                  src={avatar?.url || '/images/avatar.png'}
+                  src={avatar?.url}
+                  onError={(e) => handleImageError(e, '/images/avatar.png')}
                   alt="user-icon"
                   className="rounded-md max-w-[36px] min-w-[36px] max-h-[36px] min-h-[36px]"
                 />
