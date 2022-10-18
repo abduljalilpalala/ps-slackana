@@ -20,7 +20,7 @@ export const styles = {
   ],
   menu_items: [
     tw`
-      absolute right-0 w-44 origin-top-right divide-y
+      absolute left-0 w-44 origin-top-left divide-y
       divide-gray-200 overflow-hidden rounded-md bg-white shadow-xl
        focus:outline-none border border-[${slate_200}]
     `
