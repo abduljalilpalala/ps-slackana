@@ -1,6 +1,7 @@
 import moment from 'moment'
 import { Menu } from '@headlessui/react'
 import { useRouter } from 'next/router'
+import ReactTooltip from 'react-tooltip'
 import ReactDatePicker from 'react-datepicker'
 import ReactTextareaAutosize from 'react-textarea-autosize'
 import { forwardRef, useEffect, useRef, useState } from 'react'
@@ -250,7 +251,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
         </button>
         <ReactTextareaAutosize
           className={`
-            ml-5 flex-1 cursor-pointer select-none resize-none overflow-hidden
+            ml-5 mr-2 flex-1 cursor-pointer select-none resize-none overflow-hidden
             border-none bg-transparent px-0.5 text-sm font-medium focus:ring-0
             ${isTaskCompleted && 'opacity-60'}
           `}
@@ -320,38 +321,48 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
           )}
         </div>
       </div>
-      <div className="flex items-center justify-between px-4 py-2 transition duration-150 ease-in-out">
-        <div className="flex items-center space-x-2.5">
-          <Tooltip text={!updateAssignee?.user ? `Assignee` : updateAssignee?.user?.name}>
-            <>
-              {updateAssignee?.user ? (
-                <button
-                  disabled={!permissions?.assignTask}
-                  className="overflow-hidden rounded-full"
-                  onClick={handleUpdateAssigneeToggle}
-                >
-                  <img
-                    src={updateAssignee?.user.avatar.url}
-                    onError={(e) => handleImageError(e, '/images/avatar.png')}
-                    className="z-10 h-6 w-6 rounded-full"
-                  />
-                </button>
-              ) : (
-                <button
-                  disabled={!permissions?.assignTask}
-                  className={`
+      <div className="flex items-center justify-between py-2 transition duration-150 ease-in-out">
+        <div className="ml-4 flex items-center space-x-2.5">
+          <div>
+            <ReactTooltip
+              place="top"
+              type="dark"
+              effect="solid"
+              id="assignee"
+              getContent={(dataTip) => dataTip}
+              className="!rounded-lg  !bg-black !text-xs font-semibold"
+            />
+            {updateAssignee?.user ? (
+              <button
+                disabled={!permissions?.assignTask}
+                className="overflow-hidden rounded-full"
+                onClick={handleUpdateAssigneeToggle}
+                data-for="assignee"
+                data-tip={!updateAssignee?.user ? `Assignee` : updateAssignee?.user?.name}
+              >
+                <img
+                  src={updateAssignee?.user.avatar.url}
+                  onError={(e) => handleImageError(e, '/images/avatar.png')}
+                  className="z-10 h-6 w-6 rounded-full"
+                />
+              </button>
+            ) : (
+              <button
+                disabled={!permissions?.assignTask}
+                data-for="assignee"
+                data-tip={!updateAssignee?.user ? `Assignee` : updateAssignee?.user?.name}
+                className={`
                   hover:border-slate rounded-full border-[1.5px] border-dashed border-slate-400 p-0.5
                 text-slate-400 transition duration-75 ease-in-out focus:border-slate-500
                 focus:text-slate-500 focus:outline-none hover:border-slate-500 hover:bg-white hover:text-slate-500
                 `}
-                  onClick={handleUpdateAssigneeToggle}
-                >
-                  <User className="h-4 w-4" />
-                </button>
-              )}
-              {updateAssigneeModal && addAssigneeComponent}
-            </>
-          </Tooltip>
+                onClick={handleUpdateAssigneeToggle}
+              >
+                <User className="h-4 w-4" />
+              </button>
+            )}
+            {updateAssigneeModal && addAssigneeComponent}
+          </div>
           <Tooltip text="Due Date">
             <ReactDatePicker
               disabled={!permissions?.assignDueDates}
@@ -364,7 +375,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
         </div>
         <div
           className={`
-            opacity-0 group-task-hover:opacity-100 group-task-focus:opacity-100
+            mr-3.5 opacity-0 group-task-hover:opacity-100 group-task-focus:opacity-100
             ${task_id == task.id && 'opacity-100'}
           `}
         >
