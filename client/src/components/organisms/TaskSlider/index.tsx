@@ -46,7 +46,7 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
   const {
     useHandleUpdateTaskDueDate,
     useHandleUpdateTaskAssignee,
-    useHandleCompleteTask,
+    useHandleCompleteTaskSlider,
     useHandleRefetchTasks,
     useHandleUpdateTaskName,
     useHandleUpdateTaskDetails,
@@ -82,7 +82,7 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
 
   const handleTaskStatusToggle = async () => {
     setIsTaskCompleted(!isTaskCompleted)
-    useHandleCompleteTask(parseInt(task_id as string))
+    useHandleCompleteTaskSlider(parseInt(task_id as string))
   }
 
   const handleUpdateAssigneeToggle = () => {

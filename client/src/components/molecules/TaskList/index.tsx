@@ -131,8 +131,10 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
   }
 
   let isBlur = true
+  const [isEditing, setIsEditing] = useState(false)
   const onBlurUpdateTaskName = (e: any) => {
     if (isBlur) {
+      setIsEditing(false)
       if (e.target.value.length === 0) {
         return (e.target.value = task?.name)
       }
@@ -147,6 +149,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
 
     if (keyCode === 13) {
       e.preventDefault()
+      setIsEditing(false)
       if (e.target.value === task?.name) return (inputElement.current.disabled = true)
       useHandleUpdateTaskName(task?.section_id as number, task?.id as number, e.target.value)
       isBlur = false
@@ -155,6 +158,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
   }
 
   const onClickRenameTask = (): void => {
+    setIsEditing(true)
     inputElement.current.disabled = false
     inputElement.current.select()
     inputElement.current.focus()
@@ -261,7 +265,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
           ref={inputElement}
         />
         <div className="absolute right-2 top-2 opacity-0 group-task-hover:opacity-100 group-task-focus:opacity-100">
-          {(permissions?.deleteTask || permissions?.renameTask) && (
+          {(permissions?.deleteTask || permissions?.renameTask) && !isEditing && (
             <Menu as="div" className="relative z-10 inline-block items-center bg-white text-left">
               {({ open }) => (
                 <>

@@ -49,9 +49,11 @@ export const useTaskMethods = (projectID: number) => {
     dispatch(setAddNewTaskData(data))
     toast.promise(
       dispatch(createTask()).then((_) => {
-        dispatch(getSections()).then((_) => {
-          dispatch(resetRefresher())
-          callback()
+        dispatch(reorderTasks()).then((_) => {
+          dispatch(getSections()).then((_) => {
+            dispatch(resetRefresher())
+            callback()
+          })
         })
       }),
       {
@@ -60,7 +62,6 @@ export const useTaskMethods = (projectID: number) => {
         error: 'Error on creating task!'
       }
     )
-    useHandleReorderTasks(section_id)
   }
 
   const useHandleRemoveTask = async (section_id: number, task_id: number) => {
@@ -68,7 +69,9 @@ export const useTaskMethods = (projectID: number) => {
     dispatch(setRemoveTaskData({ id: task_id }))
     toast.promise(
       dispatch(removeTask()).then((_) => {
-        dispatch(getSections())
+        dispatch(reorderTasks()).then((_) => {
+          dispatch(getSections())
+        })
       }),
       {
         loading: 'Removing task...',
@@ -76,7 +79,6 @@ export const useTaskMethods = (projectID: number) => {
         error: 'Error on removing task!'
       }
     )
-    useHandleReorderTasks(section_id)
   }
   const useHandleReorderTasks = async (section_id: number) => {
     dispatch(setSectionID({ section_id }))
@@ -124,6 +126,10 @@ export const useTaskMethods = (projectID: number) => {
   }
   const useHandleCompleteTask = async (id: number) => {
     dispatch(setCompleteTaskData({ id }))
+    dispatch(completeTask())
+  }
+  const useHandleCompleteTaskSlider = async (id: number) => {
+    dispatch(setCompleteTaskData({ id }))
     dispatch(completeTask()).then((_) => dispatch(getSections()))
   }
   const useHandleGetTask = async (task_id: number) => {
@@ -161,6 +167,7 @@ export const useTaskMethods = (projectID: number) => {
     useHandleUpdateTaskDetails,
     useHandleRefetchTasks,
     useHandleGetTaskWithoutLoading,
+    useHandleCompleteTaskSlider,
     taskUpdate,
     isTaskLoading,
     taskData
