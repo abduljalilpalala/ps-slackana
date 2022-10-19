@@ -124,7 +124,7 @@ export const useTaskMethods = (projectID: number) => {
   }
   const useHandleCompleteTask = async (id: number) => {
     dispatch(setCompleteTaskData({ id }))
-    dispatch(completeTask())
+    dispatch(completeTask()).then((_) => dispatch(getSections()))
   }
   const useHandleGetTask = async (task_id: number) => {
     setIsTaskLoading(true)
@@ -137,11 +137,14 @@ export const useTaskMethods = (projectID: number) => {
   }
   const useHandleUpdateTaskDetails = async (task_id: number, data: any) => {
     dispatch(setUpdateTaskDetailsData({ id: task_id, ...data }))
-    toast.promise(dispatch(updateTaskDetails()), {
-      loading: 'Updating task details...',
-      success: 'Task details updated successfully!',
-      error: 'Error on updating task details!'
-    })
+    toast.promise(
+      dispatch(updateTaskDetails()).then((_) => dispatch(getTask(task_id))),
+      {
+        loading: 'Updating task details...',
+        success: 'Task details updated successfully!',
+        error: 'Error on updating task details!'
+      }
+    )
   }
   const useHandleRefetchTasks = async () => {
     dispatch(getSections())
