@@ -246,7 +246,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
         </button>
         <ReactTextareaAutosize
           className={`
-            ml-5 flex-1 cursor-pointer select-none resize-none overflow-hidden
+            ml-5 mr-2 flex-1 cursor-pointer select-none resize-none overflow-hidden
             border-none bg-transparent px-0.5 text-sm font-medium focus:ring-0
             ${isTaskCompleted && 'opacity-60'}
           `}
@@ -316,8 +316,8 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
           )}
         </div>
       </div>
-      <div className="flex items-center justify-between px-4 py-2 transition duration-150 ease-in-out">
-        <div className="flex items-center space-x-2.5">
+      <div className="flex items-center justify-between py-2 transition duration-150 ease-in-out">
+        <div className="ml-4 flex items-center space-x-2.5">
           <Tooltip text={!updateAssignee?.user ? `Assignee` : updateAssignee?.user?.name}>
             <>
               {updateAssignee?.user ? (
@@ -360,7 +360,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
         </div>
         <div
           className={`
-            opacity-0 group-task-hover:opacity-100 group-task-focus:opacity-100
+            mr-3.5 opacity-0 group-task-hover:opacity-100 group-task-focus:opacity-100
             ${task_id == task.id && 'opacity-100'}
           `}
         >
