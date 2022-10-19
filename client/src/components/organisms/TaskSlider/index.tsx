@@ -419,6 +419,7 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
                         <img
                           className="h-8 w-8 rounded-lg"
                           src={updateAssignee?.user?.avatar?.url}
+                          onError={(e) => handleImageError(e, '/images/avatar.png')}
                         />
                       </button>
                     ) : (
