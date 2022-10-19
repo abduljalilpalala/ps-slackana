@@ -1,12 +1,12 @@
 import React from 'react'
 import ReactTooltip from 'react-tooltip'
 
-import ImageSkeleton from '~/components/atoms/Skeletons/ImageSkeleton'
-import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
-import { CrownIcon } from '~/shared/icons/CrownIcon'
-import { FistIcon } from '~/shared/icons/FistIcon'
-import { StarIcon } from '~/shared/icons/StarIcon'
-import handleImageError from '~/helpers/handleImageError'
+import { FistIcon } from "~/shared/icons/FistIcon";
+import { StarIcon } from "~/shared/icons/StarIcon";
+import { CrownIcon } from "~/shared/icons/CrownIcon";
+import handleImageError from '~/helpers/handleImageError';
+import LineSkeleton from "~/components/atoms/Skeletons/LineSkeleton";
+import ImageSkeleton from "~/components/atoms/Skeletons/ImageSkeleton";
 
 const MembersTemplate = ({ data, loadingState }: any) => {
   const { teams, user, is_mvp, role } = data || {}
@@ -27,9 +27,8 @@ const MembersTemplate = ({ data, loadingState }: any) => {
             return (
               <div key={Math.random()} className="flex items-center gap-2 ">
                 <div
-                  className={`flex max-h-[44px] min-h-[44px] min-w-[44px] max-w-[44px] items-center justify-center rounded-full border-4 ${
-                    isLoggedIn ? 'border-green-600' : 'border-slate-400'
-                  }`}
+                  className={`flex max-h-[44px] min-h-[44px] min-w-[44px] max-w-[44px] items-center justify-center rounded-full border-4 ${isLoggedIn ? 'border-green-600' : 'border-slate-400'
+                    }`}
                 >
                   <ImageSkeleton className="!h-[36px] !w-[36px] rounded-full" />
                 </div>
@@ -55,9 +54,8 @@ const MembersTemplate = ({ data, loadingState }: any) => {
               alt="members-icon"
               width={100}
               height={100}
-              className={`max-h-[36px] min-h-[36px] min-w-[36px] max-w-[36px] rounded-full border-2 bg-slate-500 ${
-                (is_mvp || roleID < 3) && 'border-2 border-yellow-400'
-              }`}
+              className={`max-h-[36px] min-h-[36px] min-w-[36px] max-w-[36px] rounded-full border-2 bg-slate-500 ${(is_mvp || roleID < 3) && 'border-2 border-yellow-400'
+                }`}
             />
             <div className="absolute -bottom-[5px] -right-[5px] flex max-h-[15px] max-w-[33px] justify-end gap-1">
               {is_mvp ? (
