@@ -8,7 +8,7 @@ const slate_900 = '#0f172a'
 const slate_200 = '#e2e8f0'
 
 export const styles = {
-  popover: tw`relative z-30`,
+  popover: tw`relative z-40`,
   popover_button: ({ open }: PopoverButtonProps) => [
     tw`
       cursor-pointer rounded-full p-1 text-white focus:outline-none hover:bg-blue-600
