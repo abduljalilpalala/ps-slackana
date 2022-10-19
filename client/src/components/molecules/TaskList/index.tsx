@@ -136,7 +136,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
       if (e.target.value.length === 0) {
         return (e.target.value = task?.name)
       }
-      if (e.target.value === task?.name) return
+      if (e.target.value === task?.name) return (inputElement.current.disabled = true)
       useHandleUpdateTaskName(task?.section_id as number, task?.id as number, e.target.value)
       inputElement.current.disabled = true
     }
@@ -147,7 +147,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
 
     if (keyCode === 13) {
       e.preventDefault()
-      if (e.target.value === task?.name) return
+      if (e.target.value === task?.name) return (inputElement.current.disabled = true)
       useHandleUpdateTaskName(task?.section_id as number, task?.id as number, e.target.value)
       isBlur = false
       inputElement.current.disabled = true
