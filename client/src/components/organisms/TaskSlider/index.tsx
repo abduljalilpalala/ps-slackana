@@ -82,8 +82,7 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
 
   const handleTaskStatusToggle = async () => {
     setIsTaskCompleted(!isTaskCompleted)
-    await useHandleCompleteTask(parseInt(task_id as string))
-    useHandleRefetchTasks()
+    useHandleCompleteTask(parseInt(task_id as string))
   }
 
   const handleUpdateAssigneeToggle = () => {
@@ -133,7 +132,6 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
       taskData?.id as number,
       e.target.value
     )
-    useHandleGetTaskWithoutLoading(parseInt(task_id as string))
   }
   const handleEstimatedTimeOnBlur = async (e: any) => {
     if (parseInt(e.target.value) === (taskData?.estimated_time ?? 0)) return
@@ -142,7 +140,6 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
       actual_time_finished: taskData?.actual_time_finished,
       description: taskData?.description
     })
-    useHandleGetTaskWithoutLoading(parseInt(task_id as string))
   }
   const handleActualTimeOnBlur = async (e: any) => {
     if (parseInt(e.target.value) === (taskData?.actual_time_finished ?? 0)) return
@@ -151,7 +148,6 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
       actual_time_finished: e.target.value,
       description: taskData?.description
     })
-    useHandleGetTaskWithoutLoading(parseInt(task_id as string))
   }
   const handleDescriptionOnBlur = async (e: any) => {
     if (e.target.value === (taskData?.description ?? '')) return
@@ -160,7 +156,6 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
       actual_time_finished: taskData?.actual_time_finished,
       description: e.target.value
     })
-    useHandleGetTaskWithoutLoading(parseInt(task_id as string))
   }
   const handleRemoveTask = async (): Promise<void> => {
     setDeleteTask(true)
