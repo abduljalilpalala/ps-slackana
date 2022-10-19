@@ -80,9 +80,9 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
     }
   }, [taskData])
 
-  const handleTaskStatusToggle = () => {
+  const handleTaskStatusToggle = async () => {
     setIsTaskCompleted(!isTaskCompleted)
-    useHandleCompleteTask(parseInt(task_id as string))
+    await useHandleCompleteTask(parseInt(task_id as string))
     useHandleRefetchTasks()
   }
 
@@ -125,33 +125,37 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
     const keyCode = e.which || e.keyCode
     if (keyCode === 13 && !e.shiftKey) e.preventDefault()
   }
-  const handleTaskNameOnBlur = (e: any) => {
+  const handleTaskNameOnBlur = async (e: any) => {
     if (e.target.value === taskData?.name) return
     if (e.target.value === '') setUpdateTaskName((e.target.value = 'Untitled Task'))
-    useHandleUpdateTaskName(taskData?.section_id as number, taskData?.id as number, e.target.value)
+    await useHandleUpdateTaskName(
+      taskData?.section_id as number,
+      taskData?.id as number,
+      e.target.value
+    )
     useHandleGetTaskWithoutLoading(parseInt(task_id as string))
   }
-  const handleEstimatedTimeOnBlur = (e: any) => {
+  const handleEstimatedTimeOnBlur = async (e: any) => {
     if (parseInt(e.target.value) === (taskData?.estimated_time ?? 0)) return
-    useHandleUpdateTaskDetails(parseInt(task_id as string), {
+    await useHandleUpdateTaskDetails(parseInt(task_id as string), {
       estimated_time: e.target.value,
       actual_time_finished: taskData?.actual_time_finished,
       description: taskData?.description
     })
     useHandleGetTaskWithoutLoading(parseInt(task_id as string))
   }
-  const handleActualTimeOnBlur = (e: any) => {
+  const handleActualTimeOnBlur = async (e: any) => {
     if (parseInt(e.target.value) === (taskData?.actual_time_finished ?? 0)) return
-    useHandleUpdateTaskDetails(parseInt(task_id as string), {
+    await useHandleUpdateTaskDetails(parseInt(task_id as string), {
       estimated_time: taskData?.estimated_time,
       actual_time_finished: e.target.value,
       description: taskData?.description
     })
     useHandleGetTaskWithoutLoading(parseInt(task_id as string))
   }
-  const handleDescriptionOnBlur = (e: any) => {
+  const handleDescriptionOnBlur = async (e: any) => {
     if (e.target.value === (taskData?.description ?? '')) return
-    useHandleUpdateTaskDetails(parseInt(task_id as string), {
+    await useHandleUpdateTaskDetails(parseInt(task_id as string), {
       estimated_time: taskData?.estimated_time,
       actual_time_finished: taskData?.actual_time_finished,
       description: e.target.value
