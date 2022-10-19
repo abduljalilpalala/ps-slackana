@@ -41,7 +41,7 @@ export default class MyDocument extends Document {
             rel="stylesheet"
           />
         </Head>
-        <body className="font-inter">
+        <body className="font-inter antialiased">
           <Main />
           <NextScript />
         </body>

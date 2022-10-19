@@ -40,7 +40,9 @@ const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element =>
 
   return (
     <aside>
-      <div className={classNames(isOpenDrawer ? 'translate-x-0' : '-translate-x-full', 'drawer')}>
+      <div
+        className={classNames(isOpenDrawer ? 'z-50 translate-x-0' : '-translate-x-full', 'drawer')}
+      >
         <div css={styles.wrapper}>
           <div>
             <div css={styles.business_logo}>
@@ -131,7 +133,7 @@ const Drawer: FC<Props> = ({ isOpenDrawer, handleToggleDrawer }): JSX.Element =>
         {isOpenDrawer && (
           <div
             onClick={handleToggleDrawer}
-            className="fixed inset-0 z-30 cursor-default bg-slate-700/50 backdrop-blur-sm"
+            className="fixed inset-0 z-40 cursor-default bg-slate-700/50 backdrop-blur-sm"
           ></div>
         )}
       </>
