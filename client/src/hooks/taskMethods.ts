@@ -86,29 +86,19 @@ export const useTaskMethods = (projectID: number) => {
   }
   const useHandleUpdateTaskDueDate = async (id: number, due_date: any) => {
     dispatch(setUpdateTaskDueDateData({ id, due_date }))
-    toast.promise(
-      dispatch(updateTaskDueDate()).then((_) => {
-        dispatch(getSections())
-      }),
-      {
-        loading: 'Updating task due date...',
-        success: 'Task due date updated successfully!',
-        error: 'Error on updating task due date!'
-      }
-    )
+    toast.promise(dispatch(updateTaskDueDate()), {
+      loading: 'Updating task due date...',
+      success: 'Task due date updated successfully!',
+      error: 'Error on updating task due date!'
+    })
   }
   const useHandleUpdateTaskAssignee = async (id: number, project_member_id: any) => {
     dispatch(setUpdateTaskAssigneeData({ id, project_member_id }))
-    toast.promise(
-      dispatch(updateTaskAssignee()).then((_) => {
-        dispatch(getSections())
-      }),
-      {
-        loading: 'Updating task assignee...',
-        success: 'Task assignee updated successfully!',
-        error: 'Error on updating task assignee!'
-      }
-    )
+    toast.promise(dispatch(updateTaskAssignee()), {
+      loading: 'Updating task assignee...',
+      success: 'Task assignee updated successfully!',
+      error: 'Error on updating task assignee!'
+    })
   }
   const useHandleUpdateTaskName = async (section_id: number, id: number, name: string) => {
     dispatch(setSectionID({ section_id }))
@@ -130,7 +120,7 @@ export const useTaskMethods = (projectID: number) => {
   }
   const useHandleCompleteTaskSlider = async (id: number) => {
     dispatch(setCompleteTaskData({ id }))
-    dispatch(completeTask()).then((_) => dispatch(getSections()))
+    dispatch(completeTask())
   }
   const useHandleGetTask = async (task_id: number) => {
     setIsTaskLoading(true)

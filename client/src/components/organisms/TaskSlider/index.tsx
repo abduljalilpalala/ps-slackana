@@ -161,17 +161,26 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
     setDeleteTask(true)
     useHandleRemoveTask(taskData?.section_id as number, taskData?.id as number)
   }
+  const dueDateColor = (value: any, defaultValue: string = '') => {
+    if (!value) return defaultValue
+    return new Date(moment(new Date(value)).format('YYYY-MM-DD')) >=
+      new Date(moment().format('YYYY-MM-DD'))
+      ? 'green'
+      : 'red'
+  }
   const CustomCalendarButton = forwardRef(({ value, onClick }: any, ref: any) => (
     <div className="flex items-center space-x-2">
       <button
         onClick={onClick}
         ref={ref}
-        className="flex-shrink-0 cursor-pointer overflow-hidden rounded-full border border-blue-600 p-1 text-blue-600 active:scale-95"
+        className={`flex-shrink-0 cursor-pointer overflow-hidden rounded-full border 
+        border-${dueDateColor(value, 'blue')}-600 p-1 
+        text-${dueDateColor(value, 'blue')}-600 active:scale-95`}
       >
-        <Calendar className="h-4 w-4 rounded-full" />
+        <Calendar className={`h-4 w-4 rounded-full`} />
       </button>
       {value && (
-        <span className="text-sm font-medium text-slate-600">
+        <span className={`text-sm font-medium text-${dueDateColor(value)}-600`}>
           {moment().format('MMM D') === moment(new Date(value)).format('MMM D')
             ? 'Today'
             : moment(new Date(value)).format('MMM D')}
@@ -462,7 +471,13 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
                   <h1 className="text-sm font-medium">Due Date</h1>
                 </div>
                 <div className="flex w-full flex-1 flex-shrink-0 items-center space-x-4">
-                  <Tooltip text="Due Date">
+                  <Tooltip
+                    text={
+                      !updateTaskDueDate
+                        ? `Due Date`
+                        : moment(updateTaskDueDate).format('MMMM D, YYYY')
+                    }
+                  >
                     <ReactDatePicker
                       disabled={deleteTask || !permissions?.assignDueDates}
                       selected={updateTaskDueDate}

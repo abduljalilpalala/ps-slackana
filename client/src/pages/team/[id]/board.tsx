@@ -32,7 +32,7 @@ import { useTaskMethods } from '~/hooks/taskMethods'
 
 const Board: NextPage = (): JSX.Element => {
   const router = useRouter()
-  const { id } = router.query
+  const { id, task_id } = router.query
   const { useHandleCreateTask, useHandleRemoveTask, useHandleGetTask } = useTaskMethods(
     parseInt(id as string)
   )
@@ -73,6 +73,12 @@ const Board: NextPage = (): JSX.Element => {
       router.push(`/team/${router.query.id}/board?task_id=${taskID}`)
     }
   }, [isTaskSliderOpen, taskID])
+
+  useEffect(() => {
+    if (task_id) {
+      setIsTaskSliderOpen(true)
+    }
+  }, [task_id])
   const canCreatePermission = project?.can?.createSection
   const canRenamePermission = project?.can?.renameSection
   const canRemovePermission = project?.can?.removeSection

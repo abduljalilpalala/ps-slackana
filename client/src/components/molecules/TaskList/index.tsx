@@ -74,6 +74,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
   const { task_id } = router.query
 
   const handleUpdateAssigneeToggle = () => {
+    if (!permissions?.assignTask) return
     setUpdateAssigneeModal(!updateAssigneeModal)
     filterMembersName(parseInt(id as string), '')
   }
@@ -177,7 +178,14 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
         `}
     >
       {value ? (
-        <p className="text-xs">
+        <p
+          className={`text-xs ${
+            new Date(moment(new Date(value)).format('YYYY-MM-DD')) >=
+            new Date(moment().format('YYYY-MM-DD'))
+              ? 'text-green-600'
+              : 'text-red-600'
+          }`}
+        >
           {moment().format('MMM D') === moment(new Date(value)).format('MMM D')
             ? 'Today'
             : moment(new Date(value)).format('MMM D')}
@@ -334,7 +342,6 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
             />
             {updateAssignee?.user ? (
               <button
-                disabled={!permissions?.assignTask}
                 className="overflow-hidden rounded-full"
                 onClick={handleUpdateAssigneeToggle}
                 data-for="assignee"
@@ -348,7 +355,6 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
               </button>
             ) : (
               <button
-                disabled={!permissions?.assignTask}
                 data-for="assignee"
                 data-tip={!updateAssignee?.user ? `Assignee` : updateAssignee?.user?.name}
                 className={`
@@ -363,7 +369,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
             )}
             {updateAssigneeModal && addAssigneeComponent}
           </div>
-          <Tooltip text="Due Date">
+          <Tooltip text={!dueDate ? `Due Date` : moment(dueDate).format('MMMM D, YYYY')}>
             <ReactDatePicker
               disabled={!permissions?.assignDueDates}
               selected={selectedDueDate}
