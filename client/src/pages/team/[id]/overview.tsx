@@ -212,7 +212,7 @@ const Overview: FC = (): JSX.Element => {
                   <LineSkeleton className='w-[20%]' /></div>
                 :
                 <textarea
-                  placeholder='Description field should not be empty'
+                  placeholder='No Project Description...'
                   name="description" rows={5}
                   disabled={!can?.editProject}
                   onChange={updateDescription}

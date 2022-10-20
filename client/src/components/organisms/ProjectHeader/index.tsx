@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FaRegUser } from 'react-icons/fa'
 import React, { FC, useEffect, useState } from 'react'
+import Pusher from 'pusher-js'
 
 import {
   getProject,
@@ -20,6 +21,8 @@ import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
 import ProjectActionDropdown from '~/components/molecules/ProjectActionDropdown'
 import ProjectStatusDropdown from '~/components/molecules/ProjectStatusDropdown'
 import handleImageError from '~/helpers/handleImageError'
+import { pusher } from '~/shared/lib/pusher'
+import { usePusherNudge } from '~/hooks/pusherNudge'
 
 const ProjectHead: FC = (): JSX.Element => {
   const router = useRouter()
@@ -48,6 +51,8 @@ const ProjectHead: FC = (): JSX.Element => {
       dispatch(resetRefresher())
     })
   }, [id])
+
+  usePusherNudge(id as string)
 
   useEffect(() => {
     dispatch(setEditProjectTitle(projectTitle))
@@ -170,7 +175,7 @@ const ProjectHead: FC = (): JSX.Element => {
             </section>
           </div>
           <FaRegUser className="group-hover:text-slate-800" />
-          <h3 className="group-hover:text-slate-800">{members ? numberOfActiveMembers : 3}</h3>
+          <h3 className="group-hover:text-slate-800">{members && numberOfActiveMembers}</h3>
         </button>
       </header>
     </>
