@@ -4,3 +4,19 @@
 .react-datepicker__triangle {
   display: none;
 }
+
+.react-datepicker__header {
+  text-align: center;
+  background-color: #1d5d90;
+  border-bottom: 0px;
+  padding-top: 8px;
+  position: relative;
+}
+
+.react-datepicker__current-month {
+  color: #ffff !important;
+}
+
+.react-datepicker__day-name {
+  color: #ffff !important;
+}

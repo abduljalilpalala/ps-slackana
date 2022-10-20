@@ -376,6 +376,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
               onChange={handleSetDueDate}
               value={dueDate}
               customInput={<CustomCalendarButton />}
+              calendarClassName="!shadow-lg"
             />
           </Tooltip>
         </div>
