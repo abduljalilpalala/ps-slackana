@@ -435,9 +435,13 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
                   {updateAssignee?.user && (
                     <div className="flex flex-col text-sm">
                       <div className="flex items-center space-x-3">
-                        <h1 className="font-medium">{updateAssignee?.user?.name}</h1>
-                        <span className="h-2 w-2 rounded-full bg-green-600"></span>
-                        <p className="text-slate-500">{updateAssignee?.role?.name}</p>
+                        <Tooltip text={updateAssignee?.user?.name}>
+                          <h1 className="max-w-[120px] font-medium line-clamp-1">
+                            {updateAssignee?.user?.name}
+                          </h1>
+                        </Tooltip>
+                        <span className="h-2 w-2 flex-shrink-0 rounded-full bg-green-600"></span>
+                        <p className="text-slate-500 line-clamp-1">{updateAssignee?.role?.name}</p>
                       </div>
                       <h2 className="leading-tight text-slate-500">
                         {updateAssignee?.teams
