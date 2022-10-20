@@ -482,6 +482,7 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
                       disabled={deleteTask || !permissions?.assignDueDates}
                       selected={updateTaskDueDate}
                       onChange={handleSetDueDate}
+                      calendarClassName="!shadow-lg"
                       customInput={<CustomCalendarButton />}
                     />
                   </Tooltip>
