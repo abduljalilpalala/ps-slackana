@@ -31,13 +31,6 @@ const AuthLayout: FC<Props> = ({ children, metaTitle }): JSX.Element => {
             </div>
             <div css={styles.google_provider}>
               <h1>{isSignUp ? 'Sign Up' : 'Sign In'} to Slackana</h1>
-              <button type="button" className="focus:outline-blue-600">
-                <GoogleIcon />
-                <span>Continue with Google</span>
-              </button>
-              <div css={styles.or}>
-                <span>or</span>
-              </div>
             </div>
           </nav>
           {children}
