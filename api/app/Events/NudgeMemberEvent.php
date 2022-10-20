@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Http\Resources\UserResource;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
@@ -40,10 +41,15 @@ class NudgeMemberEvent implements ShouldBroadcast
     return new Channel('project.' . $this->project->id . '.member.' . $this->user->id);
   }
 
+  public function broadcastAs()
+  {
+    return 'NudgeMemberEvent';
+  }
+
   public function broadcastWith()
   {
     return [
-      'userName' => auth()->user()->name,
+      'user' => new UserResource(User::with('avatar')->findOrFail(auth()->user()->id)),
     ];
   }
 }

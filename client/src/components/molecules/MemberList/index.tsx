@@ -9,23 +9,29 @@ import {
   removeMember,
   leaveProject,
   filterMembers,
-  setAsTeamLead,
-} from "~/redux/member/memberSlice";
-import { nudgeMember } from '~/utils/nudgeMember';
-import { FistIcon } from "~/shared/icons/FistIcon";
-import { StarIcon } from '~/shared/icons/StarIcon';
-import { MemberListProps } from './MemberListType';
-import { CrownIcon } from "~/shared/icons/CrownIcon";
-import { ThreeDot } from "~/shared/icons/ThreeDotIcon";
-import handleImageError from '~/helpers/handleImageError';
-import { ActiveStatus } from "~/shared/icons/ActiveStatus";
-import MemberOption from "~/components/organisms/MemberOption";
-import LineSkeleton from "~/components/atoms/Skeletons/LineSkeleton";
-import ImageSkeleton from "~/components/atoms/Skeletons/ImageSkeleton";
-import { useAppDispatch, useAppSelector } from "~/hooks/reduxSelector";
-import { getProject, memberRefresher } from '~/redux/project/projectSlice';
+  setAsTeamLead
+} from '~/redux/member/memberSlice'
+import { FistIcon } from '~/shared/icons/FistIcon'
+import { StarIcon } from '~/shared/icons/StarIcon'
+import { MemberListProps } from './MemberListType'
+import { CrownIcon } from '~/shared/icons/CrownIcon'
+import { ThreeDot } from '~/shared/icons/ThreeDotIcon'
+import handleImageError from '~/helpers/handleImageError'
+import { ActiveStatus } from '~/shared/icons/ActiveStatus'
+import MemberOption from '~/components/organisms/MemberOption'
+import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
+import ImageSkeleton from '~/components/atoms/Skeletons/ImageSkeleton'
+import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
+import { getProject, memberRefresher } from '~/redux/project/projectSlice'
 
-const MemberList = ({ data, isLast, isLoading, className, filterData }: MemberListProps) => {
+const MemberList = ({
+  data,
+  isLast,
+  isLoading,
+  className,
+  filterData,
+  handleNudge
+}: MemberListProps) => {
   const dispatch = useAppDispatch()
   const [optionState, setOptionState] = useState<boolean>(false)
   const { project, auth } = useAppSelector((state) => state)
@@ -38,11 +44,21 @@ const MemberList = ({ data, isLast, isLoading, className, filterData }: MemberLi
   const { role, user, teams, is_mvp } = data || {}
   const { name: roleTitle, id: roleID } = role || {}
   const { name, avatar, isLoggedIn, id: currentUserID } = user || {}
-  const teamList = teams?.map((team: any) => { return team?.name }).join(' | ')
+  const teamList = teams
+    ?.map((team: any) => {
+      return team?.name
+    })
+    .join(' | ')
 
-  const nudge = () => {
-    if (!isLoggedIn) return;
-    nudgeMember("avatar/url", "asdadadadasd");
+  const [isClicked, setIsClicked] = useState<boolean>(false)
+
+  const handleBellClick = (currentUserID: number, isLoggedIn: boolean) => {
+    if (isClicked) return
+    setIsClicked(true)
+    setTimeout(() => {
+      setIsClicked(false)
+    }, 6000)
+    handleNudge?.(currentUserID, isLoggedIn)
   }
 
   const stateRefresh = () => {
@@ -118,30 +134,32 @@ const MemberList = ({ data, isLast, isLoading, className, filterData }: MemberLi
 
   const moreOption = (
     <>
-      {authID !== currentUserID &&
+      {authID !== currentUserID && (
         <Bell
+          focusable={true}
           fill={false ? '#2563EB' : 'transparent'}
           color="#2563EB"
-          className={`cursor-pointer ${!isLoggedIn && "opacity-60 cursor-not-allowed"}`}
-          onClick={nudge}
-          data-tip={!isLoggedIn ? "You cannot nudge an offline member" : null}
+          className={`cursor-pointer ${
+            !isLoggedIn || (isClicked && 'cursor-not-allowed opacity-60')
+          }`}
+          onClick={() => handleBellClick(currentUserID, isLoggedIn)}
+          data-tip={!isLoggedIn ? 'You cannot nudge an offline member' : null}
         />
-      }
+      )}
       <ReactTooltip />
-      {
-        (userRole !== 3 || (userRole === 3 && authID === currentUserID)) && (
-          <MemberOption
-            data={data}
-            filterData={filterData}
-            callback={dropDownOption}
-            closeOption={setOptionState}
-            isLast={isLast}>
-            <div className='hover:bg-slate-100 rotate-90 z-0 mb-[3px] cursor-pointer w-[26px] h-[26px] flex items-center justify-center rounded-[3px] border border-slate-500'>
-              <ThreeDot />
-            </div>
-          </MemberOption>
-        )
-      }
+      {(userRole !== 3 || (userRole === 3 && authID === currentUserID)) && (
+        <MemberOption
+          data={data}
+          filterData={filterData}
+          callback={dropDownOption}
+          closeOption={setOptionState}
+          isLast={isLast}
+        >
+          <div className="z-0 mb-[3px] flex h-[26px] w-[26px] rotate-90 cursor-pointer items-center justify-center rounded-[3px] border border-slate-500 hover:bg-slate-100">
+            <ThreeDot />
+          </div>
+        </MemberOption>
+      )}
     </>
   )
 
@@ -180,8 +198,9 @@ const MemberList = ({ data, isLast, isLoading, className, filterData }: MemberLi
         <div
           onMouseOut={() => setOptionState(false)}
           onMouseOverCapture={() => setOptionState(true)}
-          className={`relative flex items-center justify-between px-6 py-2 hover:bg-slate-200 ${className} ${isLast && '!mb-[210px]'
-            }`}
+          className={`relative flex items-center justify-between px-6 py-2 hover:bg-slate-200 ${className} ${
+            isLast && '!mb-[210px]'
+          }`}
         >
           <div className="flex min-w-[150px] flex-row items-center justify-start gap-3 truncate text-ellipsis mobile:w-[75%]">
             <div className="relative flex max-h-[36px] min-h-[36px] min-w-[36px] max-w-[36px] items-center justify-center mobile:min-w-[36px]">
@@ -189,8 +208,9 @@ const MemberList = ({ data, isLast, isLoading, className, filterData }: MemberLi
                 src={avatar?.url}
                 onError={(e) => handleImageError(e, '/images/avatar.png')}
                 alt="user-icon"
-                className={`max-h-[36px] min-h-[36px] min-w-[36px] max-w-[36px] rounded-md ${(is_mvp || roleID < 3) && 'border-2 border-yellow-400'
-                  } `}
+                className={`max-h-[36px] min-h-[36px] min-w-[36px] max-w-[36px] rounded-md ${
+                  (is_mvp || roleID < 3) && 'border-2 border-yellow-400'
+                } `}
               />
               <div className="absolute -bottom-[5px] -right-[5px] flex max-h-[15px] max-w-[33px] justify-end gap-1">
                 {is_mvp ? (
