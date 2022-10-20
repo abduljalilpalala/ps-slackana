@@ -5,6 +5,7 @@ use App\Http\Controllers\ProjectMemberStatusController;
 use App\Http\Controllers\UpdateUserSettingsController;
 use App\Http\Controllers\ChangeUserPasswordController;
 use App\Http\Controllers\CompleteTaskController;
+use App\Http\Controllers\NudgeMemberController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\ProjectStatusController;
@@ -37,7 +38,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::apiResource('project.member', ProjectMemberController::class);
   Route::apiResource('project.section', SectionController::class);
   Route::apiResource('project.section.task', TaskController::class);
-  
+
   Route::group(['prefix' => 'project'], function () {
     Route::put('/{project}/project-status', [ProjectStatusController::class, 'update']);
     Route::delete('/{project}/archive', [ArchiveProjectController::class, 'destroy']);
@@ -45,12 +46,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::delete('/{project}/leave', [ProjectMemberStatusController::class, 'destroy']);
     Route::post('/{project}/team-lead', [ProjectMemberStatusController::class, 'store']);
     Route::put('/{project}/mvp', [ProjectMemberStatusController::class, 'update']);
-    Route::put('/{project}/task/{task}/details', [TaskDetailsController::class,'update']);
-    Route::get('/{project}/task/{task}/details', [TaskDetailsController::class,'show']);
-    Route::put('/{project}/task/{task}/complete', [CompleteTaskController::class,'update']);
-    Route::put('/{project}/task/{task}/due-date', [TaskDueDateController::class,'update']);
-    Route::put('/{project}/task/{task}/assign', [TaskAssignmentController::class,'update']);
-    Route::put('/{project}/section/{section}/reorder-tasks', [TaskReorderController::class,'update']);
+    Route::put('/{project}/task/{task}/details', [TaskDetailsController::class, 'update']);
+    Route::get('/{project}/task/{task}/details', [TaskDetailsController::class, 'show']);
+    Route::put('/{project}/task/{task}/complete', [CompleteTaskController::class, 'update']);
+    Route::put('/{project}/task/{task}/due-date', [TaskDueDateController::class, 'update']);
+    Route::put('/{project}/task/{task}/assign', [TaskAssignmentController::class, 'update']);
+    Route::put('/{project}/section/{section}/reorder-tasks', [TaskReorderController::class, 'update']);
+    Route::get('/{project}/member/{member}/nudge-member', [NudgeMemberController::class, 'show']);
   });
 
   Route::group(['prefix' => 'user'], function () {
