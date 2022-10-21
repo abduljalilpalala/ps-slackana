@@ -1,4 +1,6 @@
-import React, { useState } from "react";;
+import toast from "react-hot-toast";
+import React, { useState } from "react";
+import ReactTooltip from "react-tooltip";
 
 import {
   uploadPhoto,
@@ -6,21 +8,18 @@ import {
   updateNotification,
   updateProfileDetails,
 } from "~/redux/setting/settingSlice";
-import toast from "react-hot-toast";
 import TaskIcon from "~/shared/icons/TaskIcon";
 import { darkToaster } from "~/utils/darkToaster";
 import { Password, Profile } from "./SettingsType";
 import { globals } from "~/shared/twin/globals.styles";
-import CalendarIcon from "~/shared/icons/CalendarIcon";
 import DialogBox from "~/components/templates/DialogBox";
 import { getProject } from "~/redux/project/projectSlice";
+import handleImageError from "~/helpers/handleImageError";
 import { hydrateUserState } from "~/redux/auth/authSlice";
 import SwitchToggle from "~/components/atoms/SwitchToggle";
 import SubmitButton from "~/components/atoms/SubmitButton";
 import { useAppDispatch, useAppSelector } from "~/hooks/reduxSelector";
 import { styles as settingsStyle } from '~/shared/twin/settings-modal.style';
-import ReactTooltip from "react-tooltip";
-import handleImageError from "~/helpers/handleImageError";
 
 const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
   const dispatch = useAppDispatch();
@@ -111,7 +110,6 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
 
       default:
         alert("No component selected");
-        break;
     }
   }
 
@@ -140,16 +138,33 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
               <div css={settingsStyle.uploadContainer}>
                 <img
                   src={avatar?.url}
-                  onError={(e) => handleImageError(e, '/images/team/qa.png')}
+                  onError={(e) => handleImageError(e, '/images/avatar.png')}
                   alt="team-icon"
                   className="rounded-full max-h-[88px] min-h-[88px] max-w-[88px] min-w-[88px]"
                 />
                 <div className="flex flex-col gap-3">
-                  <input disabled={userLoading} onChange={uploadImage} type="file" className="hidden" id="upload" accept="image/png, image/gif, image/jpeg" />
-                  <label css={settingsStyle.upload} htmlFor="upload" className={`flex justify-center items-center cursor-pointer ${userLoading && "!bg-gray-500 !cursor-not-allowed"}`} >
+                  <input
+                    disabled={userLoading}
+                    onChange={uploadImage}
+                    type="file"
+                    className="hidden"
+                    id="upload"
+                    accept="image/png, image/gif, image/jpeg"
+                  />
+                  <label
+                    css={settingsStyle.upload}
+                    htmlFor="upload"
+                    className={`flex justify-center items-center cursor-pointer ${userLoading && "!bg-gray-500 !cursor-not-allowed"} mobile:!max-w-[120px] mobile:!text-sm`}
+                  >
                     {userLoading ? 'Loading...' : "Upload photo"}
                   </label>
-                  <button data-tip="Under development" css={settingsStyle.remove} className="hover:!text-slate-900 bg-slate-500 opacity-50 cursor-not-allowed">Remove photo</button>
+
+                  <button
+                    data-tip="Under development"
+                    css={settingsStyle.remove}
+                    className="hover:!text-slate-900 bg-slate-500 opacity-50 cursor-not-allowed mobile:!max-w-[120px] mobile:!text-sm">
+                    Remove photo
+                  </button>
                   <ReactTooltip />
                 </div>
               </div>

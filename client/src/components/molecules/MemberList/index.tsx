@@ -73,9 +73,10 @@ const MemberList = ({
   }
 
   const dropDownOption = (index: number, value: string) => {
+    dispatch(memberRefresher());
+
     switch (index) {
       case 0: {
-        dispatch(memberRefresher())
         return toast.promise(
           dispatch(setAsTeamLead({ projectID, userID: currentUserID })).then((_) => {
             stateRefresh()
@@ -88,7 +89,6 @@ const MemberList = ({
         )
       }
       case 1: {
-        dispatch(memberRefresher())
         return toast.promise(
           dispatch(setAsMVP({ projectID, userID: currentUserID })).then((_) => {
             stateRefresh()
@@ -101,7 +101,6 @@ const MemberList = ({
         )
       }
       case 3: {
-        dispatch(memberRefresher())
         return toast.promise(
           dispatch(leaveProject(projectID)).then((_) => {
             stateRefresh()
@@ -114,7 +113,6 @@ const MemberList = ({
         )
       }
       case 4: {
-        dispatch(memberRefresher())
         return toast.promise(
           dispatch(removeMember({ projectID, userID: currentUserID })).then((_) => {
             stateRefresh()
@@ -125,10 +123,10 @@ const MemberList = ({
             error: 'Error on removing member!'
           }
         )
-      }
+      };
 
       default:
-        toast.error('Something went wrong.')
+        toast.error('Something went wrong.');
     }
   }
 
@@ -139,9 +137,8 @@ const MemberList = ({
           focusable={true}
           fill={false ? '#2563EB' : 'transparent'}
           color="#2563EB"
-          className={`cursor-pointer ${
-            !isLoggedIn || (isClicked && 'cursor-not-allowed opacity-60')
-          }`}
+          className={`cursor-pointer ${!isLoggedIn || (isClicked && 'cursor-not-allowed opacity-60')
+            }`}
           onClick={() => handleBellClick(currentUserID, isLoggedIn)}
           data-tip={!isLoggedIn ? 'You cannot nudge an offline member' : null}
         />
@@ -198,9 +195,8 @@ const MemberList = ({
         <div
           onMouseOut={() => setOptionState(false)}
           onMouseOverCapture={() => setOptionState(true)}
-          className={`relative flex items-center justify-between px-6 py-2 hover:bg-slate-200 ${className} ${
-            isLast && '!mb-[210px]'
-          }`}
+          className={`relative flex items-center justify-between px-6 py-2 hover:bg-slate-200 ${className} ${isLast && '!mb-[210px]'
+            }`}
         >
           <div className="flex min-w-[150px] flex-row items-center justify-start gap-3 truncate text-ellipsis mobile:w-[75%]">
             <div className="relative flex max-h-[36px] min-h-[36px] min-w-[36px] max-w-[36px] items-center justify-center mobile:min-w-[36px]">
@@ -208,9 +204,8 @@ const MemberList = ({
                 src={avatar?.url}
                 onError={(e) => handleImageError(e, '/images/avatar.png')}
                 alt="user-icon"
-                className={`max-h-[36px] min-h-[36px] min-w-[36px] max-w-[36px] rounded-md ${
-                  (is_mvp || roleID < 3) && 'border-2 border-yellow-400'
-                } `}
+                className={`max-h-[36px] min-h-[36px] min-w-[36px] max-w-[36px] rounded-md ${(is_mvp || roleID < 3) && 'border-2 border-yellow-400'
+                  } `}
               />
               <div className="absolute -bottom-[5px] -right-[5px] flex max-h-[15px] max-w-[33px] justify-end gap-1">
                 {is_mvp ? (
