@@ -131,16 +131,9 @@ export const useTaskMethods = (projectID: number) => {
   const useHandleGetTaskWithoutLoading = async (task_id: number) => {
     dispatch(getTask(task_id))
   }
-  const useHandleUpdateTaskDetails = async (task_id: number, data: any) => {
+  const useHandleUpdateTaskDetails = async (task_id: number, data: any, callback: () => void) => {
     dispatch(setUpdateTaskDetailsData({ id: task_id, ...data }))
-    toast.promise(
-      dispatch(updateTaskDetails()).then((_) => dispatch(getTask(task_id))),
-      {
-        loading: 'Updating task details...',
-        success: 'Task details updated successfully!',
-        error: 'Error on updating task details!'
-      }
-    )
+    dispatch(updateTaskDetails()).then((_) => callback())
   }
   const useHandleRefetchTasks = async () => {
     dispatch(getSections())
