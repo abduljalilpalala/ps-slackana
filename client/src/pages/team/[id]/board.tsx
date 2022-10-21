@@ -146,10 +146,7 @@ const Board: NextPage = (): JSX.Element => {
   const updateSection = (e: any, id: number) => {
     const name = e.target.value
     dispatch(setRenameSectionData({ id, name }))
-    dispatch(renameSection()).then((_) => {
-      dispatch(getSections())
-      toast.success('Successfully Updated!')
-    })
+    dispatch(renameSection())
   }
 
   const handleShowAddTask = (id: number): void => setCurrentBoardId(id)
