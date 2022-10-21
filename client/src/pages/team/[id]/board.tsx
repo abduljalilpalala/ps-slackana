@@ -117,10 +117,10 @@ const Board: NextPage = (): JSX.Element => {
     dispatch(sectionRefresher())
     dispatch(createSection()).then((_) => {
       dispatch(getSections()).then((_) => {
+        setShowAddSection(!showAddSection)
         dispatch(resetRefresher())
         toast.success('Successfully Added!')
       })
-      setShowAddSection(!showAddSection)
     })
   }
 
