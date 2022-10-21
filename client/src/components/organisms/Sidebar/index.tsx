@@ -83,7 +83,7 @@ const Sidebar: FC<Props> = ({ isOpenSidebar }): JSX.Element => {
                           <Link href={`/team/${id}/overview`}>
                             <a
                               className={classNames(
-                                router.asPath.includes(`/team/${id}`)
+                                router.asPath.includes(`/team/${id}/`)
                                   ? 'bg-blue-600 text-white'
                                   : ' hover:bg-slate-700'
                               )}
