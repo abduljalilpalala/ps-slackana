@@ -43,6 +43,9 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
   const [deleteTask, setDeleteTask]: any = useState(false)
   const [updateAssigneeModal, setUpdateAssigneeModal] = useState<boolean>(false)
   const { members, isMemberLoading, filterMembersName } = useMemberMethods(parseInt(id as string))
+  const [oldDescription, setOldDescription] = useState<any>('')
+  const [oldActualTime, setOldActualTime] = useState<any>(0)
+  const [oldEstimatedTime, setOldEstimatedTime] = useState<any>(0)
   const {
     useHandleUpdateTaskDueDate,
     useHandleUpdateTaskAssignee,
@@ -73,8 +76,11 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
     setUpdateTaskDueDate(taskData?.due_date ? new Date(taskData?.due_date) : null)
     setIsTaskCompleted(taskData?.is_completed)
     setUpdateDescription(taskData?.description ?? '')
+    setOldDescription(taskData?.description ?? '')
     setUpdateEstimatedTime(taskData?.estimated_time ?? 0)
+    setOldEstimatedTime(taskData?.estimated_time ?? 0)
     setUpdateActualTime(taskData?.actual_time_finished ?? 0)
+    setOldActualTime(taskData?.actual_time_finished ?? 0)
     return () => {
       setDeleteTask(false)
     }
@@ -134,28 +140,46 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
     )
   }
   const handleEstimatedTimeOnBlur = async (e: any) => {
-    if (parseInt(e.target.value) === (taskData?.estimated_time ?? 0)) return
-    await useHandleUpdateTaskDetails(parseInt(task_id as string), {
-      estimated_time: e.target.value,
-      actual_time_finished: taskData?.actual_time_finished,
-      description: taskData?.description
-    })
+    if (e.target.value === (oldEstimatedTime ?? 0)) return
+    await useHandleUpdateTaskDetails(
+      parseInt(task_id as string),
+      {
+        estimated_time: e.target.value,
+        actual_time_finished: updateActualTime,
+        description: updateDescription
+      },
+      () => {
+        setOldEstimatedTime(e.target.value)
+      }
+    )
   }
   const handleActualTimeOnBlur = async (e: any) => {
-    if (parseInt(e.target.value) === (taskData?.actual_time_finished ?? 0)) return
-    await useHandleUpdateTaskDetails(parseInt(task_id as string), {
-      estimated_time: taskData?.estimated_time,
-      actual_time_finished: e.target.value,
-      description: taskData?.description
-    })
+    if (e.target.value === (oldActualTime ?? 0)) return
+    await useHandleUpdateTaskDetails(
+      parseInt(task_id as string),
+      {
+        estimated_time: updateEstimatedTime,
+        actual_time_finished: e.target.value,
+        description: updateDescription
+      },
+      () => {
+        setOldActualTime(e.target.value)
+      }
+    )
   }
   const handleDescriptionOnBlur = async (e: any) => {
-    if (e.target.value === (taskData?.description ?? '')) return
-    await useHandleUpdateTaskDetails(parseInt(task_id as string), {
-      estimated_time: taskData?.estimated_time,
-      actual_time_finished: taskData?.actual_time_finished,
-      description: e.target.value
-    })
+    if (e.target.value === (oldDescription ?? '')) return
+    await useHandleUpdateTaskDetails(
+      parseInt(task_id as string),
+      {
+        estimated_time: updateEstimatedTime,
+        actual_time_finished: updateActualTime,
+        description: e.target.value
+      },
+      () => {
+        setOldDescription(e.target.value)
+      }
+    )
   }
   const handleRemoveTask = async (): Promise<void> => {
     setDeleteTask(true)
