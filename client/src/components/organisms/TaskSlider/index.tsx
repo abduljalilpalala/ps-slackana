@@ -185,33 +185,44 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
     setDeleteTask(true)
     useHandleRemoveTask(taskData?.section_id as number, taskData?.id as number)
   }
-  const dueDateColor = (value: any, defaultValue: string = '') => {
-    if (!value) return defaultValue
-    return new Date(moment(new Date(value)).format('YYYY-MM-DD')) >=
-      new Date(moment().format('YYYY-MM-DD'))
-      ? 'green'
-      : 'red'
-  }
-  const CustomCalendarButton = forwardRef(({ value, onClick }: any, ref: any) => (
-    <div className="flex items-center space-x-2">
-      <button
-        onClick={onClick}
-        ref={ref}
-        className={`flex-shrink-0 cursor-pointer overflow-hidden rounded-full border 
-        border-${dueDateColor(value, 'blue')}-600 p-1 
-        text-${dueDateColor(value, 'blue')}-600 active:scale-95`}
-      >
-        <Calendar className={`h-4 w-4 rounded-full`} />
-      </button>
-      {value && (
-        <span className={`text-sm font-medium text-${dueDateColor(value)}-600`}>
-          {moment().format('MMM D') === moment(new Date(value)).format('MMM D')
-            ? 'Today'
-            : moment(new Date(value)).format('MMM D')}
-        </span>
-      )}
-    </div>
-  ))
+  const CustomCalendarButton = forwardRef(({ value, onClick }: any, ref: any) => {
+    let today = new Date(moment().format('YYYY-MM-DD'))
+    let currentValue = new Date(moment(value).format('YYYY-MM-DD'))
+    return (
+      <div className="flex items-center space-x-2">
+        <button
+          onClick={onClick}
+          ref={ref}
+          className={classNames(
+            'flex-shrink-0 cursor-pointer overflow-hidden rounded-full',
+            `${
+              value
+                ? currentValue >= today
+                  ? 'border border-green-600'
+                  : 'border border-red-600'
+                : 'border border-blue-600'
+            } p-1`,
+            `${
+              value ? (currentValue >= today ? 'text-green-600' : 'text-red-600') : 'text-blue-600'
+            } active:scale-95`
+          )}
+        >
+          <Calendar className={`h-4 w-4 rounded-full`} />
+        </button>
+        {value && (
+          <span
+            className={`text-sm font-medium ${
+              currentValue >= today ? 'text-green-600' : 'text-red-600'
+            }`}
+          >
+            {moment().format('MMM D') === moment(new Date(value)).format('MMM D')
+              ? 'Today'
+              : moment(new Date(value)).format('MMM D')}
+          </span>
+        )}
+      </div>
+    )
+  })
   const addAssigneeComponent = (
     <DialogBox
       isOpen={true}

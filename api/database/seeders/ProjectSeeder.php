@@ -55,31 +55,10 @@ class ProjectSeeder extends Seeder
       ['user_id' => $janeDoe->id, 'role_id' => RoleEnum::MEMBER],
     ]);
 
-    // Manual seeding for section and tasks
-    // $sections=$project->sections()->createMany([
-    //   ['name' => 'To do'],
-    //   ['name' => 'In Progress'],
-    //   ['name' => 'For Review'],
-    //   ['name' => 'Completed'],
-    // ]);
-    
-    // $sections->first()->tasks()->create([
-    //   'project_member_id' => $members->first()->id,
-    //   'name'=> "Set-up Section Model and Migrations",
-    //   'description' => "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam neque, ut dicta voluptate mollitia quo nam, perspiciatis aspernatur, sint nihil facilis ab quas molestiae culpa officiis quis aliquam quidem commodi!",
-    //   'position'=>1,
-    //   'due_date' => Carbon::now(),
-    //   'estimated_time'=> 3,
-    //   'actual_time_finished'=> 4,
-    // ]);
-
-    // Using factory - faker data (lorem ipsum)
-    $sections = Section::factory(4)->create([
-      'project_id' => $project->id
-    ]);
-    Task::factory(4)->create([
-      'project_member_id' => $members->first()->id,
-      'section_id' => $sections->first()->id
+    $project->sections()->createMany([
+      ['name' => 'To Do'],
+      ['name' => 'In Progress'],
+      ['name' => 'For Review'],
     ]);
 
     // John Doe
