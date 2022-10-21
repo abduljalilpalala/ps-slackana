@@ -172,7 +172,7 @@ export const sectionSlice = createSlice({
       .addCase(getSections.fulfilled, (state, action: PayloadAction<any>) => {
         state.isLoading = false
         state.isSuccess = true
-        state.sections = action.payload
+        state.sections = [...action.payload]
         state.error = {
           status: 0,
           content: null
