@@ -32,14 +32,26 @@ export const signInUpAuthCheck: GetServerSideProps = wrapper.getServerSideProps(
 
 export const authCheck: GetServerSideProps = wrapper.getServerSideProps(
   (store) =>
-    async ({ req }) => {
+    async ({ req, params }) => {
       const token = req.cookies['token']
       const config = { headers: { Authorization: `Bearer ${token}` } }
 
       try {
         const res = await axios.get('/api/auth', config)
         store.dispatch(setAuth(res.data))
+        if (
+          req.url?.includes('overview') ||
+          req.url?.includes('chat') ||
+          req.url?.includes('board')
+        ) {
+          await axios.get(`/api/project/${params?.id}/member/${res.data.id}`, config)
+        }
       } catch (error: any) {
+        if (error.response.status === 404) {
+          return {
+            notFound: true
+          }
+        }
         return {
           redirect: {
             permanent: false,
