@@ -16,5 +16,6 @@ class TaskReorderController extends Controller
           'position'=>$position++
         ]);
       }
+      return response()->noContent();
     }
 }
