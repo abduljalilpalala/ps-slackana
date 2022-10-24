@@ -23,6 +23,7 @@ import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
 import ImageSkeleton from '~/components/atoms/Skeletons/ImageSkeleton'
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
 import { getProject, memberRefresher } from '~/redux/project/projectSlice'
+import { useRouter } from 'next/router'
 
 const MemberList = ({
   data,
@@ -49,7 +50,8 @@ const MemberList = ({
       return team?.name
     })
     .join(' | ')
-
+  
+  const router = useRouter()
   const [isClicked, setIsClicked] = useState<boolean>(false)
 
   const handleBellClick = (currentUserID: number, isLoggedIn: boolean) => {
@@ -103,7 +105,7 @@ const MemberList = ({
       case 3: {
         return toast.promise(
           dispatch(leaveProject(projectID)).then((_) => {
-            stateRefresh()
+            router.push('/')
           }),
           {
             loading: 'Leaving project...',

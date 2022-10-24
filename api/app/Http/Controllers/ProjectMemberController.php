@@ -19,10 +19,16 @@ class ProjectMemberController extends Controller
     }
     if(request('search')){
       return MemberResource::collection($project->members()->whereHas('user', function($query){
-        $query->where('name', 'like', '%' . request('search') . '%');
+        $query->where('name', 'ilike', '%' . request('search') . '%');
       } )->with(['user.avatar','role', 'teams'])->get());
     }
     return MemberResource::collection($project->members()->with(['role', 'user.avatar', 'teams'])->get());
+  }
+
+  public function show(Project $project, User $member)
+  {
+    $project->members()->where('user_id', $member->id)->firstOrFail();
+    return response()->noContent();
   }
 
   public function store(StoreProjectMemberRequest $request, Project $project)
