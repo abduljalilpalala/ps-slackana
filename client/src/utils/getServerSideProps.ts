@@ -52,6 +52,9 @@ export const authCheck: GetServerSideProps = wrapper.getServerSideProps(
             notFound: true
           }
         }
+        if (error.response.status === 500) {
+          throw new Error('Internal Server Error')
+        }
         return {
           redirect: {
             permanent: false,
