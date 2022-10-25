@@ -2,7 +2,16 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
-import { getSections } from '~/redux/section/sectionSlice'
+import {
+  addNewTaskInSection,
+  getSections,
+  removeTaskInSection,
+  setSections,
+  updateTaskAssigneeInSection,
+  updateTaskDueDateInSection,
+  updateTaskSectionIDInSection,
+  updateTaskStatusInSection
+} from '~/redux/section/sectionSlice'
 import {
   completeTask,
   createTask,
@@ -24,7 +33,9 @@ import {
   updateTaskAssignee,
   updateTaskDetails,
   updateTaskDueDate,
-  updateTaskName
+  updateTaskName,
+  updateTaskPosition,
+  updateTaskSection
 } from '~/redux/task/taskSlice'
 
 export const useTaskMethods = (projectID: number) => {
@@ -44,16 +55,31 @@ export const useTaskMethods = (projectID: number) => {
     data: any,
     callback: () => void
   ): Promise<void> => {
-    dispatch(taskRefresher())
     dispatch(setSectionID({ section_id }))
-    dispatch(setAddNewTaskData(data))
+    dispatch(setAddNewTaskData({ ...data, project_member_id: data.project_member_id?.id }))
+    dispatch(
+      addNewTaskInSection({
+        newTask: {
+          id: Math.random(),
+          section_id: section_id,
+          assignee: data.project_member_id,
+          name: data.name,
+          description: '',
+          is_completed: false,
+          position: 0,
+          due_date: data.due_date,
+          estimated_time: 0,
+          actual_time_finished: 0,
+          created_at: '',
+          updated_at: ''
+        }
+      })
+    )
+    callback()
     toast.promise(
       dispatch(createTask()).then((_) => {
         dispatch(reorderTasks()).then((_) => {
-          dispatch(getSections()).then((_) => {
-            dispatch(resetRefresher())
-            callback()
-          })
+          dispatch(getSections())
         })
       }),
       {
@@ -67,11 +93,10 @@ export const useTaskMethods = (projectID: number) => {
   const useHandleRemoveTask = async (section_id: number, task_id: number) => {
     dispatch(setSectionID({ section_id }))
     dispatch(setRemoveTaskData({ id: task_id }))
+    dispatch(removeTaskInSection({ section_id, task_id }))
     toast.promise(
       dispatch(removeTask()).then((_) => {
-        dispatch(reorderTasks()).then((_) => {
-          dispatch(getSections())
-        })
+        dispatch(reorderTasks())
       }),
       {
         loading: 'Removing task...',
@@ -138,6 +163,34 @@ export const useTaskMethods = (projectID: number) => {
   const useHandleRefetchTasks = async () => {
     dispatch(getSections())
   }
+  const useHandleSetSections = (sections: []) => {
+    dispatch(setSections({ sections }))
+  }
+  const useHandleUpdateTaskSection = (section_id: number, task_id: number) => {
+    dispatch(updateTaskSectionIDInSection({ section_id, task_id }))
+    dispatch(setSectionID({ section_id }))
+    dispatch(updateTaskSection(task_id))
+  }
+  const useHandleUpdateTaskPosition = (tasks: any) => {
+    dispatch(updateTaskPosition(tasks))
+  }
+  const useHandleUpdateTaskDueDateInSections = (
+    section_id: number,
+    task_id: number,
+    due_date: any
+  ) => {
+    dispatch(updateTaskDueDateInSection({ section_id, task_id, due_date }))
+  }
+  const useHandleUpdateTaskAssigneeInSections = (
+    section_id: number,
+    task_id: number,
+    assignee: any
+  ) => {
+    dispatch(updateTaskAssigneeInSection({ section_id, task_id, assignee }))
+  }
+  const useHandleUpdateTaskStatusInSections = (section_id: number, task_id: number) => {
+    dispatch(updateTaskStatusInSection({ section_id, task_id }))
+  }
   return {
     useHandleCreateTask,
     useHandleRemoveTask,
@@ -151,6 +204,12 @@ export const useTaskMethods = (projectID: number) => {
     useHandleRefetchTasks,
     useHandleGetTaskWithoutLoading,
     useHandleCompleteTaskSlider,
+    useHandleSetSections,
+    useHandleUpdateTaskSection,
+    useHandleUpdateTaskPosition,
+    useHandleUpdateTaskDueDateInSections,
+    useHandleUpdateTaskAssigneeInSections,
+    useHandleUpdateTaskStatusInSections,
     taskUpdate,
     isTaskLoading,
     taskData

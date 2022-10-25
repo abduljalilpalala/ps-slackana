@@ -2,19 +2,11 @@ import { axios } from '~/shared/lib/axios'
 
 const getTasks = async (project_id: number, section_id: number): Promise<any> => {
   const response = await axios.get(`/api/project/${project_id}/section/${section_id}/task`)
-
-  if (response.status === 200) {
-    return response.data
-  }
-  return 'Something went wrong'
+  return response.data
 }
 const createTask = async (project_id: number, section_id: number, data: any): Promise<any> => {
   const response = await axios.post(`/api/project/${project_id}/section/${section_id}/task`, data)
-
-  if (response.status === 200) {
-    return response.data
-  }
-  return 'Something went wrong'
+  return response.data
 }
 const removeTask = async (
   project_id: number,
@@ -24,29 +16,17 @@ const removeTask = async (
   const response = await axios.delete(
     `/api/project/${project_id}/section/${section_id}/task/${task_id}`
   )
-
-  if (response.status === 200) {
-    return response.data
-  }
-  return 'Something went wrong'
+  return response.data
 }
 const reorderTasks = async (project_id: number, section_id: number): Promise<any> => {
   const response = await axios.put(`/api/project/${project_id}/section/${section_id}/reorder-tasks`)
-
-  if (response.status === 200) {
-    return response.data
-  }
-  return 'Something went wrong'
+  return response.data
 }
 const updateDueDate = async (project_id: number, task_id: number, due_date: any): Promise<any> => {
   const response = await axios.put(`/api/project/${project_id}/task/${task_id}/due-date`, {
     due_date
   })
-
-  if (response.status === 200) {
-    return response.data
-  }
-  return 'Something went wrong'
+  return response.data
 }
 const updateAssignee = async (
   project_id: number,
@@ -56,11 +36,7 @@ const updateAssignee = async (
   const response = await axios.put(`/api/project/${project_id}/task/${task_id}/assign`, {
     project_member_id
   })
-
-  if (response.status === 200) {
-    return response.data
-  }
-  return 'Something went wrong'
+  return response.data
 }
 const renameTask = async (
   project_id: number,
@@ -74,37 +50,36 @@ const renameTask = async (
       name
     }
   )
-
-  if (response.status === 200) {
-    return response.data
-  }
-  return 'Something went wrong'
+  return response.data
 }
 const completeTask = async (project_id: number, task_id: number): Promise<any> => {
   const response = await axios.put(`/api/project/${project_id}/task/${task_id}/complete`)
-
-  if (response.status === 200) {
-    return response.data
-  }
-  return 'Something went wrong'
+  return response.data
 }
 const getTask = async (project_id: number, task_id: number): Promise<any> => {
   const response = await axios.get(`/api/project/${project_id}/task/${task_id}/details`)
-
-  if (response.status === 200) {
-    return response.data
-  }
-  return 'Something went wrong'
+  return response.data
 }
 const updateTaskDetails = async (project_id: number, task_id: number, data: any): Promise<any> => {
   const response = await axios.put(`/api/project/${project_id}/task/${task_id}/details`, data)
-
-  if (response.status === 200) {
-    return response.data
-  }
-  return 'Something went wrong'
+  return response.data
 }
 
+const updateTaskPosition = async (project_id: number, tasks: any): Promise<any> => {
+  const response = await axios.put(`/api/project/${project_id}/task/position`, { tasks })
+  return response.data
+}
+
+const updateTaskSection = async (
+  project_id: number,
+  section_id: number,
+  task_id: number
+): Promise<any> => {
+  const response = await axios.put(`/api/project/${project_id}/task/${task_id}/move-section`, {
+    section_id
+  })
+  return response.data
+}
 const taskService = {
   getTasks,
   createTask,
@@ -115,7 +90,9 @@ const taskService = {
   renameTask,
   completeTask,
   getTask,
-  updateTaskDetails
+  updateTaskDetails,
+  updateTaskPosition,
+  updateTaskSection
 }
 
 export default taskService

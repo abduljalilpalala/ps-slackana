@@ -40,7 +40,6 @@ const AddTask: FC<Props> = (props): JSX.Element => {
   const router = useRouter()
   const { id } = router.query
   const { members, isMemberLoading, filterMembersName } = useMemberMethods(parseInt(id as string))
-  const { taskUpdate } = useTaskMethods(parseInt(id as string))
 
   const handleSetAssignee = (id: number) => {
     const getMember = members.find((member: any) => member.id === id)
@@ -142,7 +141,6 @@ const AddTask: FC<Props> = (props): JSX.Element => {
             flex-1 resize-none flex-wrap overflow-hidden border-none
             bg-transparent pl-6 text-sm font-medium focus:ring-0
           `}
-          disabled={taskUpdate}
           onKeyDown={onClickEnterTask}
           onChange={onChangeTask}
           placeholder="Write task name"

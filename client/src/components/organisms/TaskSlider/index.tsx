@@ -50,12 +50,13 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
     useHandleUpdateTaskDueDate,
     useHandleUpdateTaskAssignee,
     useHandleCompleteTaskSlider,
-    useHandleRefetchTasks,
     useHandleUpdateTaskName,
     useHandleUpdateTaskDetails,
     useHandleRemoveTask,
     useHandleGetTask,
-    useHandleGetTaskWithoutLoading,
+    useHandleUpdateTaskAssigneeInSections,
+    useHandleUpdateTaskDueDateInSections,
+    useHandleUpdateTaskStatusInSections,
     taskData,
     isTaskLoading
   } = useTaskMethods(parseInt(id as string))
@@ -87,6 +88,7 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
   }, [taskData])
 
   const handleTaskStatusToggle = async () => {
+    useHandleUpdateTaskStatusInSections(taskData?.section_id as number, parseInt(task_id as string))
     setIsTaskCompleted(!isTaskCompleted)
     useHandleCompleteTaskSlider(parseInt(task_id as string))
   }
@@ -97,18 +99,33 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
   }
 
   const handleClearDueDate = () => {
+    useHandleUpdateTaskDueDateInSections(
+      taskData?.section_id as number,
+      parseInt(task_id as string),
+      null
+    )
     setUpdateTaskDueDate(null)
     useHandleUpdateTaskDueDate(parseInt(task_id as string), null)
   }
 
   const handleSetDueDate = (date: Date) => {
     let value = date ? moment(new Date(date)).format('YYYY-MM-DD') : null
+    useHandleUpdateTaskDueDateInSections(
+      taskData?.section_id as number,
+      parseInt(task_id as string),
+      value
+    )
     setUpdateTaskDueDate(date)
     useHandleUpdateTaskDueDate(parseInt(task_id as string), value)
   }
 
   const handleSetAssignee = (id: number) => {
     const getMember: any = members.find((member: any) => member.id === id)
+    useHandleUpdateTaskAssigneeInSections(
+      taskData?.section_id as number,
+      parseInt(task_id as string),
+      getMember
+    )
     setUpdateAssignee(getMember)
     useHandleUpdateTaskAssignee(parseInt(task_id as string), getMember.id)
     handleUpdateAssigneeToggle()

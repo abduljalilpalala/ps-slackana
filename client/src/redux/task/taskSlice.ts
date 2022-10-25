@@ -240,6 +240,32 @@ export const updateTaskDetails = createAsyncThunk(
     }
   }
 )
+export const updateTaskSection = createAsyncThunk(
+  'task/updateTaskSectionStatus',
+  async (task_id: number, thunkAPI) => {
+    const {
+      task: { project_id, section_id }
+    }: any = thunkAPI.getState()
+    try {
+      return await taskService.updateTaskSection(project_id, section_id, task_id)
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(catchError(error))
+    }
+  }
+)
+export const updateTaskPosition = createAsyncThunk(
+  'task/updateTaskPositionStatus',
+  async (tasks: any, thunkAPI) => {
+    const {
+      task: { project_id }
+    }: any = thunkAPI.getState()
+    try {
+      return await taskService.updateTaskPosition(project_id, tasks)
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(catchError(error))
+    }
+  }
+)
 
 export const taskSlice = createSlice({
   name: 'task',
@@ -490,6 +516,44 @@ export const taskSlice = createSlice({
         }
       })
       .addCase(updateTaskDetails.rejected, (state, action: PayloadAction<any>) => {
+        state.isError = true
+        state.isSuccess = false
+        state.isLoading = false
+        state.error = action.payload
+      })
+      // Update Task Section
+      .addCase(updateTaskSection.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(updateTaskSection.fulfilled, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.isError = false
+        state.error = {
+          status: 0,
+          content: null
+        }
+      })
+      .addCase(updateTaskSection.rejected, (state, action: PayloadAction<any>) => {
+        state.isError = true
+        state.isSuccess = false
+        state.isLoading = false
+        state.error = action.payload
+      })
+      // Update Task Position
+      .addCase(updateTaskPosition.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(updateTaskPosition.fulfilled, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.isError = false
+        state.error = {
+          status: 0,
+          content: null
+        }
+      })
+      .addCase(updateTaskPosition.rejected, (state, action: PayloadAction<any>) => {
         state.isError = true
         state.isSuccess = false
         state.isLoading = false
