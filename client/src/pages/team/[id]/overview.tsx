@@ -1,7 +1,7 @@
 import moment from 'moment'
 import { useRouter } from 'next/router'
+import React, { useState } from 'react'
 import { Plus, Edit3 } from 'react-feather'
-import React, { FC, useState } from 'react'
 import ReactTextareaAutosize from 'react-textarea-autosize'
 
 import {
@@ -30,8 +30,9 @@ import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
 import { styles as homeStyle } from '~/shared/twin/home-content.style'
 import Tooltip from '~/components/templates/Tooltip'
+import { NextPage } from 'next'
 
-const Overview: FC = (): JSX.Element => {
+const Overview: NextPage = (): JSX.Element => {
   const router = useRouter()
   const { id } = router.query
   const dispatch = useAppDispatch()

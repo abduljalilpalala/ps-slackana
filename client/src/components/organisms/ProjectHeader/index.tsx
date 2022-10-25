@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Hash, X } from 'react-feather'
 import { useRouter } from 'next/router'
 import { FaRegUser } from 'react-icons/fa'
 import React, { FC, useEffect, useState } from 'react'
@@ -88,9 +89,9 @@ const ProjectHead: FC = (): JSX.Element => {
   ]
 
   return (
-    <>
+    <div className="flex w-full items-center">
       {addModal && <AddMemberModal close={() => setAddModal(false)} />}
-      <header css={styles.header}>
+      <header css={styles.header} className="w-full min-w-[360px]">
         <section css={styles.section}>
           {isLoading ? (
             !hotReload ? (
@@ -176,7 +177,24 @@ const ProjectHead: FC = (): JSX.Element => {
           <h3 className="group-hover:text-slate-800">{members && numberOfActiveMembers}</h3>
         </button>
       </header>
-    </>
+      {router.query.chat_id && (
+        <header className="flex w-[350px] flex-shrink-0 items-center justify-between border-b border-l border-slate-300 py-3 px-4 text-slate-600">
+          <div className="flex items-center space-x-1">
+            <h1 className="py-0.5 text-lg font-bold text-slate-900">Thread</h1>
+            <p className="flex items-center text-sm text-slate-500">
+              <Hash className="ml-2 h-4 w-4" />
+              slackana_team
+            </p>
+          </div>
+          <button
+            className="rounded p-0.5 hover:bg-slate-200 active:scale-95"
+            onClick={() => router.push(`/team/${id}/chat`)}
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </header>
+      )}
+    </div>
   )
 }
 

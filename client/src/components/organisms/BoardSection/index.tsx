@@ -94,7 +94,7 @@ const BoardSection: FC<Props> = (props): JSX.Element => {
                   <Plus className="h-5 w-5" />
                 </button>
               )}
-              <Menu as="div" className="relative z-20 mt-1 inline-block items-center text-left">
+              <Menu as="div" className="relative mt-1 inline-block items-center text-left">
                 {({ open }) => (
                   <>
                     <Menu.Button
@@ -108,7 +108,7 @@ const BoardSection: FC<Props> = (props): JSX.Element => {
                     <MenuTransition>
                       <Menu.Items
                         className={classNames(
-                          'absolute right-0 mt-1 w-44 origin-top-right divide-y divide-gray-200 overflow-hidden',
+                          'absolute right-0 z-20 mt-1 w-44 origin-top-right divide-y divide-gray-200 overflow-hidden',
                           'rounded-md border border-slate-200 bg-white py-1 shadow-xl focus:outline-none'
                         )}
                       >

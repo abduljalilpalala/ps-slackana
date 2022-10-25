@@ -80,6 +80,12 @@ module.exports = {
     require('@tailwindcss/forms'),
     require('@tailwindcss/line-clamp'),
     require('tailwind-scrollbar')({ nocompatible: true }),
-    require('tailwindcss-labeled-groups')(['board', 'task', 'tooltip', 'dropdown-action'])
+    require('tailwindcss-labeled-groups')([
+      'task',
+      'board',
+      'tooltip',
+      'message',
+      'dropdown-action'
+    ])
   ]
 }

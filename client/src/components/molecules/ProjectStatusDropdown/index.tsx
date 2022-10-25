@@ -57,7 +57,7 @@ const ProjectStatusDropdown: FC = (): JSX.Element => {
   const { name, style } = activeName
 
   return (
-    <Menu as="div" className="relative z-30 inline-block text-left">
+    <Menu as="div" className="relative inline-block text-left">
       {({ open }) => (
         <>
           <Menu.Button
@@ -81,7 +81,7 @@ const ProjectStatusDropdown: FC = (): JSX.Element => {
             />
           </Menu.Button>
           <MenuTransition>
-            <Menu.Items css={styles.menu_items}>
+            <Menu.Items css={styles.menu_items} className="z-50">
               <div>
                 {statusData.map(
                   ({ name, style }: { name: string; style: string }, index: number) => {
