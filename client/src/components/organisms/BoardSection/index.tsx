@@ -11,6 +11,8 @@ import { useRouter } from 'next/router'
 type Props = {
   children: ReactNode
   [board: string]: any
+  provided: any
+  snapshot: any
   permissions: {
     canCreatePermission: boolean
     canRenamePermission: boolean
@@ -27,6 +29,8 @@ const BoardSection: FC<Props> = (props): JSX.Element => {
     id,
     name,
     children,
+    provided,
+    snapshot,
     permissions: { canCreatePermission, canRenamePermission, canRemovePermission },
     actions: { handleRemoveSection, updateSection, handleShowAddTask }
   } = props
@@ -139,7 +143,13 @@ const BoardSection: FC<Props> = (props): JSX.Element => {
           )}
         </div>
       </header>
-      <main className="flex flex-1 flex-col space-y-2 overflow-y-auto rounded-lg border bg-white px-4 py-4 group-board-hover:shadow-sm">
+      <main
+        {...provided?.droppableProps}
+        ref={provided?.innerRef}
+        className={`flex flex-1 flex-col space-y-2 overflow-y-auto rounded-lg border ${
+          snapshot?.isDraggingOver ? 'bg-slate-200' : 'bg-white'
+        }  px-4 py-4 group-board-hover:shadow-sm`}
+      >
         {children}
       </main>
     </section>

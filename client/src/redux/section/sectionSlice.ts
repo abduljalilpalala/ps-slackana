@@ -155,6 +155,84 @@ export const sectionSlice = createSlice({
     setAddNewSectionData: (state, { payload }) => {
       state.addNewSectionData = payload
     },
+    setSections: (state, { payload: { sections } }) => {
+      state.sections = sections
+    },
+    addNewTaskInSection: (state, { payload: { newTask } }) => {
+      let sections: any[] = state.sections
+      let section = state.sections.filter((section) => section.id == newTask.section_id)[0]
+      let index = sections.indexOf(section)
+      section?.tasks?.unshift(newTask as never)
+      sections[index] = section
+      state.sections = sections
+    },
+    removeTaskInSection: (state, { payload: { section_id, task_id } }) => {
+      let sections: any[] = state.sections
+      let section = state.sections.filter((section) => section.id == section_id)[0]
+      let index = sections.indexOf(section)
+      let newTasks: any = section?.tasks?.filter((task: any) => task?.id != task_id)
+      section.tasks = newTasks
+      sections[index] = section
+      state.sections = sections
+    },
+    updateTaskSectionIDInSection: (state, { payload: { section_id, task_id } }) => {
+      let sections: any[] = state.sections
+      let section = state.sections.filter((section) => section.id == section_id)[0]
+      let index = sections.indexOf(section)
+      let newTasks: any = section?.tasks?.map((task: any) => {
+        if (task?.id == task_id) {
+          task.section_id = section_id
+        }
+        return task
+      })
+      section.tasks = newTasks
+      sections[index] = section
+      state.sections = [...sections]
+    },
+    updateTaskAssigneeInSection: (state, { payload: { section_id, task_id, assignee } }) => {
+      let sections: any[] = state.sections
+      let section = state.sections.filter((section) => section.id == section_id)[0]
+      let index = sections.indexOf(section)
+      let newTasks: any = section?.tasks?.map((task: any) => {
+        if (task?.id == task_id) {
+          task.assignee = assignee
+        }
+        return task
+      })
+      section.tasks = newTasks
+      sections[index] = section
+      state.sections = sections
+      state.sections = [...sections]
+    },
+    updateTaskDueDateInSection: (state, { payload: { section_id, task_id, due_date } }) => {
+      let sections: any[] = state.sections
+      let section = state.sections.filter((section) => section.id == section_id)[0]
+      let index = sections.indexOf(section)
+      let newTasks: any = section?.tasks?.map((task: any) => {
+        if (task?.id == task_id) {
+          task.due_date = due_date
+        }
+        return task
+      })
+      section.tasks = newTasks
+      sections[index] = section
+      state.sections = sections
+      state.sections = [...sections]
+    },
+    updateTaskStatusInSection: (state, { payload: { section_id, task_id } }) => {
+      let sections: any[] = state.sections
+      let section = state.sections.filter((section) => section.id == section_id)[0]
+      let index = sections.indexOf(section)
+      let newTasks: any = section?.tasks?.map((task: any) => {
+        if (task?.id == task_id) {
+          task.is_completed = !task.is_completed
+        }
+        return task
+      })
+      section.tasks = newTasks
+      sections[index] = section
+      state.sections = [...sections]
+    },
     setRenameSectionData: (state, { payload }) => {
       state.renameSectionData = payload
     },
@@ -256,6 +334,13 @@ export const {
   setSectionData,
   setAddNewSectionData,
   setRenameSectionData,
-  setRemoveSectionData
+  setRemoveSectionData,
+  addNewTaskInSection,
+  removeTaskInSection,
+  updateTaskSectionIDInSection,
+  updateTaskAssigneeInSection,
+  updateTaskDueDateInSection,
+  updateTaskStatusInSection,
+  setSections
 } = sectionSlice.actions
 export default sectionSlice.reducer

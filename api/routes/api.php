@@ -15,7 +15,9 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskDetailsController;
 use App\Http\Controllers\TaskAssignmentController;
 use App\Http\Controllers\TaskDueDateController;
+use App\Http\Controllers\TaskPositionController;
 use App\Http\Controllers\TaskReorderController;
+use App\Http\Controllers\TaskSectionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -53,6 +55,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::put('/{project}/task/{task}/assign', [TaskAssignmentController::class, 'update']);
     Route::put('/{project}/section/{section}/reorder-tasks', [TaskReorderController::class, 'update']);
     Route::get('/{project}/member/{member}/nudge-member', [NudgeMemberController::class, 'show']);
+    Route::put('/{project}/task/position', [TaskPositionController::class, 'update']);
+    Route::put('/{project}/task/{task}/move-section', [TaskSectionController::class, 'update']);
   });
 
   Route::group(['prefix' => 'user'], function () {

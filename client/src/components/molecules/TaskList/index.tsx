@@ -20,6 +20,8 @@ import handleImageError from '~/helpers/handleImageError'
 
 type Props = {
   task: any
+  provided: any
+  snapshot: any
   isTaskSliderOpen: any
   updateTaskSliderAssignee: any
   updateTaskSliderDueDate: any
@@ -38,6 +40,8 @@ type Props = {
 const TaskList: React.FC<Props> = (props): JSX.Element => {
   const {
     task,
+    provided,
+    snapshot,
     isTaskSliderOpen,
     updateTaskSliderAssignee,
     updateTaskSliderDueDate,
@@ -68,7 +72,9 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
     useHandleUpdateTaskAssignee,
     useHandleCompleteTask,
     useHandleUpdateTaskName,
-    useHandleGetTaskWithoutLoading
+    useHandleUpdateTaskAssigneeInSections,
+    useHandleUpdateTaskDueDateInSections,
+    useHandleUpdateTaskStatusInSections
   } = useTaskMethods(parseInt(id as string))
 
   const { task_id } = router.query
@@ -81,6 +87,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
   const handleSetAssignee = (id: number) => {
     const getMember = members.find((member: any) => member.id === id)
     setUpdateAssignee(getMember)
+    useHandleUpdateTaskAssigneeInSections(task?.section_id, task?.id, getMember)
     useHandleUpdateTaskAssignee(task?.id, getMember.id)
     handleUpdateAssigneeToggle()
   }
@@ -109,12 +116,14 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
   ])
 
   const handleSetDueDate = (date: Date) => {
-    setSelectedDueDate(date)
     let value = date ? moment(new Date(date)).format('YYYY-MM-DD') : null
+    useHandleUpdateTaskDueDateInSections(task?.section_id, task?.id, value)
+    setSelectedDueDate(date)
     setDueDate(value)
     useHandleUpdateTaskDueDate(task?.id, value)
   }
   const handleTaskStatus = () => {
+    useHandleUpdateTaskStatusInSections(task?.section_id, task?.id)
     setIsTaskCompleted(!isTaskCompleted)
     useHandleCompleteTask(task?.id)
   }
@@ -233,10 +242,15 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
   let completeTask = !permissions?.setTaskAsCompleted || !canComplete(task?.assignee?.id)
   return (
     <div
+      ref={provided?.innerRef}
+      {...provided?.draggableProps}
+      {...provided?.dragHandleProps}
+      style={{ ...provided?.draggableProps?.style }}
       className={`
         group-task relative flex w-full cursor-pointer flex-col justify-between rounded-md border
         bg-white transition duration-75 ease-in-out focus-within:border-slate-400
       focus:border-slate-400 focus:outline-none focus:ring-slate-400 hover:border-slate-400
+      ${snapshot?.isDragging ? 'border-2 border-slate-400' : ''}
        ${isTaskCompleted && 'hover:border-slate-300'}
       `}
     >
@@ -270,7 +284,6 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
           onBlur={onBlurUpdateTaskName}
           onChange={(e) => setTaskName(e.target.value)}
           onKeyDown={(e) => handleUpdateTaskName(e, task.id)}
-          placeholder="Write task name"
           ref={inputElement}
         />
         <div className="absolute right-2 top-2 opacity-0 group-task-hover:opacity-100 group-task-focus:opacity-100">

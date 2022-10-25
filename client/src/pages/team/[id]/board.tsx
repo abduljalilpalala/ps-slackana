@@ -4,8 +4,9 @@ import toast from 'react-hot-toast'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
-import { getProject, setEditProjectTitle } from '~/redux/project/projectSlice'
+import { getProject } from '~/redux/project/projectSlice'
 import AddSection from '~/components/molecules/AddSection'
 import BoardSection from '~/components/organisms/BoardSection'
 import BoardWrapper from '~/components/templates/BoardWrapper'
@@ -33,9 +34,13 @@ import { useTaskMethods } from '~/hooks/taskMethods'
 const Board: NextPage = (): JSX.Element => {
   const router = useRouter()
   const { id, task_id } = router.query
-  const { useHandleCreateTask, useHandleRemoveTask, useHandleGetTask } = useTaskMethods(
-    parseInt(id as string)
-  )
+  const {
+    useHandleCreateTask,
+    useHandleRemoveTask,
+    useHandleSetSections,
+    useHandleUpdateTaskSection,
+    useHandleUpdateTaskPosition
+  } = useTaskMethods(parseInt(id as string))
   const dispatch = useAppDispatch()
   const [newTaskDueDate, setNewTaskDueDate] = useState('')
   const [currentBoardId, setCurrentBoardId] = useState<any>(null)
@@ -190,7 +195,7 @@ const Board: NextPage = (): JSX.Element => {
     const task = {
       name: taskName,
       due_date: newTaskDueDate ? moment(new Date(newTaskDueDate)).format('YYYY-MM-DD') : null,
-      project_member_id: assignee?.id
+      project_member_id: assignee
     }
     useHandleCreateTask(parseInt(currentBoardId as string), task, () => {
       setCurrentBoardId('')
@@ -229,84 +234,160 @@ const Board: NextPage = (): JSX.Element => {
       </main>
     </section>
   )
+  const reorder = (list: any, startIndex: any, endIndex: any) => {
+    const result = Array.from(list)
+    const [removed] = result.splice(startIndex, 1)
+    result.splice(endIndex, 0, removed)
 
+    return result
+  }
+
+  const move = (source: any, destination: any, droppableSource: any, droppableDestination: any) => {
+    const sourceClone = Array.from(source)
+    const destClone = Array.from(destination)
+    const [removed] = sourceClone.splice(droppableSource.index, 1)
+
+    destClone.splice(droppableDestination.index, 0, removed)
+
+    const result: any = {}
+    result[droppableSource.droppableId] = sourceClone
+    result[droppableDestination.droppableId] = destClone
+
+    return result
+  }
+  const getItem = (id: any) => boards.filter((section) => section.id == parseInt(id))
+  const onDragEnd = (result: any) => {
+    const { source, destination, draggableId } = result
+    if (!destination) {
+      return
+    }
+    let temp: any = [...boards]
+    if (source.droppableId === destination.droppableId) {
+      const it = reorder(getItem(source.droppableId)[0]?.tasks, source.index, destination.index)
+      let sectionIndex = boards.indexOf(getItem(source.droppableId)[0])
+      temp[sectionIndex] = { id: source.droppableId, tasks: it }
+      useHandleSetSections(temp)
+      useHandleUpdateTaskSection(destination.droppableId, draggableId)
+      useHandleUpdateTaskPosition(it)
+    } else {
+      const result = move(
+        getItem(source.droppableId)[0]?.tasks,
+        getItem(destination.droppableId)[0]?.tasks,
+        source,
+        destination
+      )
+      let sourceIndex = boards.indexOf(getItem(source.droppableId)[0])
+      let destIndex = boards.indexOf(getItem(destination.droppableId)[0])
+      temp[sourceIndex] = {
+        id: source.droppableId,
+        tasks: result[source.droppableId]
+      }
+      temp[destIndex] = {
+        id: destination.droppableId,
+        tasks: result[destination.droppableId]
+      }
+      useHandleSetSections(temp)
+      useHandleUpdateTaskSection(destination.droppableId, draggableId)
+      useHandleUpdateTaskPosition(result[destination.droppableId])
+    }
+  }
   return (
     <ProjectLayout metaTitle="Board">
       <BoardWrapper>
-        {!sectionsStateUpdate
-          ? boards.map((board: any) => {
-              return (
-                <BoardSection
-                  key={board.id}
-                  {...board}
-                  permissions={{ canCreatePermission, canRenamePermission, canRemovePermission }}
-                  actions={{ handleRemoveSection, updateSection, handleShowAddTask }}
-                >
-                  {currentBoardId === board.id && (
-                    <AddTask
-                      assignee={assignee}
-                      assigneeModal={assigneeModal}
-                      newTaskDueDate={newTaskDueDate}
-                      setNewTaskDueDate={setNewTaskDueDate}
-                      setAssignee={setAssignee}
-                      actions={{
-                        onClickEnterTask,
-                        onClickOutTask,
-                        onChangeTask,
-                        handleAssigneeToggle
-                      }}
-                    />
-                  )}
-                  {board.tasks?.length ? (
-                    board.tasks.map((task: any, i: number) => (
-                      <TaskList
-                        key={task.id}
-                        task={task}
-                        isTaskSliderOpen={isTaskSliderOpen}
-                        updateTaskSliderAssignee={updateAssignee}
-                        updateTaskSliderDueDate={updateTaskDueDate}
-                        isTaskSliderCompleted={isTaskCompleted}
-                        taskID={taskID}
-                        actions={{
-                          setTaskID,
-                          setIsTaskSliderOpen,
-                          setUpdateTaskSliderAssignee: setUpdateAssignee,
-                          setUpdateTaskSliderDueDate: setUpdateTaskDueDate,
-                          setIsTaskSliderCompleted: setIsTaskCompleted,
-                          handleRemoveTask
+        <DragDropContext onDragEnd={onDragEnd}>
+          {!sectionsStateUpdate
+            ? boards.map((board: any) => {
+                return (
+                  <Droppable key={board.id} droppableId={board.id + ''}>
+                    {(provided, snapshot) => (
+                      <BoardSection
+                        {...board}
+                        provided={provided}
+                        snapshot={snapshot}
+                        permissions={{
+                          canCreatePermission,
+                          canRenamePermission,
+                          canRemovePermission
                         }}
-                      />
-                    ))
-                  ) : (
-                    <p className="text-center text-sm text-slate-600">No current task</p>
-                  )}
-                </BoardSection>
-              )
-            })
-          : [...Array(4)].map(() => loadingSkeleton())}
-        <AddSection
-          showAddSection={showAddSection}
-          permissions={{ canCreatePermission }}
-          privilege={{ sectionUpdate, sectionsStateUpdate }}
-          actions={{
-            handleShowAddSection,
-            onClickEnterSection,
-            onChangeSection,
-            onClickOutSection
-          }}
-          loadingSkeleton={loadingSkeleton()}
-        />
-        <TaskSlider
-          updateAssignee={updateAssignee}
-          updateTaskDueDate={updateTaskDueDate}
-          isTaskCompleted={isTaskCompleted}
-          actions={{
-            setTaskID,
-            setUpdateAssignee,
-            setUpdateTaskDueDate,
-            setIsTaskCompleted
-          }}
-        />
+                        actions={{ handleRemoveSection, updateSection, handleShowAddTask }}
+                      >
+                        {currentBoardId === board.id && (
+                          <AddTask
+                            assignee={assignee}
+                            assigneeModal={assigneeModal}
+                            newTaskDueDate={newTaskDueDate}
+                            setNewTaskDueDate={setNewTaskDueDate}
+                            setAssignee={setAssignee}
+                            actions={{
+                              onClickEnterTask,
+                              onClickOutTask,
+                              onChangeTask,
+                              handleAssigneeToggle
+                            }}
+                          />
+                        )}
+                        {board.tasks?.length ? (
+                          board.tasks.map((task: any, i: number) => {
+                            return (
+                              <Draggable key={task.id} draggableId={task.id + ''} index={i}>
+                                {(provided, snapshot) => (
+                                  <TaskList
+                                    task={task}
+                                    provided={provided}
+                                    snapshot={snapshot}
+                                    isTaskSliderOpen={isTaskSliderOpen}
+                                    updateTaskSliderAssignee={updateAssignee}
+                                    updateTaskSliderDueDate={updateTaskDueDate}
+                                    isTaskSliderCompleted={isTaskCompleted}
+                                    taskID={taskID}
+                                    actions={{
+                                      setTaskID,
+                                      setIsTaskSliderOpen,
+                                      setUpdateTaskSliderAssignee: setUpdateAssignee,
+                                      setUpdateTaskSliderDueDate: setUpdateTaskDueDate,
+                                      setIsTaskSliderCompleted: setIsTaskCompleted,
+                                      handleRemoveTask
+                                    }}
+                                  />
+                                )}
+                              </Draggable>
+                            )
+                          })
+                        ) : (
+                          <p className="text-center text-sm text-slate-600">No current task</p>
+                        )}
+
+                        {provided.placeholder}
+                      </BoardSection>
+                    )}
+                  </Droppable>
+                )
+              })
+            : [...Array(4)].map(() => loadingSkeleton())}
+          <AddSection
+            showAddSection={showAddSection}
+            permissions={{ canCreatePermission }}
+            privilege={{ sectionUpdate, sectionsStateUpdate }}
+            actions={{
+              handleShowAddSection,
+              onClickEnterSection,
+              onChangeSection,
+              onClickOutSection
+            }}
+            loadingSkeleton={loadingSkeleton()}
+          />
+          <TaskSlider
+            updateAssignee={updateAssignee}
+            updateTaskDueDate={updateTaskDueDate}
+            isTaskCompleted={isTaskCompleted}
+            actions={{
+              setTaskID,
+              setUpdateAssignee,
+              setUpdateTaskDueDate,
+              setIsTaskCompleted
+            }}
+          />
+        </DragDropContext>
       </BoardWrapper>
     </ProjectLayout>
   )
