@@ -15,6 +15,7 @@ We want slack and asana in one. For us it is kinda a hassle to switch between as
 - [@RJ](https://github.com/rogeliojohnoliverio)
 - [@John](https://github.com/johnpaul-sun)
 - [@Joshua](https://github.com/jsvelte)
+- [@Jermaine](https://github.com/marcjermainepontiveros-sun)
 
 ## Quality Assurance
 

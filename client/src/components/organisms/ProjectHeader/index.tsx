@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FaRegUser } from 'react-icons/fa'
 import React, { FC, useEffect, useState } from 'react'
-import Pusher from 'pusher-js'
 
 import {
   getProject,
@@ -21,7 +20,6 @@ import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
 import ProjectActionDropdown from '~/components/molecules/ProjectActionDropdown'
 import ProjectStatusDropdown from '~/components/molecules/ProjectStatusDropdown'
 import handleImageError from '~/helpers/handleImageError'
-import { pusher } from '~/shared/lib/pusher'
 import { usePusherNudge } from '~/hooks/pusherNudge'
 
 const ProjectHead: FC = (): JSX.Element => {
@@ -52,7 +50,7 @@ const ProjectHead: FC = (): JSX.Element => {
     })
   }, [id])
 
-  usePusherNudge(id as string)
+  usePusherNudge()
 
   useEffect(() => {
     dispatch(setEditProjectTitle(projectTitle))

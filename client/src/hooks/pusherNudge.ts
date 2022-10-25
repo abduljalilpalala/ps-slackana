@@ -5,18 +5,31 @@ import { pusher } from '~/shared/lib/pusher'
 import { nudgeMember } from '~/utils/nudgeMember'
 import { useAppSelector } from './reduxSelector'
 
-export const usePusherNudge = (id: string) => {
-  const { user } = useAppSelector((state) => state.auth)
+export const usePusherNudge = () => {
+  const {
+    auth: { user },
+    project
+  } = useAppSelector((state) => state)
 
   useEffect(() => {
-    const channel = pusher.subscribe(`project.${id}.member.${user.id}`)
-    channel.bind('NudgeMemberEvent', (data: { user: User }) => {
-      const { name, avatar } = data.user
-      nudgeMember(avatar.url, name)
-    })
-
-    return () => {
-      pusher.unsubscribe(`project.${id}.member.${user.id}`)
+    if (project.project) {
+      const projects = project.project
+      projects?.forEach(({ id }: any) => {
+        const channel = pusher.subscribe(`project.${id}.member.${user.id}`)
+        channel.bind('NudgeMemberEvent', (data: any) => {
+          const { name, avatar } = data.user
+          nudgeMember(avatar.url, data?.projectTitle, name)
+        })
+      })
+      return () => {
+        projects?.forEach(({ id }: any) => {
+          const channel = pusher.subscribe(`project.${id}.member.${user.id}`)
+          channel.bind('NudgeMemberEvent', (data: any) => {
+            const { name, avatar } = data.user
+            nudgeMember(avatar.url, data?.projectTitle, name)
+          })
+        })
+      }
     }
-  }, [])
+  }, [project.project])
 }

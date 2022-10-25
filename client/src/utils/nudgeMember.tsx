@@ -3,7 +3,7 @@ import { Howl } from 'howler'
 
 import handleImageError from '~/helpers/handleImageError'
 
-export const nudgeMember = (avatar: string, name: string) => {
+export const nudgeMember = (avatar: string, projectTitle: string, name: string) => {
   const sound = new Howl({
     src: '/sounds/notification-nudge.mp3',
     html5: true
@@ -30,7 +30,7 @@ export const nudgeMember = (avatar: string, name: string) => {
               <p className="w-full max-w-[150px] truncate text-sm font-medium text-gray-900">
                 {name}
               </p>
-              <p className="mt-1 text-sm text-gray-500">Nudged you</p>
+              <p className="mt-1 text-sm text-gray-500">Nudging you from {projectTitle}</p>
             </div>
           </div>
         </div>
