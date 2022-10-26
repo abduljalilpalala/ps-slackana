@@ -168,11 +168,13 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
     }
   }
 
-  const onClickRenameTask = (): void => {
+  const onClickRenameTask = () => {
     setIsEditing(true)
-    inputElement.current.disabled = false
-    inputElement.current.select()
-    inputElement.current.focus()
+    setTimeout(() => {
+      inputElement.current.disabled = false
+      inputElement.current.select()
+      inputElement.current.focus()
+    }, 10)
   }
 
   const CustomCalendarButton = forwardRef(({ value, onClick }: any, ref: any) => (
@@ -271,21 +273,33 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
             <BsCheckCircle className="h-4 w-4" />
           )}
         </button>
-        <ReactTextareaAutosize
-          className={`
+        {!isEditing && (
+          <div
+            className={`ml-5 mr-2 flex-1 select-none resize-none overflow-hidden border-none
+            bg-transparent py-2 px-0.5 text-sm font-medium focus:ring-0 ${
+              isTaskCompleted && 'opacity-60'
+            }`}
+          >
+            {taskName}
+          </div>
+        )}
+        {isEditing && (
+          <ReactTextareaAutosize
+            className={`
             ml-5 mr-2 flex-1 cursor-pointer select-none resize-none overflow-hidden
             border-none bg-transparent px-0.5 text-sm font-medium focus:ring-0
             ${isTaskCompleted && 'opacity-60'}
           `}
-          value={taskName}
-          defaultChecked={task?.name}
-          disabled={true}
-          onFocus={(e) => (isBlur = true)}
-          onBlur={onBlurUpdateTaskName}
-          onChange={(e) => setTaskName(e.target.value)}
-          onKeyDown={(e) => handleUpdateTaskName(e, task.id)}
-          ref={inputElement}
-        />
+            value={taskName}
+            defaultChecked={task?.name}
+            disabled={true}
+            onFocus={(e) => (isBlur = true)}
+            onBlur={onBlurUpdateTaskName}
+            onChange={(e) => setTaskName(e.target.value)}
+            onKeyDown={(e) => handleUpdateTaskName(e, task.id)}
+            ref={inputElement}
+          />
+        )}
         <div className="absolute right-2 top-2 opacity-0 group-task-hover:opacity-100 group-task-focus:opacity-100">
           {(permissions?.deleteTask || permissions?.renameTask) && !isEditing && (
             <Menu as="div" className="relative z-10 inline-block items-center bg-white text-left">
