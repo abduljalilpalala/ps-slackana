@@ -50,6 +50,7 @@ class NudgeMemberEvent implements ShouldBroadcast
   {
     return [
       'user' => new UserResource(User::with('avatar')->findOrFail(auth()->user()->id)),
+      'projectTitle' => $this->project->title
     ];
   }
 }

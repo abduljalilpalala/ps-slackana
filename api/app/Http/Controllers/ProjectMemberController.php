@@ -17,10 +17,10 @@ class ProjectMemberController extends Controller
     if (request('filter')) {
       return MemberResource::collection($project->teams()->where('id', request('filter'))->first()->members()->with(['role', 'user.avatar', 'teams'])->get());
     }
-    if(request('search')){
-      return MemberResource::collection($project->members()->whereHas('user', function($query){
+    if (request('search')) {
+      return MemberResource::collection($project->members()->whereHas('user', function ($query) {
         $query->where('name', 'ilike', '%' . request('search') . '%');
-      } )->with(['user.avatar','role', 'teams'])->get());
+      })->with(['user.avatar', 'role', 'teams'])->get());
     }
     return MemberResource::collection($project->members()->with(['role', 'user.avatar', 'teams'])->get());
   }
@@ -36,9 +36,10 @@ class ProjectMemberController extends Controller
     $member = ProjectMember::updateOrCreate([
       'user_id' => $request->user_id,
       'project_id' => $project->id,
-    ],[
+    ], [
       'is_removed' => 0,
-      'role_id' => RoleEnum::MEMBER->value
+      'role_id' => RoleEnum::MEMBER->value,
+      'is_mvp' => 0
     ]);
     $member->teams()->sync($request->teams);
 
