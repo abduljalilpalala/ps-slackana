@@ -30,6 +30,7 @@ import AddTask from '~/components/molecules/AddTask'
 import TaskList from '~/components/molecules/TaskList'
 import TaskSlider from '~/components/organisms/TaskSlider'
 import { useTaskMethods } from '~/hooks/taskMethods'
+import { useProjectMethods } from '~/hooks/projectMethods'
 
 const Board: NextPage = (): JSX.Element => {
   const router = useRouter()
@@ -41,6 +42,7 @@ const Board: NextPage = (): JSX.Element => {
     useHandleUpdateTaskSection,
     useHandleUpdateTaskPosition
   } = useTaskMethods(parseInt(id as string))
+  const { permissions, canComplete: canMove } = useProjectMethods(parseInt(id as string))
   const dispatch = useAppDispatch()
   const [newTaskDueDate, setNewTaskDueDate] = useState('')
   const [currentBoardId, setCurrentBoardId] = useState<any>(null)
@@ -289,6 +291,7 @@ const Board: NextPage = (): JSX.Element => {
       useHandleSetSections(temp)
       useHandleUpdateTaskSection(destination.droppableId, draggableId)
       useHandleUpdateTaskPosition(result[destination.droppableId])
+      useHandleUpdateTaskPosition(result[source.droppableId])
     }
   }
   return (
@@ -328,8 +331,14 @@ const Board: NextPage = (): JSX.Element => {
                         )}
                         {board.tasks?.length ? (
                           board.tasks.map((task: any, i: number) => {
+                            let moveTask = !permissions?.moveTask || !canMove(task?.assignee?.id)
                             return (
-                              <Draggable key={task.id} draggableId={task.id + ''} index={i}>
+                              <Draggable
+                                isDragDisabled={moveTask}
+                                key={task.id}
+                                draggableId={task.id + ''}
+                                index={i}
+                              >
                                 {(provided, snapshot) => (
                                   <TaskList
                                     task={task}
