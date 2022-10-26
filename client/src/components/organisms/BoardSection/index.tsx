@@ -61,7 +61,11 @@ const BoardSection: FC<Props> = (props): JSX.Element => {
   }
 
   return (
-    <section className="group-board flex w-full max-w-[18rem] flex-shrink-0 flex-col pl-3 ">
+    <section
+      {...provided?.droppableProps}
+      ref={provided?.innerRef}
+      className="group-board flex w-full max-w-[18rem] flex-shrink-0 flex-col pl-3 "
+    >
       <header
         className={`
           flex flex-shrink-0 items-center justify-between bg-slate-50 py-1
@@ -144,8 +148,6 @@ const BoardSection: FC<Props> = (props): JSX.Element => {
         </div>
       </header>
       <main
-        {...provided?.droppableProps}
-        ref={provided?.innerRef}
         className={`flex flex-1 flex-col space-y-2 overflow-y-auto rounded-lg border ${
           snapshot?.isDraggingOver ? 'bg-slate-200' : 'bg-white'
         }  px-4 py-4 group-board-hover:shadow-sm`}

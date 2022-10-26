@@ -296,8 +296,8 @@ const Board: NextPage = (): JSX.Element => {
   }
   return (
     <ProjectLayout metaTitle="Board">
-      <BoardWrapper>
-        <DragDropContext onDragEnd={onDragEnd}>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <BoardWrapper>
           {!sectionsStateUpdate
             ? boards.map((board: any) => {
                 return (
@@ -396,8 +396,8 @@ const Board: NextPage = (): JSX.Element => {
               setIsTaskCompleted
             }}
           />
-        </DragDropContext>
-      </BoardWrapper>
+        </BoardWrapper>
+      </DragDropContext>
     </ProjectLayout>
   )
 }
