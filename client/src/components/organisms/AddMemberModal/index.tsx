@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { ChevronDown, Search } from 'react-feather'
 
-import {
-  getMembers,
-  getAllUsers,
-  filterMembers,
-  filterAllUser,
-} from '~/redux/member/memberSlice'
+import { getMembers, getAllUsers, filterMembers, filterAllUser } from '~/redux/member/memberSlice'
+import { useDebounceSearch } from '~/hooks/debounceSearch'
 import MemberFilter from '../MemberFilter'
 import { useNudgeMember } from '~/hooks/nudge'
 import DialogBox from '~/components/templates/DialogBox'
@@ -35,31 +31,18 @@ const AddMemberModal = ({ close }: AddMemberFilterProps) => {
   const { id: projectID, teams } = overviewProject || {}
   const { id: teamID, name } = filterData
 
+  const debouncedSearch = useDebounceSearch(search, 500)
+
   const setFilter = (data: any): void => {
     setFilterData(data)
   }
 
-  const onSearchChange = (e: any): void => {
-    const value = e.target.value
-    setSearch(value)
-    if (value.length === 0) {
-      setIsLoading(true)
-      dispatch(filterAllUser({ projectID, searchValue: value })).then((_) => {
-        setIsLoading(false)
-      })
-    }
-  }
-
-  const onSearch = (e: any): void => {
-    const value = e.target.value
-    const isEnter = e.key === 'Enter' || e.keyCode === 13
-
-    if (!isEnter) return
+  useEffect(() => {
     setIsLoading(true)
-    dispatch(filterAllUser({ projectID, searchValue: value })).then((_) => {
+    dispatch(filterAllUser({ projectID, searchValue: debouncedSearch })).then((_) => {
       setIsLoading(false)
     })
-  }
+  }, [debouncedSearch])
 
   useEffect(() => {
     dispatch(getMembers(projectID))
@@ -101,8 +84,7 @@ const AddMemberModal = ({ close }: AddMemberFilterProps) => {
             <input
               type="text"
               value={search || ''}
-              onKeyDown={onSearch}
-              onChange={onSearchChange}
+              onChange={(e) => setSearch(e.target.value)}
               className="mr-5 w-full border-none text-slate-900 focus:ring-transparent"
               placeholder="Find members"
             />
