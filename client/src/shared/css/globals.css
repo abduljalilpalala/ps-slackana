@@ -20,3 +20,11 @@
 .react-datepicker__day-name {
   color: #ffff !important;
 }
+
+.paginate-link-active {
+  color: #fff !important;
+  background: #2563eb !important;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  margin-top: -7px;
+}

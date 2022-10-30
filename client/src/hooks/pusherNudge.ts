@@ -14,7 +14,7 @@ export const usePusherNudge = () => {
     if (project.project) {
       const projects = project.project
       projects?.forEach(({ id }: any) => {
-        const channel = pusher.subscribe(`project.${id}.member.${user.id}`)
+        const channel = pusher.subscribe(`project.${id}.member.${user?.id}`)
         channel.bind('NudgeMemberEvent', (data: any) => {
           const { name, avatar } = data.user
           nudgeMember(avatar.url, data?.projectTitle, name)
