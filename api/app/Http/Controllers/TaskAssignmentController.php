@@ -19,10 +19,13 @@ class TaskAssignmentController extends Controller
   public function update(Project $project, UpdateTaskAssignmentRequest $request, Task $task)
   {
     if ($this->isProjectOwner($project) || $this->isTeamLeader($project)) {
+      $taskMemberID = $task->project_member_id;
       $task->update($request->validated());
       $member = ProjectMember::with('user')->findOrFail($request->project_member_id);
-      Notification::send($member->user, new AssignTaskNotification(auth()->user()->id, $task->id, $project->id));
-      event(new AssignTaskEvent($member->user));
+      if (intval($taskMemberID) !== intval($request->project_member_id)) {
+        Notification::send($member->user, new AssignTaskNotification(auth()->user()->id, $task->id, $project->id));
+        event(new AssignTaskEvent($member->user));
+      }
       return response()->noContent();
     }
     return $this->unauthorizedAccess();
