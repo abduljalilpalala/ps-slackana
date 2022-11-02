@@ -10,25 +10,38 @@ import PopoverTransition from '~/components/templates/PopoverTransition'
 import { useNotificationMethods } from '~/hooks/notificationMethods'
 import { useAppSelector } from '~/hooks/reduxSelector'
 import { formatMoment } from '~/utils/formatMoment'
+import handleImageError from '~/helpers/handleImageError'
 
 const NotificationPopover = (): JSX.Element => {
   const router = useRouter()
   const { user } = useAppSelector((state) => state.auth)
-  const { notifications, useMarkReadNotification, useGetNotifications } = useNotificationMethods()
-  const hasUnreadNotifications = notifications.some(
-    (notification: any) => notification.read_at === null
-  )
+  const {
+    notifications,
+    hasNotification,
+    useMarkReadNotification,
+    setHasNotification,
+    useSeenNotifications
+  } = useNotificationMethods()
   formatMoment()
-  const handleReadNotification = (id: string, project_id: number, task_id: number) => {
+  const handleReadNotification = (
+    id: string,
+    project_id: number,
+    task_id: number,
+    callback: () => void
+  ) => {
     useMarkReadNotification(id, project_id)
+    callback()
     router.push(`/team/${project_id}/board?task_id=${task_id}`)
   }
   return (
     <Popover css={styles.popover}>
-      {({ open }) => (
+      {({ open, close }) => (
         <>
-          <Popover.Button css={styles.popover_button({ open })}>
-            {hasUnreadNotifications && (
+          <Popover.Button
+            css={styles.popover_button({ open })}
+            onClick={() => useSeenNotifications()}
+          >
+            {hasNotification && (
               <div className="absolute -top-0 -right-0 inline-flex h-3 w-3 items-center justify-center rounded-full border-2 border-white bg-red-500 text-xs font-bold text-white dark:border-gray-900"></div>
             )}
             <Bell fill={open ? 'currentColor' : 'transparent'} />
@@ -48,7 +61,8 @@ const NotificationPopover = (): JSX.Element => {
                           handleReadNotification(
                             notification?.id,
                             notification?.data?.project_id,
-                            notification?.data?.task?.id
+                            notification?.data?.task?.id,
+                            () => close()
                           )
                         }
                         className={`${!notification?.read_at && 'bg-slate-200'} cursor-pointer`}
@@ -60,6 +74,7 @@ const NotificationPopover = (): JSX.Element => {
                                 src={`${notification?.data?.assigner?.avatar?.url}`}
                                 className="w-full object-cover"
                                 alt="avatar"
+                                onError={(e) => handleImageError(e, '/images/avatar.png')}
                               />
                             </div>
                             <p className="mx-2 text-xs text-gray-600">

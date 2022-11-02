@@ -17,6 +17,7 @@ import { useMemberMethods } from '~/hooks/memberMethods'
 import { useProjectMethods } from '~/hooks/projectMethods'
 import MenuTransition from '~/components/templates/MenuTransition'
 import handleImageError from '~/helpers/handleImageError'
+import { useDebounceSearch } from '~/hooks/debounceSearch'
 
 type Props = {
   task: any
@@ -67,6 +68,8 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
   const { permissions, canComplete } = useProjectMethods(parseInt(id as string))
   const [isTaskCompleted, setIsTaskCompleted] = useState<any>(false)
   const [taskName, setTaskName] = useState<any>('')
+  const [search, setSearch] = useState<string>('')
+  const debouncedSearch = useDebounceSearch(search, 500)
   const {
     useHandleUpdateTaskDueDate,
     useHandleUpdateTaskAssignee,
@@ -127,19 +130,10 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
     setIsTaskCompleted(!isTaskCompleted)
     useHandleCompleteTask(task?.id)
   }
-  const onSearchChange = (e: any): void => {
-    const value = e.target.value
-    if (value.length === 0) {
-      filterMembersName(parseInt(id as string), value)
-    }
-  }
-  const onSearch = (e: any): void => {
-    const value = e.target.value
-    const isEnter = e.key === 'Enter' || e.keyCode === 13
 
-    if (!isEnter) return
-    filterMembersName(parseInt(id as string), value)
-  }
+  useEffect(() => {
+    filterMembersName(parseInt(id as string), search)
+  }, [debouncedSearch])
 
   let isBlur = true
   const [isEditing, setIsEditing] = useState(false)
@@ -220,8 +214,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
             <Search color="#94A3B8" />
             <input
               type="text"
-              onChange={onSearchChange}
-              onKeyDown={onSearch}
+              onChange={(e) => setSearch(e.target.value)}
               className="mr-5 w-full border-none text-slate-900 focus:ring-transparent"
               placeholder="Find members"
             />
