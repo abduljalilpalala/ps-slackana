@@ -11,4 +11,13 @@ class ProjectMessage extends Model
 
   protected $guarded = [];
 
+  public function member()
+  {
+    return $this->belongsTo(ProjectMember::class, 'project_member_id');
+  }
+
+  public function project()
+  {
+    return $this->belongsTo(Project::class);
+  }
 }
