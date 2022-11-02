@@ -18,6 +18,7 @@ import BoxSkeleton from '~/components/atoms/Skeletons/BoxSkeleton'
 import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
 import ImageSkeleton from '~/components/atoms/Skeletons/ImageSkeleton'
 import { useProjectMethods } from '~/hooks/projectMethods'
+import { useDebounceSearch } from '~/hooks/debounceSearch'
 
 type Props = {
   updateAssignee: any
@@ -46,6 +47,8 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
   const [oldDescription, setOldDescription] = useState<any>('')
   const [oldActualTime, setOldActualTime] = useState<any>(0)
   const [oldEstimatedTime, setOldEstimatedTime] = useState<any>(0)
+  const [search, setSearch] = useState<string>('')
+  const debouncedSearch = useDebounceSearch(search, 500)
   const {
     useHandleUpdateTaskDueDate,
     useHandleUpdateTaskAssignee,
@@ -130,24 +133,16 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
     useHandleUpdateTaskAssignee(parseInt(task_id as string), getMember.id)
     handleUpdateAssigneeToggle()
   }
-  const onSearchChange = (e: any): void => {
-    const value = e.target.value
-    if (value.length === 0) {
-      filterMembersName(parseInt(id as string), value)
-    }
-  }
-  const onSearch = (e: any): void => {
-    const value = e.target.value
-    const isEnter = e.key === 'Enter' || e.keyCode === 13
 
-    if (!isEnter) return
-    filterMembersName(parseInt(id as string), value)
+  useEffect(() => {
+    filterMembersName(parseInt(id as string), search)
+  }, [debouncedSearch])
+
+  const handleSetName = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const keyCode = e.key
+    if (keyCode === 'Enter' && !e.shiftKey) e.preventDefault()
   }
-  const handleSetName = (e: any) => {
-    const keyCode = e.which || e.keyCode
-    if (keyCode === 13 && !e.shiftKey) e.preventDefault()
-  }
-  const handleTaskNameOnBlur = async (e: any) => {
+  const handleTaskNameOnBlur = async (e: React.FocusEvent<HTMLTextAreaElement, Element>) => {
     if (e.target.value === taskData?.name) return
     if (e.target.value === '') setUpdateTaskName((e.target.value = 'Untitled Task'))
     await useHandleUpdateTaskName(
@@ -156,7 +151,7 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
       e.target.value
     )
   }
-  const handleEstimatedTimeOnBlur = async (e: any) => {
+  const handleEstimatedTimeOnBlur = async (e: React.FocusEvent<HTMLInputElement, Element>) => {
     if (e.target.value === (oldEstimatedTime ?? 0)) return
     await useHandleUpdateTaskDetails(
       parseInt(task_id as string),
@@ -170,7 +165,7 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
       }
     )
   }
-  const handleActualTimeOnBlur = async (e: any) => {
+  const handleActualTimeOnBlur = async (e: React.FocusEvent<HTMLInputElement, Element>) => {
     if (e.target.value === (oldActualTime ?? 0)) return
     await useHandleUpdateTaskDetails(
       parseInt(task_id as string),
@@ -184,7 +179,7 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
       }
     )
   }
-  const handleDescriptionOnBlur = async (e: any) => {
+  const handleDescriptionOnBlur = async (e: React.FocusEvent<HTMLTextAreaElement, Element>) => {
     if (e.target.value === (oldDescription ?? '')) return
     await useHandleUpdateTaskDetails(
       parseInt(task_id as string),
@@ -204,7 +199,7 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
   }
   const CustomCalendarButton = forwardRef(({ value, onClick }: any, ref: any) => {
     let today = new Date(moment().format('YYYY-MM-DD'))
-    let currentValue = new Date(moment(value).format('YYYY-MM-DD'))
+    let currentValue = new Date(moment(new Date(value)).format('YYYY-MM-DD'))
     return (
       <div className="flex items-center space-x-2">
         <button
@@ -253,8 +248,7 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
             <Search color="#94A3B8" />
             <input
               type="text"
-              onChange={onSearchChange}
-              onKeyDown={onSearch}
+              onChange={(e) => setSearch(e.target.value)}
               className="mr-5 w-full border-none text-slate-900 focus:ring-transparent"
               placeholder="Find members"
             />

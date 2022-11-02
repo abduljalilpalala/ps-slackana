@@ -6,6 +6,7 @@ use App\Http\Controllers\UpdateUserSettingsController;
 use App\Http\Controllers\ChangeUserPasswordController;
 use App\Http\Controllers\CompleteTaskController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\NotificationSeenController;
 use App\Http\Controllers\NudgeMemberController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectFileController;
@@ -61,6 +62,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/{project}/member/{member}/nudge-member', [NudgeMemberController::class, 'show']);
     Route::put('/{project}/task/position', [TaskPositionController::class, 'update']);
     Route::put('/{project}/task/{task}/move-section', [TaskSectionController::class, 'update']);
+    Route::put('/notification/seen', [NotificationSeenController::class, 'update']);
   });
 
   Route::group(['prefix' => 'user'], function () {
