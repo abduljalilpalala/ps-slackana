@@ -7,6 +7,7 @@ use App\Http\Controllers\ChangeUserPasswordController;
 use App\Http\Controllers\CompleteTaskController;
 use App\Http\Controllers\NudgeMemberController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectFileController;
 use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\ProjectTeamController;
@@ -40,6 +41,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::apiResource('project.member', ProjectMemberController::class);
   Route::apiResource('project.section', SectionController::class);
   Route::apiResource('project.section.task', TaskController::class);
+  Route::apiResource('project.file', ProjectFileController::class);
+
 
   Route::group(['prefix' => 'project'], function () {
     Route::put('/{project}/project-status', [ProjectStatusController::class, 'update']);
