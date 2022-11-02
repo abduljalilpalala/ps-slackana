@@ -42,3 +42,34 @@ export interface Task {
   estimated_time: string
   actual_time_finished: string
 }
+
+export interface Message {
+  id: string
+  message: string
+}
+
+export interface Chat {
+  id: string
+  user_id: string
+  name: string
+  avatar_url: string
+  created_at: string
+  reply_count?: number
+  message: string
+  threads?: Thread
+}
+
+export interface Thread {
+  id: string
+  chat_id: string
+  users: User[]
+}
+
+export interface User {
+  id: string
+  user_id: string
+  name: string
+  avatar_url: string
+  created_at: string
+  message: string
+}
