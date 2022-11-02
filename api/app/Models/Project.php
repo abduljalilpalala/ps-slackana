@@ -21,6 +21,11 @@ class Project extends Model implements HasMedia
   public function registerMediaCollections(): void
   {
     $this->addMediaCollection('project-icon')->singleFile();
+    if (env('FILESYSTEM_DISK') === 's3') {
+      $this->addMediaCollection('project-files')->useDisk(env('FILESYSTEM_DISK'));
+    } else {
+      $this->addMediaCollection('project-files');
+    }
   }
 
   public function teams()
