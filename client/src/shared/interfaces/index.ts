@@ -1,3 +1,4 @@
+import * as icons from 'react-feather'
 import { IconType } from 'react-icons'
 
 export interface Team {
@@ -72,4 +73,19 @@ export interface User {
   avatar_url: string
   created_at: string
   message: string
+}
+
+export interface File {
+  id: string
+  filename: string
+  size: string
+  type: string
+  date_upload: string
+}
+
+export type IconName = keyof typeof icons
+
+export interface FileIcon {
+  name: string
+  Icon: any
 }

@@ -17,4 +17,14 @@
     @apply transform bg-slate-800 text-slate-400 transition-all duration-300;
     @apply ease-in-out scrollbar-thin scrollbar-thumb-slate-500 scrollbar-thumb-rounded-md;
   }
+  /* Pagination */
+  .paginate-section {
+    @apply flex select-none items-center justify-center py-5 px-4;
+  }
+  .paginate-link {
+    @apply border border-slate-300 py-2 px-3 text-sm leading-tight;
+  }
+  .paginate-link-active {
+    @apply bg-blue-50 text-blue-500 hover:bg-blue-100 hover:text-blue-600;
+  }
 }

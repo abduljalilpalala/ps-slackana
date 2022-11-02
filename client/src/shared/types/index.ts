@@ -74,3 +74,8 @@ export type Task = {
 export type ChatMessageValues = {
   message: string
 }
+
+export type Filename = {
+  id: string
+  filename: string
+}
