@@ -1,10 +1,12 @@
 import React, { FC } from 'react'
 
 import FileItem from './FIleItem'
+import { BlankSlateTableIcon } from '~/shared/icons/BlankSlateTableIcon'
 import TableHead from './TableHead'
 import { Filename } from '~/shared/types'
 import { File } from '~/shared/interfaces'
 import EditFilenameDialog from './EditFilenameDialog'
+import FileListSkeleton from '../FileListSkeleton'
 
 type Props = {
   isOpen: boolean
@@ -15,6 +17,18 @@ type Props = {
     handleDeleteFile: (id: string) => Promise<void>
     handleUpdateFilename: (data: Filename) => Promise<void>
   }
+  isUpdating: boolean
+  length: number
+}
+
+const BlankTable = (): JSX.Element => {
+  return (
+    <div className="flex h-full w-full flex-col items-center justify-center py-5">
+      <BlankSlateTableIcon />
+      <p className="mt-2 text-center text-slate-500">No files added to this project yet. </p>
+      <p className="text-center text-slate-500">Add a file by clicking the upload a file button.</p>
+    </div>
+  )
 }
 
 const FileList: FC<Props> = (props): JSX.Element => {
@@ -23,10 +37,16 @@ const FileList: FC<Props> = (props): JSX.Element => {
   const {
     isOpen,
     filename,
-    actions: { handleOpenEditModal, handleDeleteFile, handleUpdateFilename }
+    actions: { handleOpenEditModal, handleDeleteFile, handleUpdateFilename },
+    length
   } = props
 
-  return (
+  return props.isUpdating ? (
+    // Conditionally set the length of the skeleton if there are no files
+    <FileListSkeleton length={length + 1} />
+  ) : length === 0 ? (
+    <BlankTable />
+  ) : (
     <table className="w-full divide-y divide-slate-300 border-t border-slate-300 text-left text-sm leading-normal">
       <TableHead />
       <tbody className="divide-y divide-slate-300 text-sm text-slate-600">

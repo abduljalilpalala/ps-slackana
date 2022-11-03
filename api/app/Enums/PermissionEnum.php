@@ -26,6 +26,10 @@ enum PermissionEnum: int
   case ASSIGN_TASK = 20;
   case SET_TASK_AS_COMPLETED = 21;
   case MOVE_TASK = 22;
+  case UPLOAD_FILE = 23;
+  case DELETE_FILE = 24;
+  case DOWNLOAD_FILE = 25;
+  case RENAME_FILE = 26;
 
   public function toString()
   {
@@ -52,6 +56,10 @@ enum PermissionEnum: int
       self::ASSIGN_TASK => 'assignTask',
       self::SET_TASK_AS_COMPLETED => 'setTaskAsCompleted',
       self::MOVE_TASK => 'moveTask',
+      self::UPLOAD_FILE => 'uploadFile',
+      self::DELETE_FILE => 'deleteFile',
+      self::DOWNLOAD_FILE => 'downloadFile',
+      self::RENAME_FILE => 'renameFile'
     };
   }
 }

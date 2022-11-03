@@ -10,6 +10,10 @@ export const fileIconType: FileIcon[] = [
     Icon: Image
   },
   {
+    name: 'image/png',
+    Icon: Image
+  },
+  {
     name: 'application/pdf',
     Icon: PDFIcon
   },

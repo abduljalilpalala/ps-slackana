@@ -5,6 +5,7 @@ import { Edit3, Trash, Download } from 'react-feather'
 import { Filename } from '~/shared/types'
 import { File } from '~/shared/interfaces'
 import { fileIconType } from '~/shared/jsons/fileIconType'
+import { useAppSelector } from '~/hooks/reduxSelector'
 
 const ReactTooltip = dynamic(() => import('react-tooltip'), { ssr: false })
 
@@ -21,6 +22,8 @@ const FileItem: FC<Props> = (props): JSX.Element => {
     file: { id, filename, size, type, date_upload },
     actions: { handleOpenEditModal, handleDeleteFile }
   } = props
+
+  const { userPermission: can } = useAppSelector((state) => state.project)
 
   const data = {
     id,
@@ -55,7 +58,7 @@ const FileItem: FC<Props> = (props): JSX.Element => {
           `}
         >
           <button
-            className="outline-none active:scale-95"
+            className={`outline-none active:scale-95 ${can?.renameFile ? '' : 'hidden'}`}
             data-for="actions"
             data-tip="Edit"
             onClick={() => handleOpenEditModal(data)}
@@ -63,14 +66,18 @@ const FileItem: FC<Props> = (props): JSX.Element => {
             <Edit3 className="h-4 w-4 md:h-5 md:w-5" />
           </button>
           <button
-            className="outline-none active:scale-95"
+            className={`outline-none active:scale-95 ${can?.deleteFile ? '' : 'hidden'}`}
             data-for="actions"
             data-tip="Delete"
             onClick={() => handleDeleteFile(id)}
           >
             <Trash className="h-4 w-4 md:h-5 md:w-5" />
           </button>
-          <button className="outline-none active:scale-95" data-for="actions" data-tip="Download">
+          <button
+            className={`outline-none active:scale-95 ${can?.downloadFile ? '' : 'hidden'}`}
+            data-for="actions"
+            data-tip="Download"
+          >
             <Download className="h-4 w-4 md:h-5 md:w-5" />
           </button>
           <ReactTooltip

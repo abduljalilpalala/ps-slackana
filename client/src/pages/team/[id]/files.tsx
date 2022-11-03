@@ -1,14 +1,27 @@
 import { NextPage } from 'next'
+import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { Upload, Link2 as LinkIcon } from 'react-feather'
-
 import { Filename } from '~/shared/types'
-import { files } from '~/shared/jsons/filesData'
 import FileList from '~/components/molecules/FileList'
 import Pagination from '~/components/atoms/Pagination'
+import PaginationSkeleton from '~/components/molecules/PaginationSkeleton'
 import ProjectLayout from '~/components/templates/ProjectLayout'
+import { darkToaster } from '~/utils/darkToaster'
+import { useFileMethods } from '~/hooks/fileMethods'
+import { useAppSelector } from '~/hooks/reduxSelector'
 
 const Files: NextPage = (): JSX.Element => {
+  const router = useRouter()
+  const { id: projectIDFiles } = router.query
+  const {
+    isLoading: isFileMethodLoading,
+    files,
+    useHandleCreateFiles,
+    useHandleRenameFile,
+    useHandleDeleteFile
+  } = useFileMethods(parseInt(projectIDFiles as string))
+
   const [pageNumber, setPageNumber] = useState<number>(0)
   const [isOpen, setIsOpen] = useState<boolean>(false)
   /*
@@ -32,7 +45,11 @@ const Files: NextPage = (): JSX.Element => {
    * This is the toggle for Edit Modal
    */
   const handleOpenEditModal = (data?: Filename): void => {
-    setFilename(data)
+    // set filename to be edited, remove the extension
+    setFilename({
+      id: data?.id,
+      filename: data?.filename?.split('.')[0]
+    })
     setIsOpen(!isOpen)
   }
 
@@ -40,7 +57,9 @@ const Files: NextPage = (): JSX.Element => {
    * Handle Update Filename
    */
   const handleUpdateFilename = async (data: Filename): Promise<void> => {
-    alert(JSON.stringify(data, null, 2))
+    useHandleRenameFile(filename.id, data.filename, () => {
+      darkToaster('File renamed successfully!', '✅')
+    })
     handleOpenEditModal()
   }
 
@@ -49,14 +68,19 @@ const Files: NextPage = (): JSX.Element => {
    */
   const handleDeleteFile = async (id: string): Promise<void> => {
     if (confirm('Do you want to delete?')) {
-      alert(`deleted ${id}`)
+      useHandleDeleteFile(id, () => {
+        darkToaster('File delete success!', '✅')
+      })
     }
   }
 
   return (
     <ProjectLayout metaTitle="Files">
       <section className="mx-auto flex w-full max-w-7xl flex-col justify-between overflow-hidden bg-white px-4 pt-5 pb-4">
-        <FileHeader />
+        <FileHeader
+          useHandleCreateFiles={useHandleCreateFiles}
+          isSubmitting={isFileMethodLoading}
+        />
         <main
           className={`
             h-full overflow-y-auto rounded-b-md border-x border-b border-slate-300 bg-white 
@@ -76,6 +100,8 @@ const Files: NextPage = (): JSX.Element => {
             filename={filename}
             files={displayFiles}
             actions={{ handleOpenEditModal, handleDeleteFile, handleUpdateFilename }}
+            isUpdating={isFileMethodLoading}
+            length={files.length}
           />
         </main>
         <footer className="mt-3 flex items-center justify-center ">
@@ -83,12 +109,18 @@ const Files: NextPage = (): JSX.Element => {
            * This will render
            * the table pagination
            */}
-          <Pagination
-            length={files?.length}
-            pageNumber={pageNumber}
-            pageCount={pageCount}
-            actions={{ changePage }}
-          />
+          {pageCount > 1 ? (
+            isFileMethodLoading ? (
+              <PaginationSkeleton />
+            ) : (
+              <Pagination
+                length={files?.length}
+                pageNumber={pageNumber}
+                pageCount={pageCount}
+                actions={{ changePage }}
+              />
+            )
+          ) : null}
         </footer>
       </section>
     </ProjectLayout>
@@ -100,7 +132,40 @@ const Files: NextPage = (): JSX.Element => {
  * - List of Files
  * - Upload Files button
  */
-const FileHeader = (): JSX.Element => {
+type FileHeaderProps = {
+  useHandleCreateFiles: (data: any, callback: () => void) => Promise<void>
+  isSubmitting: boolean
+}
+
+const FileHeader = (props: FileHeaderProps): JSX.Element => {
+  const error = useAppSelector((state) => state.file.error)
+  const isError = useAppSelector((state) => state.file.isError)
+  const { userPermission: can } = useAppSelector((state) => state.project)
+
+  /*
+   * Add files
+   */
+  const { useHandleCreateFiles, isSubmitting } = props
+  const hiddenFileInput = React.useRef<HTMLInputElement>(null)
+  const handleClick = (): void => {
+    hiddenFileInput.current?.click()
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const fileUploaded = e.target.files?.[0]
+
+    if (fileUploaded && !isSubmitting) {
+      useHandleCreateFiles(fileUploaded, () => {
+        if (isError) {
+          darkToaster(`${error.content}`, '❌')
+        } else {
+          darkToaster('File uploaded successfully!', '✅')
+        }
+        e.target.value = ''
+      })
+    }
+  }
+
   return (
     <header
       className={`
@@ -112,19 +177,28 @@ const FileHeader = (): JSX.Element => {
         <LinkIcon className="h-5 w-5" />
         <h1 className="text-sm font-medium">List of Files</h1>
       </div>
-      <label
-        htmlFor="upload"
-        className={`
+      {can?.uploadFile ? (
+        <label
+          htmlFor="upload"
+          className={`
           flex cursor-pointer items-center rounded border border-blue-700 bg-blue-600 px-2 py-[0.26rem] text-sm text-white
           shadow outline-none transition duration-150 ease-in-out focus:bg-blue-600 hover:bg-blue-700 active:scale-95 
-        `}
-      >
-        <input type="file" id="upload" className="hidden" />
-        <Upload className="mr-2 h-4 w-4" />
-        Upload Files
-      </label>
+        ${isSubmitting ? 'hidden' : ''}`}
+        >
+          <input
+            type="file"
+            ref={hiddenFileInput}
+            onChange={handleChange}
+            id="upload"
+            className="hidden"
+          />
+          <Upload className="mr-2 h-4 w-4" onClick={handleClick} />
+          Upload a file
+        </label>
+      ) : null}
     </header>
   )
 }
 
+export { authCheck as getServerSideProps } from '~/utils/getServerSideProps'
 export default Files
