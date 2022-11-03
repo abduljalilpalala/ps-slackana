@@ -89,3 +89,12 @@ export interface FileIcon {
   name: string
   Icon: any
 }
+
+export interface Notification {
+  id: string
+  name: string
+  notification_type: string
+  task_name?: string
+  link?: string
+  created_at: string
+}

@@ -1,10 +1,12 @@
 import React, { FC } from 'react'
-import ReactTooltip from 'react-tooltip'
+import dynamic from 'next/dynamic'
 import { Edit3, Trash, Download } from 'react-feather'
 
 import { Filename } from '~/shared/types'
 import { File } from '~/shared/interfaces'
 import { fileIconType } from '~/shared/jsons/fileIconType'
+
+const ReactTooltip = dynamic(() => import('react-tooltip'), { ssr: false })
 
 type Props = {
   file: File
