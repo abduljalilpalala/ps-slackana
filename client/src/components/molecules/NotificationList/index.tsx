@@ -1,9 +1,11 @@
 import moment from 'moment'
+import { NextRouter, useRouter } from 'next/router'
 import React, { FC } from 'react'
 import { GitHub } from 'react-feather'
 import { BsGithub } from 'react-icons/bs'
 import { FaRegUser } from 'react-icons/fa'
 
+import { useNotificationMethods } from '~/hooks/notificationMethods'
 import ImageSkeleton from '~/components/atoms/Skeletons/ImageSkeleton'
 import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
 import { useAppSelector } from '~/hooks/reduxSelector'
@@ -15,6 +17,8 @@ type Props = {
 }
 
 const NotificationList: FC<Props> = (props): JSX.Element => {
+  const router: NextRouter = useRouter()
+  const { useMarkReadNotification } = useNotificationMethods()
   const { user } = useAppSelector((state) => state.auth)
   if (!props.notifications) null
 
@@ -60,6 +64,11 @@ const NotificationList: FC<Props> = (props): JSX.Element => {
     </tr>
   )
 
+  const handleReadNotification = (id: string, project_id: number, task_id: number) => {
+    useMarkReadNotification(id, project_id)
+    router.push(`/team/${project_id}/board?task_id=${task_id}`)
+  }
+
   return (
     <table className="min-w-2xl w-full flex-1 divide-y divide-slate-300 overflow-auto border-t border-slate-300 text-left text-sm leading-normal">
       <tbody className="w-full divide-y divide-slate-300 text-sm text-slate-600">
@@ -93,8 +102,14 @@ const NotificationList: FC<Props> = (props): JSX.Element => {
                       )}
                     </span>
                     <a
-                      href={`/team/${notification.data.project_id}/board?task_id=${notification.data.task?.id}`}
-                      className="font-semibold text-slate-900 underline line-clamp-1"
+                      onClick={() =>
+                        handleReadNotification(
+                          notification.id,
+                          notification.data.project_id,
+                          notification.data.task?.id as number
+                        )
+                      }
+                      className="cursor-pointer font-semibold text-slate-900 underline line-clamp-1"
                     >
                       {notification.data.task?.name}
                     </a>

@@ -97,7 +97,7 @@ export interface SidebarProject {
 }
 
 export interface Notification {
-  id: number
+  id: string
   data: {
     type: string
     task?: {
