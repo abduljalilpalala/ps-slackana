@@ -104,6 +104,22 @@ class PermissionSeeder extends Seeder
         'id' => PermissionEnum::MOVE_TASK,
         'name' => PermissionEnum::tryFrom(PermissionEnum::MOVE_TASK->value)->toString(),
       ],
+      [
+        'id' => PermissionEnum::UPLOAD_FILE,
+        'name' => PermissionEnum::tryFrom(PermissionEnum::UPLOAD_FILE->value)->toString(),
+      ],
+      [
+        'id' => PermissionEnum::DOWNLOAD_FILE,
+        'name' => PermissionEnum::tryFrom(PermissionEnum::DOWNLOAD_FILE->value)->toString(),
+      ],
+      [
+        'id' => PermissionEnum::DELETE_FILE,
+        'name' => PermissionEnum::tryFrom(PermissionEnum::DELETE_FILE->value)->toString(),
+      ],
+      [
+        'id' => PermissionEnum::RENAME_FILE,
+        'name' => PermissionEnum::tryFrom(PermissionEnum::RENAME_FILE->value)->toString(),
+      ]
     ];
     Permission::upsert($permissions, ['id'], ['name']);
   }

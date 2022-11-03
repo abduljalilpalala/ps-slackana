@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ProjectFileResource;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreProjectFileRequest;
 use App\Models\Project;
 
 class ProjectFileController extends Controller
@@ -15,17 +16,17 @@ class ProjectFileController extends Controller
      */
     public function index(Project $project)
     {
-        return ProjectFileResource::collection($project->getMedia('project-files'));
+        return ProjectFileResource::collection($project->getMedia('project-files')->sortByDesc('created_at'));
     }
 
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\StoreProjectFileRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, Project $project)
+    public function store(StoreProjectFileRequest $request, Project $project)
     {
         if ($request->hasFile('file')) {
             $project->addMedia($request->file('file'))

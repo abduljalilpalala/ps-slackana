@@ -39,6 +39,10 @@ class PermissionRolesSeeder extends Seeder
       ['permission_id' => PermissionEnum::ASSIGN_TASK],
       ['permission_id' => PermissionEnum::SET_TASK_AS_COMPLETED],
       ['permission_id' => PermissionEnum::MOVE_TASK],
+      ['permission_id' => PermissionEnum::UPLOAD_FILE],
+      ['permission_id' => PermissionEnum::DOWNLOAD_FILE],
+      ['permission_id' => PermissionEnum::DELETE_FILE],
+      ['permission_id' => PermissionEnum::RENAME_FILE],
     ]);
 
     $teamLeader = Role::find(RoleEnum::TEAM_LEADER)->permissions();
@@ -60,6 +64,10 @@ class PermissionRolesSeeder extends Seeder
       ['permission_id' => PermissionEnum::ASSIGN_TASK],
       ['permission_id' => PermissionEnum::SET_TASK_AS_COMPLETED],
       ['permission_id' => PermissionEnum::MOVE_TASK],
+      ['permission_id' => PermissionEnum::UPLOAD_FILE],
+      ['permission_id' => PermissionEnum::DOWNLOAD_FILE],
+      ['permission_id' => PermissionEnum::DELETE_FILE],
+      ['permission_id' => PermissionEnum::RENAME_FILE],
     ]);
 
     $member = Role::find(RoleEnum::MEMBER)->permissions();
@@ -67,6 +75,7 @@ class PermissionRolesSeeder extends Seeder
       ['permission_id' => PermissionEnum::LEAVE_PROJECT],
       ['permission_id' => PermissionEnum::SET_TASK_AS_COMPLETED],
       ['permission_id' => PermissionEnum::MOVE_TASK],
+      ['permission_id' => PermissionEnum::DOWNLOAD_FILE]
     ]);
   }
 }

@@ -81,6 +81,7 @@ export interface File {
   size: string
   type: string
   date_upload: string
+  url: string
 }
 
 export type IconName = keyof typeof icons
