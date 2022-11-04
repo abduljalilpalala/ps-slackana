@@ -10,6 +10,7 @@ import ProjectLayout from '~/components/templates/ProjectLayout'
 import { darkToaster } from '~/utils/darkToaster'
 import { useFileMethods } from '~/hooks/fileMethods'
 import { useAppSelector } from '~/hooks/reduxSelector'
+import { DeleteConfirmModal } from '~/components/molecules/FileList/DeleteConfirmModal'
 
 const Files: NextPage = (): JSX.Element => {
   const router = useRouter()
@@ -67,11 +68,11 @@ const Files: NextPage = (): JSX.Element => {
    * Handle Delete the File
    */
   const handleDeleteFile = async (id: string): Promise<void> => {
-    if (confirm('Do you want to delete?')) {
+    DeleteConfirmModal(() => {
       useHandleDeleteFile(id, () => {
-        darkToaster('File delete success!', '✅')
+        darkToaster('File deleted successfully!', '✅')
       })
-    }
+    })
   }
 
   return (
@@ -102,6 +103,7 @@ const Files: NextPage = (): JSX.Element => {
             actions={{ handleOpenEditModal, handleDeleteFile, handleUpdateFilename }}
             isUpdating={isFileMethodLoading}
             length={files.length}
+            projectID={parseInt(projectIDFiles as string)}
           />
         </main>
         <footer className="mt-3 flex items-center justify-center ">

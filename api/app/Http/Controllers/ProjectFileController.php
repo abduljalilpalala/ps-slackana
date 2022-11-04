@@ -48,6 +48,8 @@ class ProjectFileController extends Controller
         return $project->getMedia('project-files')->where('uuid', $file_uuid)->firstOrFail();
     }
 
+
+
     /**
      * Update the specified resource in storage.
      *
@@ -65,6 +67,7 @@ class ProjectFileController extends Controller
         ]);
         return response()->json(['message' => 'File updated successfully']);
     }
+
 
     /**
      * Remove the specified resource from storage.

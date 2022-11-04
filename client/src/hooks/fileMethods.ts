@@ -9,6 +9,8 @@ import {
   renameProjectFile
 } from '~/redux/files/fileSlice'
 
+import fileService from '~/redux/files/fileService'
+
 export const useFileMethods = (projectID: number) => {
   const [isFileLoading, setIsFileLoading] = useState(false)
   const dispatch = useAppDispatch()
@@ -48,10 +50,18 @@ export const useFileMethods = (projectID: number) => {
     })
   }
 
+  const useHandleDownloadFile = async (fileID: string): Promise<string | Blob> => {
+    setIsFileLoading(true)
+    const file = fileService.getProjectFile(projectID, fileID)
+    setIsFileLoading(false)
+    return file
+  }
+
   return {
     useHandleCreateFiles,
     useHandleDeleteFile,
     useHandleRenameFile,
+    useHandleDownloadFile,
     isFileLoading,
     isLoading,
     files
