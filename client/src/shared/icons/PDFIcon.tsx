@@ -1,10 +1,11 @@
 import React from 'react'
+import { IconType } from 'react-icons'
 
 type Props = {
   className?: string
 }
 
-export const PDFIcon: React.FC<Props> = ({ className }): JSX.Element => {
+export const PDFIcon: IconType = ({ className }): JSX.Element => {
   return (
     <svg
       version="1.1"
