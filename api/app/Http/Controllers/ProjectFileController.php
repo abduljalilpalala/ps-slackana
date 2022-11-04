@@ -13,7 +13,7 @@ class ProjectFileController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index(Project $project)
     {
@@ -25,22 +25,27 @@ class ProjectFileController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \App\Http\Requests\StoreProjectFileRequest $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreProjectFileRequest $request, Project $project)
     {
-
-        $mediaItems = $project->getMedia('project-files');
-
+        // get all project related files
+        $utils = new ProjectFileUtils();
         if ($request->hasFile('file')) {
-            $utils = new ProjectFileUtils();
-            $file_name = $request->file('file')->getClientOriginalName();
-            if ($mediaItems->contains('file_name', $file_name)) {
-                $file_name = $utils->addSuffixToFileName($file_name, $mediaItems);
+            $mediaItems = $project->getMedia('project-files');
+            //extract the name and remove the extension
+            $name = explode('.', $request->file('file')->getClientOriginalName())[0];
+            //check if the name already exists
+            if ($mediaItems->contains('name', $name)) {
+                //add suffix to the name
+                $name = $utils->addSuffixToName($name, $project);
             }
-            $project->addMediaFromRequest('file')->usingFileName($file_name)->toMediaCollection('project-files');
+            //add the file to the project
+            $project->addMedia($request->file('file'))
+                ->usingName($name)
+                ->toMediaCollection('project-files');
 
-            return response()->json(['message' => 'File uploaded successfully', 'file_name' => $file_name], 200);
+            return response()->json(['message' => 'File uploaded successfully'], 200);
         }
 
         return response()->json(['message' => 'File upload failed'], 500);
@@ -52,7 +57,7 @@ class ProjectFileController extends Controller
      * Display the specified resource.
      *
      * @param  Project  $project
-     * @param  uuid  $file_uuid
+     * @param  String  $file_uuid
      * @return \Illuminate\Http\Response
      */
     public function show(Project $project, $file_uuid)
@@ -67,15 +72,21 @@ class ProjectFileController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  Project  $project
-     * @param  id  $file_uuid
+     * @param  String  $file_uuid
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Project $project, $file_uuid)
     {
+        $name = $request->name;
+        $utils = new ProjectFileUtils();
+        if ($project->getMedia('project-files')->contains('name', $name)) {
+            //add suffix to the name
+            $name = $utils->addSuffixToName($name, $project);
+        }
         $media = $project->getMedia('project-files')->where('uuid', $file_uuid)->firstOrFail();
         $media->update([
-            'name' => $request->name,
-            'file_name' => $request->name . '.' . $media->extension
+            'name' => $name,
+            'file_name' => $name . '.' . $media->extension
         ]);
         return response()->json(['message' => 'File updated successfully']);
     }
@@ -85,8 +96,8 @@ class ProjectFileController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  Project  $project
-     * @param  id  $file_uuid
-     * @return \Illuminate\Http\Response
+     * @param  String  $file_uuid
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Project $project, $file_uuid)
     {

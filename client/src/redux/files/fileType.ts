@@ -4,6 +4,8 @@ import { File } from '~/shared/interfaces'
 export type ProjectFileType = {
   uuid: string
   file_name: string
+  name: string
+  extension: string
   mime_type: string
   size: number
   created_at: string

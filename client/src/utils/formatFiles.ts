@@ -26,7 +26,7 @@ const formatFiles = (files: ProjectFileType[] | string): File[] | string => {
   return files.map((file) => {
     return {
       id: file.uuid,
-      filename: file.file_name,
+      filename: file.name + '.' + file.extension,
       type: file.mime_type,
       size: formatFileSize(file.size),
       date_upload: moment(file.created_at).format('MMMM DD, YYYY'),
