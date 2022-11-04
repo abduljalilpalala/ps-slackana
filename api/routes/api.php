@@ -12,6 +12,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectFileController;
 use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\ProjectMessageController;
+use App\Http\Controllers\ProjectMessageThreadController;
 use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\ProjectTeamController;
 use App\Http\Controllers\SectionController;
@@ -65,6 +66,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::put('/{project}/task/position', [TaskPositionController::class, 'update']);
     Route::put('/{project}/task/{task}/move-section', [TaskSectionController::class, 'update']);
     Route::put('/notification/seen', [NotificationSeenController::class, 'update']);
+    Route::apiResource('/message.thread', ProjectMessageThreadController::class)->except(['show']);
   });
 
   Route::group(['prefix' => 'user'], function () {

@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProjectMessageResource extends JsonResource
+class ProjectMessageThreadResource extends JsonResource
 {
   /**
    * Transform the resource into an array.
@@ -18,8 +18,6 @@ class ProjectMessageResource extends JsonResource
       'id' => $this->id,
       'member' => new MemberResource($this->whenLoaded('member')),
       'message' => $this->message,
-      'threadCount' => $this->when(isset($this->thread_count), $this->thread_count),
-      'thread' => ProjectMessageThreadResource::collection($this->whenLoaded('thread')),
       'created_at' => $this->created_at
     ];
   }

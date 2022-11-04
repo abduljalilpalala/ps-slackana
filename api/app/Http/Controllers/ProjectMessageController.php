@@ -12,7 +12,7 @@ class ProjectMessageController extends Controller
 {
   public function index(Project $project)
   {
-    return ProjectMessageResource::collection($project->messages()->with('member.user.avatar')->get());
+    return ProjectMessageResource::collection($project->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->get());
   }
 
   public function store(ProjectMessageRequest $request, Project $project)
@@ -22,18 +22,18 @@ class ProjectMessageController extends Controller
       'message' => $request->message
     ]);
     event(new SendProjectMessageEvent($newMessage, $project));
-    return response()->json(new ProjectMessageResource($newMessage));
+    return new ProjectMessageResource($newMessage);
   }
 
   public function update(ProjectMessageRequest $request, Project $project, ProjectMessage $message)
   {
     $message->update(['message' => $request->message]);
-    return response()->json(new ProjectMessageResource($message));
+    return new ProjectMessageResource($message);
   }
 
   public function destroy(Project $project, ProjectMessage $message)
   {
     $message->delete();
-    return response()->json(new ProjectMessageResource($message));
+    return new ProjectMessageResource($message);
   }
 }

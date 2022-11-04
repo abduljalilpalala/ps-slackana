@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProjectMessage extends Model
+class ProjectMessageThread extends Model
 {
   use HasFactory;
 
@@ -16,13 +16,8 @@ class ProjectMessage extends Model
     return $this->belongsTo(ProjectMember::class, 'project_member_id');
   }
 
-  public function project()
+  public function message()
   {
-    return $this->belongsTo(Project::class);
-  }
-
-  public function thread()
-  {
-    return $this->hasMany(ProjectMessageThread::class, 'project_message_id');
+    return $this->belongsTo(ProjectMessage::class, 'project_message_id');
   }
 }
