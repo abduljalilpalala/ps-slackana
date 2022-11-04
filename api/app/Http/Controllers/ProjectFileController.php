@@ -6,6 +6,7 @@ use App\Http\Resources\ProjectFileResource;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreProjectFileRequest;
 use App\Models\Project;
+use App\Utils\ProjectFileUtils;
 
 class ProjectFileController extends Controller
 {
@@ -32,11 +33,10 @@ class ProjectFileController extends Controller
         $mediaItems = $project->getMedia('project-files');
 
         if ($request->hasFile('file')) {
+            $utils = new ProjectFileUtils();
             $file_name = $request->file('file')->getClientOriginalName();
-
-            // Check if file already exists, if exists, add a suffix to the file name
             if ($mediaItems->contains('file_name', $file_name)) {
-                $file_name = $this->addSuffixToFileName($file_name, $mediaItems);
+                $file_name = $utils->addSuffixToFileName($file_name, $mediaItems);
             }
             $project->addMediaFromRequest('file')->usingFileName($file_name)->toMediaCollection('project-files');
 
@@ -46,13 +46,6 @@ class ProjectFileController extends Controller
         return response()->json(['message' => 'File upload failed'], 500);
     }
 
-    private function addSuffixToFileName($file_name, $mediaItems)
-    {
-        $file_name_parts = explode('.', $file_name);
-        $file_name = $file_name_parts[0] . ' (' . $mediaItems->count() . ')' . '.' .  $file_name_parts[1];
-
-        return $file_name;
-    }
 
 
     /**
@@ -68,17 +61,6 @@ class ProjectFileController extends Controller
     }
 
 
-    private function countDuplicates($mediaItems, $file_name)
-    {
-        $count = 0;
-        foreach ($mediaItems as $media) {
-            //check if file name is the same
-            if ($media->file_name == $file_name) {
-                $count++;
-            }
-        }
-        return $count;
-    }
 
     /**
      * Update the specified resource in storage.

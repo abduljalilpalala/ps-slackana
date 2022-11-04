@@ -5,6 +5,8 @@ import { Filename } from '~/shared/types'
 import { styles } from '~/shared/twin/auth.styles'
 import { Spinner } from '~/shared/icons/SpinnerIcon'
 import DialogBox from '~/components/templates/DialogBox'
+import { EditFilenameModal } from './EditFilenameModal'
+import { useAppSelector } from '~/hooks/reduxSelector'
 
 type Props = {
   isOpen: boolean
@@ -13,6 +15,11 @@ type Props = {
   actions: {
     handleUpdateFilename: (data: Filename) => Promise<void>
   }
+}
+
+type FormData = {
+  filename: string
+  id: string
 }
 
 const EditFilenameDialog: FC<Props> = (props): JSX.Element => {
@@ -34,6 +41,40 @@ const EditFilenameDialog: FC<Props> = (props): JSX.Element => {
     }
   })
 
+  const files = useAppSelector((state) => state.file.files)
+
+  const onSubmit = async (data: FormData) => {
+    const { filename } = data
+    // Check if there are duplicates
+    const duplicateFiles = files.filter((file) => {
+      const filename = file.filename.split('.')[0]
+      return filename === data.filename && file.id !== data.id
+    })
+
+    if (duplicateFiles.length > 0) {
+      EditFilenameModal(
+        'The file has duplicates, do you want to continue?',
+        '',
+        async (confirmed: boolean) => {
+          if (confirmed) {
+            // Look for all files that starts with the file name
+            const fileMatches = files.filter((file) => {
+              const filename = file.filename.split('.')[0]
+              return filename.startsWith(data.filename) && file.id !== data.id
+            })
+            const newFileName = `${filename}-(${fileMatches.length})`
+            await handleUpdateFilename({ id: data.id, filename: newFileName })
+            closeModal({ id: data.id, filename: newFileName })
+          }
+        }
+      )
+    } else {
+      // if there are no duplicates, just rename the file
+      await handleUpdateFilename({ id, filename })
+      closeModal({ id, filename })
+    }
+  }
+
   return (
     <DialogBox
       isOpen={isOpen}
@@ -42,7 +83,7 @@ const EditFilenameDialog: FC<Props> = (props): JSX.Element => {
       headerTitle="Edit Filename"
       bodyClass="px-8"
     >
-      <form className="-mt-4 mb-10" onSubmit={handleSubmit(handleUpdateFilename)}>
+      <form className="-mt-4 mb-10" onSubmit={handleSubmit(onSubmit)}>
         {/*
          * This will partially stored the `id` for filename to conditionally
          * update into the database
