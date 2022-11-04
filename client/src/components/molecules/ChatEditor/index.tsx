@@ -1,11 +1,11 @@
-import { useForm } from 'react-hook-form'
-import React, { FC, useEffect } from 'react'
+import ReactMde from 'react-mde'
+import { useForm, Controller } from 'react-hook-form'
+import React, { FC, useEffect, useState } from 'react'
 
 import SendIcon from '~/shared/icons/SendIcon'
 import { ChatMessageValues } from '~/shared/types'
 import { Spinner } from '~/shared/icons/SpinnerIcon'
-
-import TextEditorButtons from '~/components/atoms/TextEditorButtons'
+import { converter, save } from '~/utils/mdeOptions'
 
 type Props = {
   value?: string
@@ -14,8 +14,8 @@ type Props = {
 
 const ChatEditor: FC<Props> = ({ value, handleMessage }): JSX.Element => {
   const {
-    register,
     reset,
+    control,
     formState,
     handleSubmit,
     formState: { isSubmitting, isDirty, isValid }
@@ -32,48 +32,42 @@ const ChatEditor: FC<Props> = ({ value, handleMessage }): JSX.Element => {
     }
   }, [formState, reset])
 
+  const [selectedTab, setSelectedTab] = useState<'write' | 'preview'>('write')
+
   return (
-    <footer
-      className={`
-        mb-[120px] w-full flex-shrink-0 bg-white text-slate-400 focus-within:text-slate-900
-        ${isSubmitting ? 'bg-opacity-50' : ''}
-    `}
-    >
-      <form
-        onSubmit={handleSubmit(handleMessage)}
-        className={`
-          group overflow-hidden rounded-lg border border-slate-200 transition duration-200 
-          ease-in-out focus-within:border-slate-300 focus-within:shadow-sm
-      `}
-      >
-        <TextEditorButtons isSubmitting={isSubmitting} />
-        <div className="flex items-center px-2">
-          <input
-            type="text"
-            {...register('message', { required: true })}
-            placeholder="Message #Team 6 Digits"
-            disabled={isSubmitting}
-            defaultValue={value}
-            className={`
-              w-full select-none border-none py-3.5 text-sm outline-none 
-            placeholder:text-slate-400 focus:border-slate-600 focus:ring-0 
-              focus:placeholder:text-slate-500 disabled:bg-opacity-50
-            `}
-            autoComplete="off"
+    <form onSubmit={handleSubmit(handleMessage)} className="relative mb-[120px]">
+      <Controller
+        name="message"
+        control={control}
+        defaultValue={value}
+        rules={{ required: 'You must a message to reply.' }}
+        render={({ field }) => (
+          <ReactMde
+            {...field}
+            selectedTab={selectedTab}
+            onTabChange={setSelectedTab}
+            generateMarkdownPreview={(markdown) => Promise.resolve(converter.makeHtml(markdown))}
+            childProps={{
+              writeButton: {
+                tabIndex: -1
+              }
+            }}
           />
-          {!isSubmitting ? (
-            <SendIcon
-              className={`
-             h-5 w-5 fill-current text-slate-400
-             ${isDirty || isValid || isSubmitting ? 'text-blue-500' : ''}
-           `}
-            />
-          ) : (
-            <Spinner className="h-5 w-5 fill-current text-slate-400" />
-          )}
-        </div>
-      </form>
-    </footer>
+        )}
+      />
+      <button type="submit" className="absolute top-0.5 right-0 py-3.5 px-4 outline-none">
+        {!isSubmitting ? (
+          <SendIcon
+            className={`
+              h-5 w-5 fill-current text-slate-400
+              ${isDirty || isValid || isSubmitting ? 'text-blue-500' : ''}
+            `}
+          />
+        ) : (
+          <Spinner className="h-5 w-5 fill-current text-slate-400" />
+        )}
+      </button>
+    </form>
   )
 }
 

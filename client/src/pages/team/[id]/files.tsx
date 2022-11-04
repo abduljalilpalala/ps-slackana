@@ -11,6 +11,7 @@ import { darkToaster } from '~/utils/darkToaster'
 import { useFileMethods } from '~/hooks/fileMethods'
 import { useAppSelector } from '~/hooks/reduxSelector'
 import { DeleteConfirmModal } from '~/components/molecules/FileList/DeleteConfirmModal'
+import toast from 'react-hot-toast'
 
 const Files: NextPage = (): JSX.Element => {
   const router = useRouter()
@@ -57,7 +58,7 @@ const Files: NextPage = (): JSX.Element => {
    */
   const handleUpdateFilename = async (data: Filename): Promise<void> => {
     useHandleRenameFile(filename.id, data.filename, () => {
-      darkToaster('File renamed successfully!', '✅')
+      toast.success('File renamed successfully!')
     })
     handleOpenEditModal(data)
   }
@@ -68,7 +69,7 @@ const Files: NextPage = (): JSX.Element => {
   const handleDeleteFile = async (id: string): Promise<void> => {
     DeleteConfirmModal(() => {
       useHandleDeleteFile(id, () => {
-        darkToaster('File deleted successfully!', '✅')
+        toast.success('File deleted successfully!')
       })
     })
   }
@@ -157,9 +158,9 @@ const FileHeader = (props: FileHeaderProps): JSX.Element => {
     if (fileUploaded && !isSubmitting) {
       useHandleCreateFiles(fileUploaded, () => {
         if (isError) {
-          darkToaster(`${error.content}`, '❌')
+          toast.error(`${error.content}`)
         } else {
-          darkToaster('File uploaded successfully!', '✅')
+          toast.success('File uploaded successfully!')
         }
         e.target.value = ''
       })
