@@ -24,7 +24,7 @@ class TaskAssignmentController extends Controller
       $member = ProjectMember::with('user')->findOrFail($request->project_member_id);
       if (intval($taskMemberID) !== intval($request->project_member_id)) {
         Notification::send($member->user, new AssignTaskNotification(auth()->user()->id, $task->id, $project->id));
-        event(new AssignTaskEvent($member->user));
+        event(new AssignTaskEvent($member->user, $project));
       }
       return response()->noContent();
     }

@@ -1,6 +1,6 @@
 import { Notification } from '../interfaces'
 
-export const notifications: Notification[] = [
+export const notifications = [
   {
     id: '1',
     name: 'Christofer Culhane',

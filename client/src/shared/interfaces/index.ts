@@ -91,11 +91,39 @@ export interface FileIcon {
   Icon: any
 }
 
+export interface SidebarProject {
+  id: number
+  title: string
+}
+
 export interface Notification {
-  id: string
-  name: string
-  notification_type: string
-  task_name?: string
-  link?: string
+  id: number
+  data: {
+    type: string
+    task?: {
+      id: number
+      name: string
+      assignee?: {
+        id: number
+        user?: {
+          id: number
+          name: number
+          avatar?: {
+            url: string
+          }
+        }
+      }
+    }
+    assigner?: {
+      id: number
+      name: string
+      avatar?: {
+        url: string
+      }
+    }
+    project_id: number
+  }
+  read_at: string
+  is_seen: boolean
   created_at: string
 }

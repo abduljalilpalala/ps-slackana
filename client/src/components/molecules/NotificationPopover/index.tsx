@@ -18,11 +18,12 @@ const NotificationPopover = (): JSX.Element => {
   const {
     notifications,
     hasNotification,
+    sidebarProject,
     useMarkReadNotification,
-    setHasNotification,
     useSeenNotifications
   } = useNotificationMethods()
   formatMoment()
+
   const handleReadNotification = (
     id: string,
     project_id: number,
@@ -33,6 +34,12 @@ const NotificationPopover = (): JSX.Element => {
     callback()
     router.push(`/team/${project_id}/board?task_id=${task_id}`)
   }
+
+  const handleSeeAllNotification = (callback: () => void) => {
+    callback()
+    router.push(`/notifications/projects/${sidebarProject[0]?.id}?type=all`)
+  }
+
   return (
     <Popover css={styles.popover}>
       {({ open, close }) => (
@@ -101,7 +108,12 @@ const NotificationPopover = (): JSX.Element => {
                 )}
               </main>
               <footer css={styles.footer}>
-                <a href="#">See all notifications</a>
+                <a
+                  className=" cursor-pointer"
+                  onClick={() => handleSeeAllNotification(() => close())}
+                >
+                  See all notifications
+                </a>
               </footer>
             </Popover.Panel>
           </PopoverTransition>

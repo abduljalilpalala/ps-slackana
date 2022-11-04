@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Project;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -21,9 +22,11 @@ class AssignTaskEvent implements ShouldBroadcast
    * @return void
    */
   public $user;
-  public function __construct(User $user)
+  public $project;
+  public function __construct(User $user, Project $project = null)
   {
     $this->user = $user;
+    $this->project = $project;
   }
 
   /**
@@ -39,5 +42,12 @@ class AssignTaskEvent implements ShouldBroadcast
   public function broadcastAs()
   {
     return 'AssignTaskEvent';
+  }
+
+  public function broadcastWith()
+  {
+    return [
+      'project' => $this->project
+    ];
   }
 }
