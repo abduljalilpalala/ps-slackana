@@ -22,7 +22,6 @@ const Files: NextPage = (): JSX.Element => {
     useHandleRenameFile,
     useHandleDeleteFile
   } = useFileMethods(parseInt(projectIDFiles as string))
-
   const [pageNumber, setPageNumber] = useState<number>(0)
   const [isOpen, setIsOpen] = useState<boolean>(false)
   /*
@@ -46,7 +45,6 @@ const Files: NextPage = (): JSX.Element => {
    * This is the toggle for Edit Modal
    */
   const handleOpenEditModal = (data?: Filename): void => {
-    // set filename to be edited, remove the extension
     setFilename({
       id: data?.id,
       filename: data?.filename?.split('.')[0]
@@ -61,7 +59,7 @@ const Files: NextPage = (): JSX.Element => {
     useHandleRenameFile(filename.id, data.filename, () => {
       darkToaster('File renamed successfully!', '✅')
     })
-    handleOpenEditModal()
+    handleOpenEditModal(data)
   }
 
   /*

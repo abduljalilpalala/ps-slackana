@@ -18,7 +18,7 @@ export const DeleteConfirmModal = (onConfirm: () => void) => {
       if (result.isConfirmed) {
         onConfirm()
       } else {
-        mySwal.fire('Cancelled', 'Your file is safe :)', 'error')
+        mySwal.fire('Cancelled', '', 'info')
       }
     })
 }
