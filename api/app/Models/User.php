@@ -59,4 +59,14 @@ class User extends Authenticatable implements HasMedia
   {
     return $this->belongsToMany(Setting::class, 'notification_settings')->withPivot(['status']);
   }
+
+  public static function boot()
+  {
+    parent::boot();
+
+    self::created(function (User $user) {
+      $user->addMedia(public_path('assets/avatar/avatar-' . rand(1, 12) . '.png'))
+      ->preservingOriginal()->toMediaCollection('avatar', 'public');
+    });
+  }
 }

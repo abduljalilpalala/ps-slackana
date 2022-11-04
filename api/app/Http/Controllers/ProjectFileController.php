@@ -13,7 +13,7 @@ class ProjectFileController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index(Project $project)
     {
@@ -25,7 +25,7 @@ class ProjectFileController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \App\Http\Requests\StoreProjectFileRequest $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreProjectFileRequest $request, Project $project)
     {
@@ -57,7 +57,7 @@ class ProjectFileController extends Controller
      * Display the specified resource.
      *
      * @param  Project  $project
-     * @param  uuid  $file_uuid
+     * @param  String  $file_uuid
      * @return \Illuminate\Http\Response
      */
     public function show(Project $project, $file_uuid)
@@ -72,8 +72,8 @@ class ProjectFileController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  Project  $project
-     * @param  id  $file_uuid
-     * @return \Illuminate\Http\Response
+     * @param  String  $file_uuid
+     * @return \Illuminate\Http\JsonResponse 
      */
     public function update(Request $request, Project $project, $file_uuid)
     {
@@ -96,8 +96,8 @@ class ProjectFileController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  Project  $project
-     * @param  id  $file_uuid
-     * @return \Illuminate\Http\Response
+     * @param  String  $file_uuid
+     * @return \Illuminate\Http\JsonResponse 
      */
     public function destroy(Project $project, $file_uuid)
     {

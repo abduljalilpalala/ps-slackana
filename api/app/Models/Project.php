@@ -62,4 +62,14 @@ class Project extends Model implements HasMedia
   {
     return $this->hasMany(ProjectMessage::class);
   }
+
+  public static function boot()
+  {
+    parent::boot();
+
+    self::created(function (Project $project) {
+      $project->addMedia(public_path('assets/project-icons/project-icon-' . rand(1, 20) . '.png'))
+        ->preservingOriginal()->toMediaCollection('project-icon', 'public');
+    });
+  }
 }
