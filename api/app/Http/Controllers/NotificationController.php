@@ -25,6 +25,7 @@ class NotificationController extends Controller
 
   public function update(DatabaseNotification $notification, Request $request)
   {
-    return $notification->markAsRead();
+    $notification->markAsRead();
+    return response()->noContent();
   }
 }

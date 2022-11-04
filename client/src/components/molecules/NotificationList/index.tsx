@@ -64,9 +64,16 @@ const NotificationList: FC<Props> = (props): JSX.Element => {
     </tr>
   )
 
-  const handleReadNotification = (id: string, project_id: number, task_id: number) => {
-    useMarkReadNotification(id, project_id)
-    router.push(`/team/${project_id}/board?task_id=${task_id}`)
+  const handleReadNotification = (
+    id: string,
+    project_id: number,
+    task_id: number,
+    type: string
+  ) => {
+    if (type === 'assignTask') {
+      useMarkReadNotification(id, project_id)
+      router.push(`/team/${project_id}/board?task_id=${task_id}`)
+    }
   }
 
   return (
@@ -84,40 +91,43 @@ const NotificationList: FC<Props> = (props): JSX.Element => {
                   !notification.read_at && 'bg-slate-200'
                 } text-sm transition duration-75 ease-in-out hover:bg-slate-100`}
               >
-                <td className="flex flex-1 items-center px-6 md:justify-between">
-                  <div className="flex flex-wrap items-center space-x-2 py-2 text-slate-600">
-                    {notificationIconType.map(
-                      (notifIcon, i) =>
-                        notifIcon.name.includes(notification.data.type) && (
-                          <notifIcon.Icon key={i} className="h-4 w-4 shrink-0" />
-                        )
-                    )}
-                    <div className="shrink-0 font-semibold text-slate-900">
-                      {pronoun ? 'You' : notification.data.assigner?.name}
-                    </div>
-                    <span className="flex-shrink-0 font-normal">
-                      {showNotificationTypeText(
-                        notification.data.type,
-                        pronoun ? 'yourself' : 'you'
+                <a
+                  onClick={() =>
+                    handleReadNotification(
+                      notification.id,
+                      notification.data.project_id,
+                      notification.data.task?.id as number,
+                      notification.data.type
+                    )
+                  }
+                  className="cursor-pointer"
+                >
+                  <td className="flex flex-1 items-center px-6 md:justify-between">
+                    <div className="flex flex-wrap items-center space-x-2 py-2 text-slate-600">
+                      {notificationIconType.map(
+                        (notifIcon, i) =>
+                          notifIcon.name.includes(notification.data.type) && (
+                            <notifIcon.Icon key={i} className="h-4 w-4 shrink-0" />
+                          )
                       )}
+                      <div className="shrink-0 font-semibold text-slate-900">
+                        {pronoun ? 'You' : notification.data.assigner?.name}
+                      </div>
+                      <span className="flex-shrink-0 font-normal">
+                        {showNotificationTypeText(
+                          notification.data.type,
+                          pronoun ? 'yourself' : 'you'
+                        )}
+                      </span>
+                      <span className="font-semibold text-slate-900 underline line-clamp-1">
+                        {notification.data.task?.name}
+                      </span>
+                    </div>
+                    <span className="shrink-0 text-sm font-light text-slate-500">
+                      {moment(notification.created_at).fromNow()}
                     </span>
-                    <a
-                      onClick={() =>
-                        handleReadNotification(
-                          notification.id,
-                          notification.data.project_id,
-                          notification.data.task?.id as number
-                        )
-                      }
-                      className="cursor-pointer font-semibold text-slate-900 underline line-clamp-1"
-                    >
-                      {notification.data.task?.name}
-                    </a>
-                  </div>
-                  <span className="shrink-0 text-sm font-light text-slate-500">
-                    {moment(notification.created_at).fromNow()}
-                  </span>
-                </td>
+                  </td>
+                </a>
               </tr>
             )
           })
