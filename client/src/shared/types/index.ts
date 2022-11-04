@@ -1,3 +1,6 @@
+import { IconType } from 'react-icons'
+import { Icon } from 'react-feather'
+
 export type SignInUpFormValues = {
   name: string
   email: string
@@ -78,4 +81,9 @@ export type ChatMessageValues = {
 export type Filename = {
   id: string
   filename: string
+}
+
+export type FileIconType = {
+  name: string
+  Icon: IconType | Icon
 }

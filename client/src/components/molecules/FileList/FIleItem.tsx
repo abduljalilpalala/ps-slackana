@@ -6,6 +6,7 @@ import { Filename } from '~/shared/types'
 import { File } from '~/shared/interfaces'
 import { fileIconType } from '~/shared/jsons/fileIconType'
 import { useAppSelector } from '~/hooks/reduxSelector'
+import { MapMimeToFileComponent } from '~/utils/mapMimeToFileIcon'
 
 const ReactTooltip = dynamic(() => import('react-tooltip'), { ssr: false })
 
@@ -31,15 +32,12 @@ const FileItem: FC<Props> = (props): JSX.Element => {
     filename
   }
 
+  const Icon = MapMimeToFileComponent(type)
+
   return (
     <tr className="group transition duration-75 ease-in-out hover:bg-slate-100">
       <td className="flex w-full max-w-[220px] items-center space-x-1 py-2 px-6">
-        {fileIconType.map(
-          (fileIcon, i) =>
-            fileIcon.name.includes(type) && (
-              <fileIcon.Icon key={i} className="h-5 w-5 flex-shrink-0 stroke-1" />
-            )
-        )}
+        {Icon && <Icon className="h-5 w-5 flex-shrink-0 stroke-1" />}
         <span className="line-clamp-1">{filename}</span>
       </td>
       <td className="py-2 px-6">
