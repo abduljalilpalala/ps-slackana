@@ -14,13 +14,14 @@ type Props = {
   actions: {
     handleOpenEditModal: (data?: Filename) => void
     handleDeleteFile: (id: string) => Promise<void>
+    handleDownloadFile: (id: string, fileName: string) => Promise<void>
   }
 }
 
 const FileItem: FC<Props> = (props): JSX.Element => {
   const {
     file: { id, filename, size, type, date_upload },
-    actions: { handleOpenEditModal, handleDeleteFile }
+    actions: { handleOpenEditModal, handleDeleteFile, handleDownloadFile }
   } = props
 
   const { userPermission: can } = useAppSelector((state) => state.project)
@@ -77,6 +78,7 @@ const FileItem: FC<Props> = (props): JSX.Element => {
             className={`outline-none active:scale-95 ${can?.downloadFile ? '' : 'hidden'}`}
             data-for="actions"
             data-tip="Download"
+            onClick={() => handleDownloadFile(id, filename)}
           >
             <Download className="h-4 w-4 md:h-5 md:w-5" />
           </button>

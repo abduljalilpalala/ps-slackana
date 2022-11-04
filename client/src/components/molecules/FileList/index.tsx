@@ -1,4 +1,5 @@
 import React, { FC } from 'react'
+import fileDownload from 'js-file-download'
 
 import FileItem from './FIleItem'
 import { BlankSlateTableIcon } from '~/shared/icons/BlankSlateTableIcon'
@@ -7,6 +8,7 @@ import { Filename } from '~/shared/types'
 import { File } from '~/shared/interfaces'
 import EditFilenameDialog from './EditFilenameDialog'
 import FileListSkeleton from '../FileListSkeleton'
+import { useFileMethods } from '~/hooks/fileMethods'
 
 type Props = {
   isOpen: boolean
@@ -19,6 +21,7 @@ type Props = {
   }
   isUpdating: boolean
   length: number
+  projectID: number
 }
 
 const BlankTable = (): JSX.Element => {
@@ -32,6 +35,7 @@ const BlankTable = (): JSX.Element => {
 }
 
 const FileList: FC<Props> = (props): JSX.Element => {
+  const { useHandleDownloadFile } = useFileMethods(props.projectID)
   if (!props.files) null
 
   const {
@@ -40,6 +44,11 @@ const FileList: FC<Props> = (props): JSX.Element => {
     actions: { handleOpenEditModal, handleDeleteFile, handleUpdateFilename },
     length
   } = props
+
+  const handleDownloadFile = async (fileID: string, fileName: string): Promise<void> => {
+    const dataBlob = (await useHandleDownloadFile(fileID)) as Blob
+    fileDownload(dataBlob, fileName)
+  }
 
   return props.isUpdating ? (
     // Conditionally set the length of the skeleton if there are no files
@@ -71,7 +80,11 @@ const FileList: FC<Props> = (props): JSX.Element => {
            *  <td>{data goes here}</td>
            * </tr>
            */
-          <FileItem key={i} file={file} actions={{ handleOpenEditModal, handleDeleteFile }} />
+          <FileItem
+            key={i}
+            file={file}
+            actions={{ handleOpenEditModal, handleDeleteFile, handleDownloadFile }}
+          />
         ))}
       </tbody>
     </table>
