@@ -22,29 +22,36 @@ class ProjectSeeder extends Seeder
    */
   public function run()
   {
-    $johnDoe = User::create([
+    $johnDoe = User::updateOrCreate([
+      'email' => 'john@gmail.com'
+    ], [
       'name' => 'John Doe',
-      'email' => 'john@gmail.com',
       'password' => bcrypt('password')
     ]);
+
     $johnDoe->addMedia(public_path('assets/avatar/avatar-' . rand(1, 12) . '.png'))
       ->preservingOriginal()->toMediaCollection('avatar', 'public');
 
-    $janeDoe = User::create([
+    $janeDoe = User::updateOrCreate([
+      'email' => 'jane@gmail.com'
+    ], [
       'name' => 'Jane Doe',
-      'email' => 'jane@gmail.com',
       'password' => bcrypt('password')
     ]);
+
     $janeDoe->addMedia(public_path('assets/avatar/avatar-' . rand(1, 12) . '.png'))
       ->preservingOriginal()->toMediaCollection('avatar', 'public');
 
-    $project = Project::create([
+    $project = Project::updateOrCreate([
       'title' => 'Slackana',
+    ], [
       'description' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam neque, ut dicta voluptate mollitia quo nam, perspiciatis aspernatur, sint nihil facilis ab quas molestiae culpa officiis quis aliquam quidem commodi!',
       'status_id' => ProjectStatusEnum::ON_TRACK,
     ]);
+
     $project->addMedia(public_path('assets/project-icons/project-icon-' . rand(1, 20) . '.png'))
       ->preservingOriginal()->toMediaCollection('project-icon', 'public');
+
     $project->teams()->createMany([
       ['name' => 'Front End'],
       ['name' => 'Back End'],
