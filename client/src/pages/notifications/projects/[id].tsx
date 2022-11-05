@@ -10,23 +10,23 @@ import NotificationList from '~/components/molecules/NotificationList'
 import NotificationLayout from '~/components/templates/NotificationLayout'
 import { useNotificationMethods } from '~/hooks/notificationMethods'
 import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
-import { SidebarProject } from '~/shared/interfaces'
+import { Notification, SidebarProject } from '~/shared/interfaces'
+import { NotificationTypes } from '~/utils/constants'
 
 const Notifications: NextPage = (): JSX.Element => {
   const router: NextRouter = useRouter()
   const [pageNumber, setPageNumber] = useState<number>(0)
+  const { id, type } = router.query
   const {
     sidebarProject,
     isSidebarLoading,
     notificationsTable,
     isTableLoading,
-    setCurrentProjectID,
-    useGetNotificationsTable
-  } = useNotificationMethods()
-  const { id, type } = router.query
+    useGetNotificationsTable,
+    useMarkReadNotification
+  } = useNotificationMethods(parseInt(id as string))
 
   useEffect(() => {
-    setCurrentProjectID(parseInt(id as string))
     useGetNotificationsTable(parseInt(id as string), type as string)
   }, [id, type])
 
@@ -49,6 +49,21 @@ const Notifications: NextPage = (): JSX.Element => {
   )
   const handleSelectProject = (e: React.ChangeEvent<HTMLSelectElement>) => {
     router.push(`/notifications/projects/${e.target.value}?type=all`)
+  }
+
+  const handleReadNotification = (notification: Notification) => {
+    useMarkReadNotification(notification.id, notification.data.project_id)
+    if (notification.data.type === NotificationTypes.ASSIGN_TASK) {
+      router.push(
+        `/team/${notification.data.project_id}/board?task_id=${notification.data.task?.id}`
+      )
+    }
+    if (notification.data.type === NotificationTypes.COMMIT) {
+      window.open(notification.data.commit?.url)
+    }
+    if (notification.data.type === NotificationTypes.MERGE) {
+      window.open(notification.data.pr_details?.url)
+    }
   }
   return (
     <NotificationLayout metaTitle="Notifications">
@@ -97,6 +112,7 @@ const Notifications: NextPage = (): JSX.Element => {
                 onChange={handleSelectProject}
                 css={globals.form_control}
                 className="w-full font-semibold"
+                value={parseInt(router.query.id as string)}
               >
                 {sidebarProject?.map(({ id, title }: SidebarProject) => (
                   <option value={id} key={id} className="line-clamp-1">
@@ -134,7 +150,11 @@ const Notifications: NextPage = (): JSX.Element => {
                 scrollbar-thin scrollbar-thumb-slate-400 scrollbar-thumb-rounded-md
               `}
             >
-              <NotificationList isLoading={isTableLoading} notifications={displayNotifications} />
+              <NotificationList
+                isLoading={isTableLoading}
+                notifications={displayNotifications}
+                actions={{ handleReadNotification }}
+              />
             </main>
             <footer className="mt-3 flex items-center justify-center ">
               <Pagination

@@ -87,3 +87,9 @@ export type FileIconType = {
   name: string
   Icon: IconType | Icon
 }
+
+export type NotificationConstants = {
+  ASSIGN_TASK: string
+  COMMIT: string
+  MERGE: string
+}

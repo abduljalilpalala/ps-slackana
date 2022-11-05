@@ -121,6 +121,25 @@ export interface Notification {
         url: string
       }
     }
+    sender?: {
+      login: string
+      avatar_url: string
+    }
+    repository?: {
+      name: string
+    }
+    commit?: {
+      message: string
+      url: string
+    }
+    merged_by?: {
+      login: string
+      avatar_url: string
+    }
+    pr_details?: {
+      title: string
+      url: string
+    }
     project_id: number
   }
   read_at: string

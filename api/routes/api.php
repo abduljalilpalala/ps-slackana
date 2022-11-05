@@ -13,6 +13,7 @@ use App\Http\Controllers\ProjectFileController;
 use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\ProjectMessageController;
 use App\Http\Controllers\ProjectMessageThreadController;
+use App\Http\Controllers\ProjectRepositoryController;
 use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\ProjectTeamController;
 use App\Http\Controllers\SectionController;
@@ -38,7 +39,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
+Route::githubWebhooks('github-webhooks');
 Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::apiResource('project', ProjectController::class);
   Route::apiResource('project.team', ProjectTeamController::class);
@@ -50,6 +51,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::apiResource('project.message', ProjectMessageController::class)->except(['show']);
 
   Route::group(['prefix' => 'project'], function () {
+    Route::put('/{project}/repository', [ProjectRepositoryController::class, 'update']);
     Route::put('/{project}/project-status', [ProjectStatusController::class, 'update']);
     Route::delete('/{project}/archive', [ArchiveProjectController::class, 'destroy']);
     Route::put('/{project}/un-archive', [ArchiveProjectController::class, 'update']);

@@ -3,7 +3,6 @@
 namespace App\Events;
 
 use App\Models\Project;
-use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -12,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class AssignTaskEvent implements ShouldBroadcast
+class GithubWebhookEvent implements ShouldBroadcast
 {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -21,12 +20,16 @@ class AssignTaskEvent implements ShouldBroadcast
    *
    * @return void
    */
-  public $user;
   public $project;
-  public function __construct(User $user, Project $project = null)
+  public $users;
+  public $channels = [];
+  public function __construct($users, $project)
   {
-    $this->user = $user;
     $this->project = $project;
+    $this->users = $users;
+    foreach ($users as $user) {
+      $this->channels[] = new Channel('user.' . $user->id . '.notifications');
+    }
   }
 
   /**
@@ -36,7 +39,7 @@ class AssignTaskEvent implements ShouldBroadcast
    */
   public function broadcastOn()
   {
-    return new Channel('user.' . $this->user->id . '.notifications');
+    return $this->channels;
   }
 
   public function broadcastAs()

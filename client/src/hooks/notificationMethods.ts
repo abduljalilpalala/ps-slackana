@@ -7,10 +7,9 @@ import { getSections, setProjectID } from '~/redux/section/sectionSlice'
 import { getSidebarProjects } from '~/redux/project/projectSlice'
 import { Notification } from '~/shared/interfaces'
 
-export const useNotificationMethods = () => {
+export const useNotificationMethods = (id: number = 0) => {
   const [notifications, setNotifications] = useState([])
   const [notificationsTable, setNotificationsTable] = useState([])
-  const [currentProjectID, setCurrentProjectID] = useState<number | null>(null)
   const [isTableLoading, setIsTableLoading] = useState<boolean>(false)
   const [hasNotification, setHasNotification] = useState<boolean>(false)
   const { user } = useAppSelector((state) => state.auth)
@@ -36,9 +35,13 @@ export const useNotificationMethods = () => {
   }
   const useGetNotificationsTableOnUpdate = async (project_id: number) => {
     const response = await axios.get(`/api/notification?project=${project_id}&type=all`)
-    if (currentProjectID === project_id) {
+    if (id === project_id) {
       setNotificationsTable(response.data)
     }
+  }
+  const useGetNotificationsTableNoLoading = async (project_id: number) => {
+    const response = await axios.get(`/api/notification?project=${project_id}&type=all`)
+    setNotificationsTable(response.data)
   }
   const useGetNotificationsOnMount = async () => {
     const response = await axios.get(`/api/notification`)
@@ -57,6 +60,7 @@ export const useNotificationMethods = () => {
     dispatch(setProjectID({ project_id }))
     dispatch(getSections())
     useGetNotifications()
+    useGetNotificationsTableNoLoading(project_id)
   }
   useEffect(() => {
     useGetNotificationsOnMount()
@@ -64,7 +68,7 @@ export const useNotificationMethods = () => {
 
   useEffect(() => {
     const channel = pusher.subscribe(`user.${user?.id}.notifications`)
-    channel.bind('AssignTaskEvent', (data: any) => {
+    channel.bind('NotificationEvent', (data: any) => {
       setHasNotification(true)
       useGetNotifications()
       useGetNotificationsTableOnUpdate(data?.project?.id)
@@ -80,7 +84,6 @@ export const useNotificationMethods = () => {
     notificationsTable,
     isTableLoading,
     isSidebarLoading,
-    setCurrentProjectID,
     setIsTableLoading,
     useGetNotificationsTable,
     useMarkReadNotification,

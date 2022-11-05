@@ -11,6 +11,8 @@ import { useNotificationMethods } from '~/hooks/notificationMethods'
 import { useAppSelector } from '~/hooks/reduxSelector'
 import { formatMoment } from '~/utils/formatMoment'
 import handleImageError from '~/helpers/handleImageError'
+import { Notification } from '~/shared/interfaces'
+import { NotificationTypes } from '~/utils/constants'
 
 const NotificationPopover = (): JSX.Element => {
   const router = useRouter()
@@ -24,15 +26,20 @@ const NotificationPopover = (): JSX.Element => {
   } = useNotificationMethods()
   formatMoment()
 
-  const handleReadNotification = (
-    id: string,
-    project_id: number,
-    task_id: number,
-    callback: () => void
-  ) => {
-    useMarkReadNotification(id, project_id)
-    callback()
-    router.push(`/team/${project_id}/board?task_id=${task_id}`)
+  const handleReadNotification = (notification: Notification, callback: () => void) => {
+    useMarkReadNotification(notification?.id, notification?.data.project_id)
+    if (notification?.data?.type === NotificationTypes.ASSIGN_TASK) {
+      callback()
+      router.push(
+        `/team/${notification?.data?.project_id}/board?task_id=${notification?.data?.task?.id}`
+      )
+    }
+    if (notification?.data?.type === NotificationTypes.COMMIT) {
+      window.open(notification?.data?.commit?.url)
+    }
+    if (notification?.data?.type === NotificationTypes.MERGE) {
+      window.open(notification?.data?.pr_details?.url)
+    }
   }
 
   const handleSeeAllNotification = (callback: () => void) => {
@@ -60,21 +67,14 @@ const NotificationPopover = (): JSX.Element => {
               </header>
               <main css={styles.main} className="scroll-show-on-hover default-scrollbar">
                 {notifications.length ? (
-                  notifications.map((notification: any) => {
+                  notifications.map((notification: Notification) => {
                     return (
                       <a
                         key={notification?.id}
-                        onClick={() =>
-                          handleReadNotification(
-                            notification?.id,
-                            notification?.data?.project_id,
-                            notification?.data?.task?.id,
-                            () => close()
-                          )
-                        }
+                        onClick={() => handleReadNotification(notification, () => close())}
                         className={`${!notification?.read_at && 'bg-slate-200'} cursor-pointer`}
                       >
-                        {notification?.data?.type === 'assignTask' && (
+                        {notification?.data?.type === NotificationTypes.ASSIGN_TASK && (
                           <>
                             <div css={globals.avatar}>
                               <img
@@ -95,6 +95,48 @@ const NotificationPopover = (): JSX.Element => {
                               to a task -{' '}
                               <span className="font-bold text-blue-600">
                                 {notification?.data?.task?.name}
+                              </span>
+                              . {moment(notification?.created_at).add('hours').fromNow(true)}
+                            </p>
+                          </>
+                        )}
+                        {notification?.data?.type === NotificationTypes.COMMIT && (
+                          <>
+                            <div css={globals.avatar}>
+                              <img
+                                src={`${notification?.data?.sender?.avatar_url}`}
+                                className="w-full object-cover"
+                                alt="avatar"
+                                onError={(e) => handleImageError(e, '/images/avatar.png')}
+                              />
+                            </div>
+                            <p className="mx-2 text-xs text-gray-600">
+                              <span className="font-bold">{notification?.data?.sender?.login}</span>{' '}
+                              has committed to project -{' '}
+                              <span className="font-bold text-blue-600">
+                                {notification?.data?.repository?.name}
+                              </span>
+                              . {moment(notification?.created_at).add('hours').fromNow(true)}
+                            </p>
+                          </>
+                        )}
+                        {notification?.data?.type === NotificationTypes.MERGE && (
+                          <>
+                            <div css={globals.avatar}>
+                              <img
+                                src={`${notification?.data?.merged_by?.avatar_url}`}
+                                className="w-full object-cover"
+                                alt="avatar"
+                                onError={(e) => handleImageError(e, '/images/avatar.png')}
+                              />
+                            </div>
+                            <p className="mx-2 text-xs text-gray-600">
+                              <span className="font-bold">
+                                {notification?.data?.merged_by?.login}
+                              </span>{' '}
+                              has merged this pull request -{' '}
+                              <span className="font-bold text-blue-600">
+                                {notification?.data?.pr_details?.title}
                               </span>
                               . {moment(notification?.created_at).add('hours').fromNow(true)}
                             </p>
