@@ -86,6 +86,7 @@ module.exports = {
       'tooltip',
       'message',
       'dropdown-action'
-    ])
+    ]),
+    require('@tailwindcss/typography')
   ]
 }

@@ -8,6 +8,7 @@ import settingReducer from './setting/settingSlice'
 import memberReducer from './member/memberSlice'
 import taskReducer from './task/taskSlice'
 import fileReducer from './files/fileSlice'
+import chatReducer from './chat/chatSlice'
 
 export const store = configureStore({
   reducer: {
@@ -17,7 +18,8 @@ export const store = configureStore({
     section: sectionReducer,
     member: memberReducer,
     task: taskReducer,
-    file: fileReducer
+    file: fileReducer,
+    chat: chatReducer
   }
 })
 

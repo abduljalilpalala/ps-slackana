@@ -1,5 +1,7 @@
 @import './tailwind.css';
 @import 'react-datepicker/dist/react-datepicker.css';
+@import 'react-mde/lib/styles/css/react-mde-all.css';
+@import 'react-confirm-alert/src/react-confirm-alert.css';
 
 .react-datepicker__triangle {
   display: none;
@@ -27,4 +29,29 @@
   padding-top: 7px;
   padding-bottom: 7px;
   margin-top: -7px;
+}
+
+.mde-text {
+  height: 100px !important;
+  resize: none !important;
+}
+
+.react-mde-tabbed-layout {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.mde-header {
+  background-color: #f8fafc !important;
+  color: #64748b !important;
+}
+
+.mde-header-group .mde-header-item {
+  background-color: #f8fafc !important;
+  color: #64748b !important;
+}
+.image-tip {
+  background-color: #f8fafc !important;
+  color: #64748b !important;
 }

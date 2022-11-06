@@ -1,14 +1,19 @@
-import { useForm } from 'react-hook-form'
-import React, { FC, useState } from 'react'
+import moment from 'moment'
+import ReactMde from 'react-mde'
+import ReactTooltip from 'react-tooltip'
+import ReactMarkdown from 'react-markdown'
 import { ChevronRight } from 'react-feather'
 import { NextRouter, useRouter } from 'next/router'
-import ReactTextareaAutosize from 'react-textarea-autosize'
+import { useForm, Controller } from 'react-hook-form'
+import React, { FC, useEffect, useRef, useState } from 'react'
 
-import { styles } from '~/shared/twin/auth.styles'
-import { Chat, Message } from '~/shared/interfaces'
+import { Chat } from '~/redux/chat/chatType'
+import { Message } from '~/shared/interfaces'
+import SendIcon from '~/shared/icons/SendIcon'
+import { converter, save } from '~/utils/mdeOptions'
 import DownRight from '~/shared/icons/DownRightIcon'
 import { Spinner } from '~/shared/icons/SpinnerIcon'
-import Tooltip from '~/components/templates/Tooltip'
+import { useAppSelector } from '~/hooks/reduxSelector'
 import DialogBox from '~/components/templates/DialogBox'
 import MessageOptionDropdown from '../MessageOptionDropdown'
 import ThreadMessageIcon from '~/shared/icons/ThreadMessageIcon'
@@ -17,13 +22,15 @@ type Props = {
   chatData: Chat[]
   isOpenEditModal: boolean
   actions: {
-    handleDeleteMessage: (id: string) => Promise<void>
-    handleUpdateMessage: (data: Message) => Promise<void>
+    handleDeleteMessage: (messageId: number) => Promise<void>
+    handleUpdateMessage: (data?: Message) => Promise<void>
     handleCloseEditModalToggle: () => void
   }
 }
 
 const ChatList: FC<Props> = (props): JSX.Element => {
+  const messageRef = useRef<HTMLDivElement>(null)
+  const { user: author } = useAppSelector((state) => state.auth)
   const {
     chatData,
     isOpenEditModal,
@@ -31,7 +38,7 @@ const ChatList: FC<Props> = (props): JSX.Element => {
   } = props
 
   const [chatMessage, setChatMessage] = useState<Message>({
-    id: '',
+    id: 0,
     message: ''
   })
 
@@ -44,8 +51,18 @@ const ChatList: FC<Props> = (props): JSX.Element => {
 
   const { id } = router.query
 
+  useEffect(() => {
+    if (messageRef.current) {
+      messageRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'end',
+        inline: 'nearest'
+      })
+    }
+  }, [chatData])
+
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col py-4" ref={messageRef}>
       {isOpenEditModal && (
         <EditMessageDialog
           isOpen={isOpenEditModal}
@@ -54,66 +71,81 @@ const ChatList: FC<Props> = (props): JSX.Element => {
           actions={{ handleUpdateMessage }}
         />
       )}
-      {chatData.map((chat: Chat, i: number) => (
-        <section
-          key={chat?.id}
-          className="group-message relative flex items-start space-x-2 px-6 py-2 transition duration-75 ease-in-out hover:bg-slate-100"
-        >
-          <header className="flex-shrink-0">
-            <img src={chat.avatar_url} className="h-8 w-8 rounded-md" alt="" />
-          </header>
-          <main className="text-sm text-slate-900">
-            <header className="flex items-end space-x-2">
-              <h3 className="font-bold line-clamp-1">{chat.name}</h3>
-              <p className="text-xs text-slate-500 line-clamp-1">{chat.created_at}</p>
-            </header>
-            <section>
-              <p className="font-normal leading-6">{chat.message}</p>
-              {chat.threads && (
-                <button
-                  onClick={() => router.push(`/team/${id}/chat/?chat_id=${chat.id}`)}
-                  className="group -mx-1 flex w-full max-w-md items-center justify-between rounded border border-transparent p-1 text-xs hover:border-slate-200 hover:bg-white"
-                >
-                  <div className="flex items-center space-x-2">
-                    <DownRight className="h-5 w-5 fill-current text-slate-500" />
-                    <h4 className="font-semibold text-blue-600 hover:underline">
-                      {chat.reply_count} replies
-                    </h4>
-                    <span className="font-medium text-slate-500 group-hover:hidden">
-                      24 hours ago
-                    </span>
-                    <span className="hidden font-medium text-slate-500 group-hover:block">
-                      View Thread
-                    </span>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-slate-500 opacity-0 group-hover:opacity-100" />
-                </button>
-              )}
-            </section>
-          </main>
-          <aside
-            className={`
-              absolute right-4 -top-4 flex items-center justify-center space-x-0.5 rounded border
-              border-slate-300 bg-white px-0.5 pt-0.5 opacity-0 shadow-lg group-message-hover:opacity-100
-            `}
+      {chatData.map((chat) => {
+        const user = chat?.member?.user
+        return (
+          <section
+            key={chat.id}
+            className="group-message relative flex items-start space-x-2 px-6 py-2 transition duration-75 ease-in-out hover:bg-slate-100"
           >
-            <Tooltip text="Reply in thread">
+            <header className="flex-shrink-0">
+              <img src={user?.avatar?.url} className="h-8 w-8 rounded-md" alt="" />
+            </header>
+            <main className="text-sm text-slate-900">
+              <header className="flex items-end space-x-2">
+                <h3 className="font-bold line-clamp-1">{user.name}</h3>
+                <p className="text-xs text-slate-500 line-clamp-1">
+                  {moment(chat.created_at).fromNow()}
+                </p>
+              </header>
+              <section>
+                <article className="prose pb-6">
+                  <ReactMarkdown children={chat.message} />
+                </article>
+                {!chat?.thread && (
+                  <button
+                    onClick={() => router.push(`/team/${id}/chat/?chat_id=${chat.id}`)}
+                    className="group -mx-1 flex w-full max-w-md items-center justify-between rounded border border-transparent p-1 text-xs hover:border-slate-200 hover:bg-white"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <DownRight className="h-5 w-5 fill-current text-slate-500" />
+                      <h4 className="font-semibold text-blue-600 hover:underline">
+                        {chat.threadCount} replies
+                      </h4>
+                      <span className="font-medium text-slate-500 group-hover:hidden">
+                        {moment(chat.created_at).fromNow()}
+                      </span>
+                      <span className="hidden font-medium text-slate-500 group-hover:block">
+                        View Thread
+                      </span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-slate-500 opacity-0 group-hover:opacity-100" />
+                  </button>
+                )}
+              </section>
+            </main>
+            <aside
+              className={`
+                absolute right-4 -top-4 flex items-center justify-center space-x-0.5 rounded border
+              border-slate-300 bg-white px-0.5 pt-0.5 opacity-0 shadow-lg group-message-hover:opacity-100
+              `}
+            >
               <button
                 onClick={() => router.push(`/team/${id}/chat/?chat_id=${chat.id}`)}
+                data-for="actions"
+                data-tip="Reply to thread"
                 className="rounded p-1 text-slate-400 focus:bg-slate-200 focus:text-slate-900 hover:bg-slate-200 hover:text-slate-900"
               >
                 <ThreadMessageIcon className="h-5 w-5 fill-current" />
               </button>
-            </Tooltip>
-            <Tooltip text="Options">
-              <MessageOptionDropdown
-                chat={chat}
-                actions={{ handleDeleteMessage, handleOpenEditMessageDialog }}
+              {author?.id === user?.id && (
+                <MessageOptionDropdown
+                  chat={chat}
+                  actions={{ handleDeleteMessage, handleOpenEditMessageDialog }}
+                />
+              )}
+              <ReactTooltip
+                place="top"
+                type="dark"
+                effect="solid"
+                id="actions"
+                getContent={(dataTip) => dataTip}
+                className="!rounded-lg !bg-black !text-xs font-semibold !text-white"
               />
-            </Tooltip>
-          </aside>
-        </section>
-      ))}
+            </aside>
+          </section>
+        )
+      })}
     </div>
   )
 }
@@ -128,6 +160,7 @@ type EditMessageDialogProps = {
 }
 
 const EditMessageDialog: FC<EditMessageDialogProps> = (props): JSX.Element => {
+  const [selectedTab, setSelectedTab] = useState<'write' | 'preview'>('write')
   const {
     isOpen,
     closeModal,
@@ -136,9 +169,10 @@ const EditMessageDialog: FC<EditMessageDialogProps> = (props): JSX.Element => {
   } = props
 
   const {
+    control,
     register,
     handleSubmit,
-    formState: { isSubmitting, errors }
+    formState: { isSubmitting, isDirty, isValid }
   } = useForm<Message>({
     defaultValues: {
       id: chatMessage.id,
@@ -147,29 +181,40 @@ const EditMessageDialog: FC<EditMessageDialogProps> = (props): JSX.Element => {
   })
 
   return (
-    <DialogBox
-      isOpen={isOpen}
-      closeModal={closeModal}
-      hasHeader={true}
-      headerTitle="Edit Message"
-      bodyClass="px-8"
-    >
-      <form className="-mt-4 mb-10" onSubmit={handleSubmit(handleUpdateMessage)}>
+    <DialogBox isOpen={isOpen} closeModal={closeModal} bodyClass="px-0 -my-20">
+      <form onSubmit={handleSubmit(handleUpdateMessage)} className="relative -mt-4 mb-10">
         <input {...register('id')} hidden type="text" defaultValue={chatMessage.id} />
-        <div>
-          <ReactTextareaAutosize
-            {...register('message', { required: true })}
-            autoFocus
-            defaultValue={chatMessage.message}
-            className="min-h-[150px] w-full resize-none overflow-hidden rounded-lg border border-slate-300 transition duration-150 ease-in-out"
-          />
-          {errors?.message && <span className="error">{`${errors?.message?.message}`}</span>}
-        </div>
-        <div className="mt-3">
-          <button type="submit" css={styles.form_submit} disabled={isSubmitting}>
-            {isSubmitting ? <Spinner className="h-5 w-5" /> : 'Save'}
-          </button>
-        </div>
+        <Controller
+          name="message"
+          control={control}
+          defaultValue={chatMessage.message}
+          rules={{ required: 'You must a message to reply.' }}
+          render={({ field }) => (
+            <ReactMde
+              {...field}
+              selectedTab={selectedTab}
+              onTabChange={setSelectedTab}
+              generateMarkdownPreview={(markdown) => Promise.resolve(converter.makeHtml(markdown))}
+              childProps={{
+                writeButton: {
+                  tabIndex: -1
+                }
+              }}
+            />
+          )}
+        />
+        <button type="submit" className="absolute top-0.5 right-0 py-3.5 px-4 outline-none">
+          {!isSubmitting ? (
+            <SendIcon
+              className={`
+                h-5 w-5 fill-current text-slate-400
+                ${isDirty || isValid || isSubmitting ? 'text-blue-500' : ''}
+              `}
+            />
+          ) : (
+            <Spinner className="h-5 w-5 fill-current text-slate-400" />
+          )}
+        </button>
       </form>
     </DialogBox>
   )

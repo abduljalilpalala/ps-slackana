@@ -22,18 +22,18 @@ class ProjectMessageController extends Controller
       'message' => $request->message
     ]);
     event(new SendProjectMessageEvent($newMessage, $project));
-    return new ProjectMessageResource($newMessage);
+    return ProjectMessageResource::collection(Project::find($project->id)->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->get());
   }
 
   public function update(ProjectMessageRequest $request, Project $project, ProjectMessage $message)
   {
     $message->update(['message' => $request->message]);
-    return new ProjectMessageResource($message);
+    return ProjectMessageResource::collection(Project::find($project->id)->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->get());
   }
 
   public function destroy(Project $project, ProjectMessage $message)
   {
     $message->delete();
-    return new ProjectMessageResource($message);
+    return ProjectMessageResource::collection(Project::find($project->id)->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->get());
   }
 }
