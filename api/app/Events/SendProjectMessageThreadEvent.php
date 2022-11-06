@@ -3,8 +3,10 @@
 namespace App\Events;
 
 use App\Http\Resources\ProjectMessageResource;
+use App\Http\Resources\ProjectMessageThreadResource;
 use App\Models\Project;
 use App\Models\ProjectMessage;
+use App\Models\ProjectMessageThread;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -13,21 +15,23 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class SendProjectMessageEvent implements ShouldBroadcast
+class SendProjectMessageThreadEvent implements ShouldBroadcast
 {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
-  public $result;
-  public $project;
+  public $newThreadMessages;
+  public $updatedMessage;
+  public $id;
   /**
    * Create a new event instance.
    *
    * @return void
    */
-  public function __construct(Project $project)
+  public function __construct($newThreadMessages, $updatedMessage, $id)
   {
-    $this->result = ProjectMessageResource::collection(Project::find($project->id)->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->get());
-    $this->project = $project;
+    $this->newThreadMessages = $newThreadMessages;
+    $this->updatedMessage = $updatedMessage;
+    $this->id = $id;
   }
 
   /**
@@ -37,18 +41,19 @@ class SendProjectMessageEvent implements ShouldBroadcast
    */
   public function broadcastOn()
   {
-    return new Channel('project.' . $this->project->id . '.chat');
+    return new Channel('chat.' . $this->id . '.thread');
   }
 
   public function broadcastAs()
   {
-    return 'SendProjectMessage';
+    return 'SendProjectMessageThread';
   }
 
   public function broadcastWith()
   {
     return [
-      'result' => $this->result
+      'newThreadMessages' => $this->newThreadMessages,
+      'message' => $this->updatedMessage
     ];
   }
 }

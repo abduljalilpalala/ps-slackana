@@ -2,7 +2,8 @@ import {
   createSlice,
   PayloadAction,
   createAsyncThunk,
-  ActionReducerMapBuilder
+  ActionReducerMapBuilder,
+  current
 } from '@reduxjs/toolkit'
 
 import { Chat } from './chatType'
@@ -11,6 +12,8 @@ import { catchError } from '~/utils/handleAxiosError'
 
 type InitialState = {
   chats: Chat[]
+  threads: Chat[]
+  message: Chat | null
   isError: boolean
   isLoading: boolean
   isSuccess: boolean
@@ -22,6 +25,8 @@ type InitialState = {
 
 const initialState: InitialState = {
   chats: [],
+  threads: [],
+  message: null,
   isError: false,
   isLoading: false,
   isSuccess: false,
@@ -31,11 +36,23 @@ const initialState: InitialState = {
   }
 }
 
+// MESSAGES
 export const getMessages = createAsyncThunk(
   'chat/getMessages',
   async (projectId: any, thunkAPI) => {
     try {
       return await chatService.getMessages(projectId)
+    } catch (error) {
+      return thunkAPI.rejectWithValue(catchError(error))
+    }
+  }
+)
+
+export const showMessage = createAsyncThunk(
+  'chat/showMessage',
+  async ({ projectId, messageId }: any, thunkAPI) => {
+    try {
+      return await chatService.showMessage(projectId, messageId)
     } catch (error) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
@@ -75,6 +92,48 @@ export const deleteMessage = createAsyncThunk(
   }
 )
 
+// THREADS
+export const getThreads = createAsyncThunk('chat/getThreads', async (messageId: any, thunkAPI) => {
+  try {
+    return await chatService.getThreads(messageId)
+  } catch (error) {
+    return thunkAPI.rejectWithValue(catchError(error))
+  }
+})
+
+export const addThread = createAsyncThunk(
+  'chat/addThread',
+  async ({ messageId, payload }: any, thunkAPI) => {
+    try {
+      return await chatService.addThread(messageId, payload)
+    } catch (error) {
+      return thunkAPI.rejectWithValue(catchError(error))
+    }
+  }
+)
+
+export const updateThread = createAsyncThunk(
+  'chat/updateThread',
+  async ({ message_id, thread_id, payload }: any, thunkAPI) => {
+    try {
+      return await chatService.updateThread(message_id, thread_id, payload)
+    } catch (error) {
+      return thunkAPI.rejectWithValue(catchError(error))
+    }
+  }
+)
+
+export const deleteThread = createAsyncThunk(
+  'chat/deleteThread',
+  async ({ messageId, threadId }: any, thunkAPI) => {
+    try {
+      return await chatService.deleteThread(messageId, threadId)
+    } catch (error) {
+      return thunkAPI.rejectWithValue(catchError(error))
+    }
+  }
+)
+
 export const chatSlice = createSlice({
   name: 'chat',
   initialState,
@@ -86,6 +145,22 @@ export const chatSlice = createSlice({
       state.error = {
         status: 0,
         content: null
+      }
+    },
+    setChats: (state, { payload }) => {
+      state.chats = payload
+    },
+    setThreads: (state, { payload }) => {
+      const { message, newThreadMessages } = payload || {}
+      const newMessages = current(state.chats).map((chat) => {
+        if (chat.id === message.id) return message
+        return chat
+      })
+
+      state.chats = newMessages
+
+      if (state.message) {
+        state.message.thread = newThreadMessages
       }
     }
   },
@@ -102,6 +177,19 @@ export const chatSlice = createSlice({
         state.chats = action.payload
       })
       .addCase(getMessages.rejected, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isError = true
+        state.error = action.payload
+      })
+
+      // Get Single Message
+      .addCase(showMessage.fulfilled, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.isError = false
+        state.message = action.payload
+      })
+      .addCase(showMessage.rejected, (state, action: PayloadAction<any>) => {
         state.isLoading = false
         state.isError = true
         state.error = action.payload
@@ -152,8 +240,72 @@ export const chatSlice = createSlice({
         state.isError = true
         state.error = action.payload
       })
+
+      // Get All Threads
+      .addCase(getThreads.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(getThreads.fulfilled, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.isError = false
+        state.threads = action.payload
+      })
+      .addCase(getThreads.rejected, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isError = true
+        state.error = action.payload
+      })
+
+      // // Add Thread
+      .addCase(addThread.fulfilled, (state, { payload }: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isError = false
+        state.error = {
+          status: 0,
+          content: null
+        }
+
+        setThreads(payload)
+      })
+      .addCase(addThread.rejected, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isError = true
+        state.error = action.payload
+      })
+
+      .addCase(deleteThread.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(deleteThread.fulfilled, (state, { payload }: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isSuccess = true
+        setThreads(payload)
+      })
+      .addCase(deleteThread.rejected, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isError = true
+        state.error = action.payload
+      })
+
+      .addCase(updateThread.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(updateThread.fulfilled, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isSuccess = true
+
+        if (state.message) {
+          state.message.thread = action.payload.newThreadMessages
+        }
+      })
+      .addCase(updateThread.rejected, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isError = true
+        state.error = action.payload
+      })
   }
 })
 
-export const { reset } = chatSlice.actions
+export const { reset, setChats, setThreads } = chatSlice.actions
 export default chatSlice.reducer
