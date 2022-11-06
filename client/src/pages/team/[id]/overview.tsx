@@ -212,14 +212,17 @@ const Overview: NextPage = (): JSX.Element => {
                         placeholder={editTitle}
                         className={`
                           w-full max-w-[500px] flex-shrink-0 resize-none overflow-hidden text-ellipsis rounded-md border
-                          border-transparent py-2 pl-2 pr-8 text-4xl font-bold transition duration-150 ease-in-out 
+                          border-transparent bg-white py-2 pl-2 pr-8 text-4xl font-bold transition duration-150 ease-in-out
                           line-clamp-1 placeholder:text-slate-900 focus-within:border-slate-200 focus-within:bg-slate-50 
                           focus:outline-slate-400 group-focus:pr-4 hover:border-slate-200 lg:max-w-[500px] 
+                          ${!can?.editProject ? 'border-none' : ''}
                         `}
                       />
-                      <span className="insert-y-0 absolute right-0 cursor-text px-2 py-4 opacity-100 group-focus-within:opacity-0 group-hover:border-slate-200">
-                        <Edit3 className="h-6 w-6 text-slate-600" />
-                      </span>
+                      {can?.editProject && (
+                        <span className="insert-y-0 absolute right-0 cursor-text px-2 py-4 opacity-100 group-focus-within:opacity-0 group-hover:border-slate-200">
+                          <Edit3 className="h-6 w-6 text-slate-600" />
+                        </span>
+                      )}
                     </label>
                   </Tooltip>
                 )}
@@ -252,13 +255,16 @@ const Overview: NextPage = (): JSX.Element => {
                     }}
                     className={`
                         min-h-[140px] w-full resize-none break-words rounded-md border-transparent px-2 py-3 pr-10 text-sm
-                        text-slate-500 outline-none transition duration-150 ease-in-out focus:border-slate-200
+                      text-slate-500 outline-none transition duration-150 ease-in-out focus:border-slate-200
                       focus:bg-slate-50 focus:ring-slate-400 hover:border-slate-200
+                      ${!can?.editProject ? 'border-none' : ''}
                     `}
                   />
-                  <span className="insert-y-0 absolute top-3 right-4 cursor-text opacity-100 group-focus-within:opacity-0">
-                    <Edit3 className="h-4 w-5 text-slate-600" />
-                  </span>
+                  {can?.editProject && (
+                    <span className="insert-y-0 absolute top-3 right-4 cursor-text opacity-100 group-focus-within:opacity-0">
+                      <Edit3 className="h-4 w-5 text-slate-600" />
+                    </span>
+                  )}
                 </label>
               )}
             </div>
