@@ -16,6 +16,8 @@ class ProjectFileResource extends JsonResource
     {
         return [
             'uuid' => $this->uuid,
+            'name' => $this->name,
+            'extension' => $this->extension,
             'file_name' => $this->file_name,
             'mime_type' => $this->mime_type,
             'size' => $this->size,

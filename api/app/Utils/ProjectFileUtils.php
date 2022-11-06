@@ -9,11 +9,13 @@ namespace App\Utils;
 
 class ProjectFileUtils
 {
-  public function addSuffixToFileName($file_name, $mediaItems)
+  public function addSuffixToName($name, $project)
   {
-    $file_name_parts = explode('.', $file_name);
-    $file_name = $file_name_parts[0] . ' (' . $mediaItems->count() . ')' . '.' . $file_name_parts[1];
-
-    return $file_name;
+    $mediaItems = $project->getMedia('project-files');
+    $count = $mediaItems->filter(function ($item) use ($name) {
+      return !strpos($item->name, $name);
+    })->count();
+    $name = $name . ' (' . $count . ')';
+    return $name;
   }
 }

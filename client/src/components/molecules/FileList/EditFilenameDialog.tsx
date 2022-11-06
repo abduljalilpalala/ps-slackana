@@ -51,10 +51,15 @@ const EditFilenameDialog: FC<Props> = (props): JSX.Element => {
       return filename === data.filename && file.id !== data.id
     })
 
+    const matchCount = files.filter((file) => {
+      const filename = file.filename.split('.')[0]
+      return filename.startsWith(data.filename) && file.id !== data.id
+    }).length
+
     if (duplicateFiles.length > 0) {
       EditFilenameModal(
-        'The file has duplicates, do you want to continue?',
-        '',
+        'The file has duplicates',
+        `The file ${filename} will be renamed to ${filename} (${matchCount}). Would you like to continue?`,
         async (confirmed: boolean) => {
           if (confirmed) {
             // Look for all files that starts with the file name
@@ -62,7 +67,7 @@ const EditFilenameDialog: FC<Props> = (props): JSX.Element => {
               const filename = file.filename.split('.')[0]
               return filename.startsWith(data.filename) && file.id !== data.id
             })
-            const newFileName = `${filename}-(${fileMatches.length})`
+            const newFileName = `${filename} (${fileMatches.length})`
             await handleUpdateFilename({ id: data.id, filename: newFileName })
             closeModal({ id: data.id, filename: newFileName })
           }
