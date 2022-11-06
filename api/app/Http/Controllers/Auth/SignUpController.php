@@ -21,8 +21,6 @@ class SignUpController extends Controller
     $token = $user->createToken('access-token')->plainTextToken;
     $user->update(['is_logged_in' => UserStatusEnum::SIGNED_IN]);
     $user->notificationSettings()->sync([NotificationEnum::TASK_REMINDER->value => ['status' => true]]);
-    $user->addMedia(public_path('assets/avatar/avatar-' . rand(1, 12) . '.png'))
-      ->preservingOriginal()->toMediaCollection('avatar', 'public');
 
     return response()->json([
       'user' => new UserResource(User::with(['avatar'])->findOrFail($user->id)),

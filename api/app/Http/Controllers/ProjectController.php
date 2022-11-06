@@ -42,10 +42,7 @@ class ProjectController extends Controller
       'title' => $request->title,
       'description' => $request->description
     ]);
-
-    $project->addMedia(public_path('assets/project-icons/project-icon-' . rand(1, 20) . '.png'))
-      ->preservingOriginal()->toMediaCollection('project-icon', 'public');
-
+    
     $project->teams()->createMany($request->teams);
 
     $project->sections()->createMany([

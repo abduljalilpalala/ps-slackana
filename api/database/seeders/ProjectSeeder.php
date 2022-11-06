@@ -7,11 +7,12 @@ use App\Enums\RoleEnum;
 use App\Models\Project;
 use App\Models\ProjectMember;
 use App\Models\Section;
-use App\Models\Task;
+use App\Models\Team;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ProjectSeeder extends Seeder
 {
@@ -25,52 +26,65 @@ class ProjectSeeder extends Seeder
     $johnDoe = User::updateOrCreate([
       'email' => 'john@gmail.com'
     ], [
+      'email' => 'john@gmail.com',
       'name' => 'John Doe',
       'password' => bcrypt('password')
     ]);
 
-    $johnDoe->addMedia(public_path('assets/avatar/avatar-' . rand(1, 12) . '.png'))
-      ->preservingOriginal()->toMediaCollection('avatar', 'public');
-
     $janeDoe = User::updateOrCreate([
       'email' => 'jane@gmail.com'
     ], [
+      'email' => 'jane@gmail.com',
       'name' => 'Jane Doe',
       'password' => bcrypt('password')
     ]);
 
-    $janeDoe->addMedia(public_path('assets/avatar/avatar-' . rand(1, 12) . '.png'))
-      ->preservingOriginal()->toMediaCollection('avatar', 'public');
+    DB::beginTransaction();
 
-    $project = Project::updateOrCreate([
-      'title' => 'Slackana',
-    ], [
-      'description' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam neque, ut dicta voluptate mollitia quo nam, perspiciatis aspernatur, sint nihil facilis ab quas molestiae culpa officiis quis aliquam quidem commodi!',
-      'status_id' => ProjectStatusEnum::ON_TRACK,
-    ]);
+    try {
+      $project = Project::updateOrCreate([
+        'title' => 'Slackana'
+      ], [
+        'titles' => 'Slackana',
+        'description' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam neque, ut dicta voluptate mollitia quo nam, perspiciatis aspernatur, sint nihil facilis ab quas molestiae culpa officiis quis aliquam quidem commodi!',
+        'status_id' => ProjectStatusEnum::ON_TRACK,
+      ]);
 
-    $project->addMedia(public_path('assets/project-icons/project-icon-' . rand(1, 20) . '.png'))
-      ->preservingOriginal()->toMediaCollection('project-icon', 'public');
+      Team::updateOrCreate(
+        ['project_id' => $project->id, 'name' => 'Front End'],
+        ['name' => 'Front Endasdsd']
+      );
 
-    $project->teams()->createMany([
-      ['name' => 'Front End'],
-      ['name' => 'Back End'],
-      ['name' => 'QA'],
-    ]);
-    $members = $project->members()->createMany([
-      ['user_id' => $johnDoe->id, 'role_id' => RoleEnum::PROJECT_OWNER],
-      ['user_id' => $janeDoe->id, 'role_id' => RoleEnum::MEMBER],
-    ]);
+      Team::updateOrCreate(
+        ['project_id' => $project->id, 'name' => 'Back End'],
+        ['name' => 'Back End']
+      );
 
-    $project->sections()->createMany([
-      ['name' => 'To Do'],
-      ['name' => 'In Progress'],
-      ['name' => 'For Review'],
-    ]);
+      Team::updateOrCreate(
+        ['project_id' => $project->id, 'name' => 'QA'],
+        ['name' => 'QA']
+      );
 
-    // John Doe
-    ProjectMember::where('user_id', $johnDoe->id)->first()->teams()->sync([1, 2, 3]);
-    // Jane Doe
-    ProjectMember::where('user_id', $janeDoe->id)->first()->teams()->sync([1, 2]);
+      ProjectMember::upsert([
+        ['id' => 1, 'project_id' => $project->id, 'user_id' => $johnDoe->id, 'role_id' => RoleEnum::PROJECT_OWNER],
+        ['id' => 2, 'project_id' => $project->id, 'user_id' => $janeDoe->id, 'role_id' => RoleEnum::MEMBER],
+      ], ['id'], ['user_id', 'role_id']);
+
+      Section::upsert([
+        ['id' => 1, 'project_id' => $project->id, 'name' => 'To Do'],
+        ['id' => 2, 'project_id' => $project->id, 'name' => 'In Progress'],
+        ['id' => 3, 'project_id' => $project->id, 'name' => 'For Review'],
+      ], ['id'], ['name']);
+
+      // John Doe
+      ProjectMember::where('user_id', $johnDoe->id)->firstOrFail()->teams()->sync([1, 2, 3]);
+
+      // Jane Doe
+      ProjectMember::where('user_id', $janeDoe->id)->firstOrFail()->teams()->sync([1, 2]);
+      DB::commit();
+    } catch (\Throwable $e) {
+      DB::rollBack();
+      abort(500, $e->getMessage());
+    }
   }
 }
