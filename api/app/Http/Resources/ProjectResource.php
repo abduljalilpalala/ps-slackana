@@ -13,6 +13,7 @@ class ProjectResource extends JsonResource
       'id' => $this->id,
       'title' => $this->title,
       'description' => $this->description,
+      'repository' => $this->repository,
       'icon' => new AvatarResource($this->whenLoaded('icon')),
       'status' => new ProjectStatusResource($this->whenLoaded('status')),
       'teams' => TeamResource::collection($this->whenLoaded('teams')),

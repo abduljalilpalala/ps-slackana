@@ -5,46 +5,51 @@ import { GitHub } from 'react-feather'
 import { BsGithub } from 'react-icons/bs'
 import { FaRegUser } from 'react-icons/fa'
 
-import { useNotificationMethods } from '~/hooks/notificationMethods'
 import ImageSkeleton from '~/components/atoms/Skeletons/ImageSkeleton'
 import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
 import { useAppSelector } from '~/hooks/reduxSelector'
 import { Notification } from '~/shared/interfaces'
+import { NotificationTypes } from '~/utils/constants'
 
 type Props = {
   notifications: Notification[]
   isLoading: boolean
+  actions: {
+    handleReadNotification: (e: Notification) => void
+  }
 }
 
 const NotificationList: FC<Props> = (props): JSX.Element => {
   const router: NextRouter = useRouter()
-  const { useMarkReadNotification } = useNotificationMethods()
+  const {
+    actions: { handleReadNotification }
+  } = props
   const { user } = useAppSelector((state) => state.auth)
   if (!props.notifications) null
 
   const notificationIconType = [
     {
-      name: 'committed',
+      name: NotificationTypes.COMMIT,
       Icon: GitHub
     },
     {
-      name: 'merged',
+      name: NotificationTypes.MERGE,
       Icon: BsGithub
     },
     {
-      name: 'assignTask',
+      name: NotificationTypes.ASSIGN_TASK,
       Icon: FaRegUser
     }
   ]
 
   const showNotificationTypeText = (text: string, pronoun: string = '') => {
     switch (text) {
-      case 'assignTask':
+      case NotificationTypes.ASSIGN_TASK:
         return (text = `assigned ${pronoun} to a task -`)
-      case 'merge':
+      case NotificationTypes.MERGE:
         return (text = 'has merged this pull request -')
-      case 'commit':
-        return (text = 'has committed to project')
+      case NotificationTypes.COMMIT:
+        return (text = 'has committed to project -')
     }
   }
 
@@ -64,18 +69,6 @@ const NotificationList: FC<Props> = (props): JSX.Element => {
     </tr>
   )
 
-  const handleReadNotification = (
-    id: string,
-    project_id: number,
-    task_id: number,
-    type: string
-  ) => {
-    if (type === 'assignTask') {
-      useMarkReadNotification(id, project_id)
-      router.push(`/team/${project_id}/board?task_id=${task_id}`)
-    }
-  }
-
   return (
     <table className="min-w-2xl w-full flex-1 divide-y divide-slate-300 overflow-auto border-t border-slate-300 text-left text-sm leading-normal">
       <tbody className="w-full divide-y divide-slate-300 text-sm text-slate-600">
@@ -91,18 +84,11 @@ const NotificationList: FC<Props> = (props): JSX.Element => {
                   !notification.read_at && 'bg-slate-200'
                 } text-sm transition duration-75 ease-in-out hover:bg-slate-100`}
               >
-                <a
-                  onClick={() =>
-                    handleReadNotification(
-                      notification.id,
-                      notification.data.project_id,
-                      notification.data.task?.id as number,
-                      notification.data.type
-                    )
-                  }
-                  className="cursor-pointer"
-                >
-                  <td className="flex flex-1 items-center px-6 md:justify-between">
+                <td className="flex flex-1 items-center px-6 md:justify-between">
+                  <a
+                    onClick={() => handleReadNotification(notification)}
+                    className="cursor-pointer"
+                  >
                     <div className="flex flex-wrap items-center space-x-2 py-2 text-slate-600">
                       {notificationIconType.map(
                         (notifIcon, i) =>
@@ -111,7 +97,13 @@ const NotificationList: FC<Props> = (props): JSX.Element => {
                           )
                       )}
                       <div className="shrink-0 font-semibold text-slate-900">
-                        {pronoun ? 'You' : notification.data.assigner?.name}
+                        {notification.data.type === NotificationTypes.ASSIGN_TASK && pronoun
+                          ? 'You'
+                          : notification.data.assigner?.name}
+                        {notification.data.type === NotificationTypes.COMMIT &&
+                          notification.data.sender?.login}
+                        {notification.data.type === NotificationTypes.MERGE &&
+                          notification.data.merged_by?.login}
                       </div>
                       <span className="flex-shrink-0 font-normal">
                         {showNotificationTypeText(
@@ -120,14 +112,19 @@ const NotificationList: FC<Props> = (props): JSX.Element => {
                         )}
                       </span>
                       <span className="font-semibold text-slate-900 underline line-clamp-1">
-                        {notification.data.task?.name}
+                        {notification.data.type === NotificationTypes.ASSIGN_TASK &&
+                          notification.data.task?.name}
+                        {notification.data.type === NotificationTypes.COMMIT &&
+                          notification.data.repository?.name}
+                        {notification.data.type === NotificationTypes.MERGE &&
+                          notification.data.pr_details?.title}
                       </span>
                     </div>
                     <span className="shrink-0 text-sm font-light text-slate-500">
                       {moment(notification.created_at).fromNow()}
                     </span>
-                  </td>
-                </a>
+                  </a>
+                </td>
               </tr>
             )
           })

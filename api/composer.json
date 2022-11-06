@@ -14,7 +14,9 @@
         "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-sftp-v3": "^3.0",
         "pusher/pusher-php-server": "^7.2",
-        "spatie/laravel-medialibrary": "^10.2.0"
+        "spatie/laravel-github-webhooks": "^1.2",
+        "spatie/laravel-medialibrary": "^10.2.0",
+        "spatie/laravel-ray": "^1.31"
     },
     "require-dev": {
         "laravel/breeze": "^1.13",
