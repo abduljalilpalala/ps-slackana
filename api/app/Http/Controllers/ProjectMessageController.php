@@ -15,25 +15,35 @@ class ProjectMessageController extends Controller
     return ProjectMessageResource::collection($project->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->get());
   }
 
+  public function show(Project $project, ProjectMessage $message)
+  {
+    return new ProjectMessageResource(ProjectMessage::withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->findOrFail($message->id));
+  }
+
   public function store(ProjectMessageRequest $request, Project $project)
   {
-    $newMessage = $project->messages()->create([
+    $project->messages()->create([
       'project_member_id' => $request->member_id,
       'message' => $request->message
     ]);
-    event(new SendProjectMessageEvent($newMessage, $project));
-    return ProjectMessageResource::collection(Project::find($project->id)->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->get());
+    return $this->returnData($project);
   }
 
   public function update(ProjectMessageRequest $request, Project $project, ProjectMessage $message)
   {
     $message->update(['message' => $request->message]);
-    return ProjectMessageResource::collection(Project::find($project->id)->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->get());
+    return $this->returnData($project);
   }
 
   public function destroy(Project $project, ProjectMessage $message)
   {
     $message->delete();
+    return $this->returnData($project);
+  }
+
+  private function returnData(Project $project)
+  {
+    event(new SendProjectMessageEvent($project));
     return ProjectMessageResource::collection(Project::find($project->id)->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->get());
   }
 }

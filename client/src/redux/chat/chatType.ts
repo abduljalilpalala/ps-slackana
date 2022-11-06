@@ -19,7 +19,7 @@ export type Chat = {
     date_joined: string
   }
   message: string
-  threadCount: number
-  thread?: []
+  threadCount: number | undefined
+  thread: Chat[]
   created_at: string
 }

@@ -235,7 +235,7 @@ const ProjectHead: FC = (): JSX.Element => {
             <h1 className="py-0.5 text-lg font-bold text-slate-900">Thread</h1>
             <p className="flex items-center text-sm text-slate-500">
               <Hash className="ml-2 h-4 w-4" />
-              slackana_team
+              {projectTitle}
             </p>
           </div>
           <button

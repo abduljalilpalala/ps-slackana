@@ -48,7 +48,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::apiResource('project.section.task', TaskController::class);
   Route::apiResource('project.file', ProjectFileController::class);
   Route::apiResource('notification', NotificationController::class);
-  Route::apiResource('project.message', ProjectMessageController::class)->except(['show']);
+  Route::apiResource('project.message', ProjectMessageController::class);
 
   Route::group(['prefix' => 'project'], function () {
     Route::put('/{project}/repository', [ProjectRepositoryController::class, 'update']);

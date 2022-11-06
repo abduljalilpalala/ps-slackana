@@ -10,7 +10,7 @@ import React, { FC, useEffect, useRef, useState } from 'react'
 import { Chat } from '~/redux/chat/chatType'
 import { Message } from '~/shared/interfaces'
 import SendIcon from '~/shared/icons/SendIcon'
-import { converter, save } from '~/utils/mdeOptions'
+import { converter } from '~/utils/mdeOptions'
 import DownRight from '~/shared/icons/DownRightIcon'
 import { Spinner } from '~/shared/icons/SpinnerIcon'
 import { useAppSelector } from '~/hooks/reduxSelector'
@@ -92,26 +92,26 @@ const ChatList: FC<Props> = (props): JSX.Element => {
                 <article className="prose pb-6">
                   <ReactMarkdown children={chat.message} />
                 </article>
-                {!chat?.thread && (
+                {chat.thread?.length ? (
                   <button
                     onClick={() => router.push(`/team/${id}/chat/?chat_id=${chat.id}`)}
-                    className="group -mx-1 flex w-full max-w-md items-center justify-between rounded border border-transparent p-1 text-xs hover:border-slate-200 hover:bg-white"
+                    className="group -mx-1 flex w-[300px] items-center justify-between rounded border border-transparent p-1 text-xs hover:border-slate-200 hover:bg-white"
                   >
                     <div className="flex items-center space-x-2">
                       <DownRight className="h-5 w-5 fill-current text-slate-500" />
-                      <h4 className="font-semibold text-blue-600 hover:underline">
-                        {chat.threadCount} replies
+                      <h4 className="shrink-0 font-semibold text-blue-600 hover:underline">
+                        {chat.thread.length} replies
                       </h4>
                       <span className="font-medium text-slate-500 group-hover:hidden">
                         {moment(chat.created_at).fromNow()}
                       </span>
-                      <span className="hidden font-medium text-slate-500 group-hover:block">
+                      <span className="hidden shrink-0 font-medium text-slate-500 group-hover:block">
                         View Thread
                       </span>
                     </div>
                     <ChevronRight className="h-4 w-4 text-slate-500 opacity-0 group-hover:opacity-100" />
                   </button>
-                )}
+                ) : null}
               </section>
             </main>
             <aside

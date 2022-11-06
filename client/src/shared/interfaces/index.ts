@@ -49,6 +49,12 @@ export interface Message {
   message: string
 }
 
+export interface ThreadMessage {
+  id?: number | undefined
+  thread_id: number | undefined
+  message: string | undefined
+}
+
 export interface Chat {
   id: string
   user_id: string
