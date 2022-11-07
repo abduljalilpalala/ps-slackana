@@ -137,6 +137,7 @@ const Chat: NextPage = (): JSX.Element => {
     const request = {
       messageId: chat_id,
       payload: {
+        project_id: id,
         member_id: user?.id,
         message: data?.message
       }

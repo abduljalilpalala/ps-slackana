@@ -45,7 +45,7 @@ class ProjectSeeder extends Seeder
       $project = Project::updateOrCreate([
         'title' => 'Slackana'
       ], [
-        'titles' => 'Slackana',
+        'title' => 'Slackana',
         'description' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam neque, ut dicta voluptate mollitia quo nam, perspiciatis aspernatur, sint nihil facilis ab quas molestiae culpa officiis quis aliquam quidem commodi!',
         'status_id' => ProjectStatusEnum::ON_TRACK,
       ]);

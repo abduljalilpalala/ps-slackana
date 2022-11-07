@@ -72,4 +72,9 @@ class Project extends Model implements HasMedia
         ->preservingOriginal()->toMediaCollection('project-icon', 'public');
     });
   }
+
+  public function user(int $userId)
+  {
+    return $this->members()->where('user_id', $userId);
+  }
 }
