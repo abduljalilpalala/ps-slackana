@@ -24,6 +24,7 @@ class ProjectMessageRequest extends FormRequest
   public function rules()
   {
     return [
+      'project_id' => ['nullable'],
       'member_id' => ['required'],
       'message' => ['required']
     ];

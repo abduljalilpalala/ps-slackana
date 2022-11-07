@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\SendProjectMessageThreadEvent;
 use App\Http\Requests\ProjectMessageRequest;
 use App\Http\Resources\ProjectMessageResource;
+use App\Models\Project;
 use App\Models\ProjectMessage;
 use App\Models\ProjectMessageThread;
 
@@ -18,7 +19,7 @@ class ProjectMessageThreadController extends Controller
   public function store(ProjectMessageRequest $request, ProjectMessage $message)
   {
     $message->thread()->create([
-      'project_member_id' => $request->member_id,
+      'project_member_id' => Project::find($request->project_id)->user($request->member_id)->firstOrFail()->id,
       'message' => $request->message
     ]);
 

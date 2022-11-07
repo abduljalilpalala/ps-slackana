@@ -158,10 +158,8 @@ export const chatSlice = createSlice({
       })
 
       state.chats = newMessages
-
-      if (state.message) {
-        state.message.thread = newThreadMessages
-      }
+      state.threads = newThreadMessages
+      state.message!.thread = newThreadMessages
     }
   },
   extraReducers: (builder: ActionReducerMapBuilder<InitialState>) => {
@@ -265,8 +263,14 @@ export const chatSlice = createSlice({
           status: 0,
           content: null
         }
+        const { message, newThreadMessages } = payload || {}
+        const newMessages = current(state.chats).map((chat) => {
+          if (chat.id === message.id) return message
+          return chat
+        })
 
-        setThreads(payload)
+        state.chats = newMessages
+        if (state.message) state.message.thread = newThreadMessages
       })
       .addCase(addThread.rejected, (state, action: PayloadAction<any>) => {
         state.isLoading = false
@@ -280,7 +284,14 @@ export const chatSlice = createSlice({
       .addCase(deleteThread.fulfilled, (state, { payload }: PayloadAction<any>) => {
         state.isLoading = false
         state.isSuccess = true
-        setThreads(payload)
+        const { message, newThreadMessages } = payload || {}
+        const newMessages = current(state.chats).map((chat) => {
+          if (chat.id === message.id) return message
+          return chat
+        })
+
+        state.chats = newMessages
+        if (state.message) state.message.thread = newThreadMessages
       })
       .addCase(deleteThread.rejected, (state, action: PayloadAction<any>) => {
         state.isLoading = false

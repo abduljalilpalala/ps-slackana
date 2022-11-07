@@ -23,7 +23,7 @@ class ProjectMessageController extends Controller
   public function store(ProjectMessageRequest $request, Project $project)
   {
     $project->messages()->create([
-      'project_member_id' => $request->member_id,
+      'project_member_id' => $project->user($request->member_id)->firstOrFail()->id,
       'message' => $request->message
     ]);
     return $this->returnData($project);
