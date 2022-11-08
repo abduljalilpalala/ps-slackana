@@ -1,21 +1,30 @@
 import ReactMde from 'react-mde'
-import { useForm, Controller } from 'react-hook-form'
 import React, { FC, useEffect, useState } from 'react'
+import { useForm, Controller, UseFormReset } from 'react-hook-form'
 
+import { converter } from '~/utils/mdeOptions'
 import SendIcon from '~/shared/icons/SendIcon'
 import { ChatMessageValues } from '~/shared/types'
 import { Spinner } from '~/shared/icons/SpinnerIcon'
-import { converter, save } from '~/utils/mdeOptions'
 
 type Props = {
   value?: string
-  handleMessage: (data: ChatMessageValues) => void
+  isLoadingEnterPress: boolean
+  handleMessage: (data: ChatMessageValues) => Promise<void>
+  checkKeyDown: (
+    event: React.KeyboardEvent<HTMLFormElement>,
+    data: ChatMessageValues,
+    reset: UseFormReset<ChatMessageValues>
+  ) => void
 }
 
-const ChatEditor: FC<Props> = ({ value, handleMessage }): JSX.Element => {
+const ChatEditor: FC<Props> = (props): JSX.Element => {
+  const { value, handleMessage, checkKeyDown, isLoadingEnterPress } = props
+
   const {
     reset,
     control,
+    getValues,
     formState,
     handleSubmit,
     formState: { isSubmitting, isDirty, isValid }
@@ -35,7 +44,19 @@ const ChatEditor: FC<Props> = ({ value, handleMessage }): JSX.Element => {
   const [selectedTab, setSelectedTab] = useState<'write' | 'preview'>('write')
 
   return (
-    <form onSubmit={handleSubmit(handleMessage)} className="relative mb-[120px]">
+    <form
+      onSubmit={handleSubmit(handleMessage)}
+      className="relative mb-[120px]"
+      onKeyDown={(e) =>
+        checkKeyDown(
+          e,
+          {
+            message: getValues('message')
+          },
+          reset
+        )
+      }
+    >
       <Controller
         name="message"
         control={control}
@@ -56,7 +77,7 @@ const ChatEditor: FC<Props> = ({ value, handleMessage }): JSX.Element => {
         )}
       />
       <button type="submit" className="absolute top-0.5 right-0 py-3.5 px-4 outline-none">
-        {!isSubmitting ? (
+        {!isSubmitting && !isLoadingEnterPress ? (
           <SendIcon
             className={`
               h-5 w-5 fill-current text-slate-400
