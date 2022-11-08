@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\ProjectFileResource;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreProjectFileRequest;
+use Illuminate\Support\Facades\Log;
 use App\Models\Project;
 use App\Utils\ProjectFileUtils;
 
@@ -27,25 +28,28 @@ class ProjectFileController extends Controller
      * @param  \App\Http\Requests\StoreProjectFileRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(StoreProjectFileRequest $request, Project $project)
+    public function store(Request $request, Project $project)
     {
         // get all project related files
         $utils = new ProjectFileUtils();
         if ($request->hasFile('file')) {
-            $mediaItems = $project->getMedia('project-files');
-            //extract the name and remove the extension
-            $name = explode('.', $request->file('file')->getClientOriginalName())[0];
-            //check if the name already exists
-            if ($mediaItems->contains('name', $name)) {
-                //add suffix to the name
-                $name = $utils->addSuffixToName($name, $project);
+            foreach ($request->file('file') as $file) {
+                $mediaItems = $project->getMedia('project-files');
+                //extract the name and remove the extension
+                $name = explode('.', $file->getClientOriginalName())[0];
+                if ($mediaItems->contains('name', $name)) {
+                    //add suffix to the name
+                    $name = $utils->addSuffixToName($name, $project);
+                }
+                //add the file to the project
+                $project->addMedia($file)
+                    ->usingName($name)
+                    ->toMediaCollection('project-files');
             }
-            //add the file to the project
-            $project->addMedia($request->file('file'))
-                ->usingName($name)
-                ->toMediaCollection('project-files');
 
-            return response()->json(['message' => 'File uploaded successfully', 'name' => $name, 'collection' => $project->getMedia('project-files')], 200);
+            return response()->json([
+                'message' => 'File(s) uploaded successfully'
+            ], 200);
         }
 
         return response()->json(['message' => 'File upload failed'], 500);

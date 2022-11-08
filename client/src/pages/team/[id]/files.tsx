@@ -153,7 +153,7 @@ const FileHeader = (props: FileHeaderProps): JSX.Element => {
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const fileUploaded = e.target.files?.[0]
+    const fileUploaded = e.target.files
 
     if (fileUploaded && !isSubmitting) {
       useHandleCreateFiles(fileUploaded, () => {
@@ -192,9 +192,10 @@ const FileHeader = (props: FileHeaderProps): JSX.Element => {
             onChange={handleChange}
             id="upload"
             className="hidden"
+            multiple
           />
           <Upload className="mr-2 h-4 w-4" onClick={handleClick} />
-          Upload a file
+          Upload file(s)
         </label>
       ) : null}
     </header>

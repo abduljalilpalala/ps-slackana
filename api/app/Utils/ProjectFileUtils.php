@@ -13,7 +13,7 @@ class ProjectFileUtils
   {
     $mediaItems = $project->getMedia('project-files');
     $count = $mediaItems->filter(function ($item) use ($name) {
-      return !strpos($item->name, $name);
+      return str_contains($item->name, $name);
     })->count();
     $name = $name . ' (' . $count . ')';
     return $name;
