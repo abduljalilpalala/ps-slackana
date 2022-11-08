@@ -22,7 +22,7 @@ export const useFileMethods = (projectID: number) => {
     dispatch(getProjectFiles(projectID)).then((_) => setIsFileLoading(false))
   }, [projectID])
 
-  const useHandleCreateFiles = async (data: any, callback: () => void): Promise<void> => {
+  const useHandleCreateFiles = async (data: FileList, callback: () => void): Promise<void> => {
     setIsFileLoading(true)
     dispatch(addProjectFile({ projectId: projectID, file: data })).then((_) => {
       setIsFileLoading(false)

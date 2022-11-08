@@ -13,10 +13,12 @@ const getProjectFile = async (projectId: number, fileId: string): Promise<Blob |
   return response.data
 }
 
-const addProjectFile = async (projectId: number, file: any): Promise<string> => {
+const addProjectFile = async (projectId: number, file: FileList): Promise<string> => {
   try {
     const formData = new FormData()
-    formData.append('file', file)
+    for (const f in file) {
+      formData.append('file[]', file[f])
+    }
     const response = await axios.post(`/api/project/${projectId}/file`, formData)
     return response.data.message
   } catch (error: unknown) {

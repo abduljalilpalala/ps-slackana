@@ -53,7 +53,7 @@ export const addProjectFile = createAsyncThunk(
       const response = await fileService.addProjectFile(payload.projectId, payload.file)
       const files = await fileService.getProjectFiles(payload.projectId)
       const formattedFiles = formatFiles(files)
-      if (response === 'File uploaded successfully') {
+      if (response === 'File(s) uploaded successfully') {
         return {
           message: response,
           files: formattedFiles
