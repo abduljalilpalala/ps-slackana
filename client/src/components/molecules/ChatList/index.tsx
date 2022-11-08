@@ -49,7 +49,7 @@ const ChatList: FC<Props> = (props): JSX.Element => {
     handleCloseEditModalToggle()
   }
 
-  const { id } = router.query
+  const { id, chat_id } = router.query
 
   useEffect(() => {
     if (messageRef.current) {
@@ -76,7 +76,14 @@ const ChatList: FC<Props> = (props): JSX.Element => {
         return (
           <section
             key={chat.id}
-            className="group-message relative flex items-start space-x-2 px-6 py-2 transition duration-75 ease-in-out hover:bg-slate-100"
+            className={`
+              group-message relative flex items-start space-x-2 border border-transparent px-6 py-1 transition duration-75 ease-in-out
+              ${
+                chat_id === chat.id.toString()
+                  ? 'border-y border-amber-100 bg-amber-50'
+                  : 'hover:bg-slate-100'
+              }
+            `}
           >
             <header className="flex-shrink-0">
               <img src={user?.avatar?.url} className="h-8 w-8 rounded-md" alt="" />
