@@ -28,17 +28,18 @@ import { pusher } from '~/shared/lib/pusher'
 const Chat: NextPage = (): JSX.Element => {
   const router = useRouter()
   const { id, chat_id } = router.query
-  const [isLoadingMessage, setIsLoadingMessage] = useState<boolean>(true)
   const [isLoadingThread, setIsLoadingThread] = useState<boolean>(true)
 
   const dispatch = useAppDispatch()
-  const { chats, threads } = useAppSelector((state) => state.chat)
-  const { user } = useAppSelector((state) => state.auth)
-  const { projectDescription } = useAppSelector((state) => state.project)
-  const { title: projectTitle } = projectDescription || {}
+  const { chat, project, auth } = useAppSelector((state) => state)
+  const { chats, threads, isLoading } = chat
+  const {
+    projectDescription: { title: projectTitle }
+  } = project
+  const { user } = auth
 
   useEffect(() => {
-    dispatch(getMessages(id)).then(() => setIsLoadingMessage(false))
+    dispatch(getMessages(id))
   }, [id])
 
   useEffect(() => {
@@ -192,7 +193,6 @@ const Chat: NextPage = (): JSX.Element => {
       }
     }
 
-    // alert(JSON.stringify(request, null, 2))
     await dispatch(updateThread(request)).then(() => handleCloseEditModalThreadToggle())
   }
 
@@ -204,13 +204,13 @@ const Chat: NextPage = (): JSX.Element => {
             className={`default-scrollbar flex h-full flex-col justify-between
              overflow-y-auto scroll-smooth scrollbar-thumb-slate-400`}
           >
-            {isLoadingMessage ? (
+            {isLoading ? (
               <div className="flex min-h-full items-end justify-center py-6">
                 <Spinner className="h-6 w-6 text-blue-500" />
               </div>
             ) : (
               <>
-                {!chats.length ? (
+                {!chats ? (
                   <p className="text-center text-sm font-normal text-slate-400">No Conversation</p>
                 ) : (
                   <>

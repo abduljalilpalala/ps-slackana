@@ -11,6 +11,7 @@ import { Spinner } from '~/shared/icons/SpinnerIcon'
 import { showMessage } from '~/redux/chat/chatSlice'
 import ThreadOptionDropdown from '../ThreadOptionDropdown'
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
+import handleImageError from '~/helpers/handleImageError'
 
 type Props = {
   isLoadingThread: boolean
@@ -93,7 +94,12 @@ const ThreadList: FC<Props> = (props): JSX.Element => {
             className="mt-2 flex items-start space-x-2 px-4 py-2 transition duration-75 ease-in-out"
           >
             <header className="flex-shrink-0">
-              <img src={message?.member?.user?.avatar?.url} className="h-8 w-8 rounded-md" alt="" />
+              <img
+                src={message?.member?.user?.avatar?.url}
+                onError={(e) => handleImageError(e, '/images/avatar.png')}
+                className="h-8 w-8 rounded-md"
+                alt=""
+              />
             </header>
             <main className="text-sm text-slate-900">
               <header className="flex items-end space-x-2">
@@ -122,7 +128,12 @@ const ThreadList: FC<Props> = (props): JSX.Element => {
                     className="group-message relative flex items-start space-x-2 px-6 py-2 transition duration-75 ease-in-out hover:bg-slate-100"
                   >
                     <header className="flex-shrink-0">
-                      <img src={user.avatar.url} className="h-8 w-8 rounded-md" alt="" />
+                      <img
+                        src={user.avatar.url}
+                        onError={(e) => handleImageError(e, '/images/avatar.png')}
+                        className="h-8 w-8 rounded-md"
+                        alt=""
+                      />
                     </header>
                     <main className="text-sm text-slate-900">
                       <header className="flex items-end space-x-2">
