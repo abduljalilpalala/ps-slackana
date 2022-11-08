@@ -17,6 +17,7 @@ import { useAppSelector } from '~/hooks/reduxSelector'
 import DialogBox from '~/components/templates/DialogBox'
 import MessageOptionDropdown from '../MessageOptionDropdown'
 import ThreadMessageIcon from '~/shared/icons/ThreadMessageIcon'
+import handleImageError from '~/helpers/handleImageError'
 
 type Props = {
   chatData: Chat[]
@@ -86,7 +87,12 @@ const ChatList: FC<Props> = (props): JSX.Element => {
             `}
           >
             <header className="flex-shrink-0">
-              <img src={user?.avatar?.url} className="h-8 w-8 rounded-md" alt="" />
+              <img
+                src={user?.avatar?.url}
+                onError={(e) => handleImageError(e, '/images/avatar.png')}
+                className="h-8 w-8 rounded-md"
+                alt=""
+              />
             </header>
             <main className="text-sm text-slate-900">
               <header className="flex items-end space-x-2">

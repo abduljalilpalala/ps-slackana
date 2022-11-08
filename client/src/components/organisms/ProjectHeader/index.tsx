@@ -150,7 +150,7 @@ const ProjectHead: FC = (): JSX.Element => {
               <ImageSkeleton className="!max-h-[44px] !min-h-[44px] !min-w-[44px] !max-w-[44px] !rounded-md" />
             ) : (
               <img
-                src={icon?.url}
+                src={icon?.url || '/images/image-dummy.png'}
                 onError={(e) => handleImageError(e, '/images/image-dummy.png')}
                 alt="team-icon"
                 width={44}
@@ -159,7 +159,7 @@ const ProjectHead: FC = (): JSX.Element => {
             )
           ) : (
             <img
-              src={icon?.url}
+              src={icon ? icon.url : '/images/image-dummy.png'}
               onError={(e) => handleImageError(e, '/images/image-dummy.png')}
               alt="team-icon"
               width={44}
