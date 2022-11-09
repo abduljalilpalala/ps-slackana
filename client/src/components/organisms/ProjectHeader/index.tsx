@@ -124,7 +124,7 @@ const ProjectHead: FC = (): JSX.Element => {
               defaultValue={repo}
               onChange={(e) => setRepo(e.target.value)}
               className="mr-5 w-full border-none text-slate-900 focus:ring-transparent"
-              placeholder="Repository Name"
+              placeholder="owner/repository-name"
             />
           </div>
         </div>

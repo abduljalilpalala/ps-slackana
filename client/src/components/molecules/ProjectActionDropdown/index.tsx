@@ -44,7 +44,7 @@ const ProjectActionDropdown: FC<Props> = (props): JSX.Element => {
   }
   const handleCopyPayloadURL = () => {
     navigator.clipboard.writeText(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL as string}/api/github-webhooks`
+      `${process.env.NEXT_PUBLIC_BACKEND_URL as string}api/github-webhooks`
     )
     darkToaster('✅', 'Payload URL is successfully copied')
   }

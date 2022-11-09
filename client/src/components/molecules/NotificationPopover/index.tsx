@@ -114,7 +114,7 @@ const NotificationPopover = (): JSX.Element => {
                               <span className="font-bold">{notification?.data?.sender?.login}</span>{' '}
                               has committed to project -{' '}
                               <span className="font-bold text-blue-600">
-                                {notification?.data?.repository?.name}
+                                {notification?.data?.repository?.full_name}
                               </span>
                               . {moment(notification?.created_at).add('hours').fromNow(true)}
                             </p>

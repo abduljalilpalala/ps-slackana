@@ -115,7 +115,7 @@ const NotificationList: FC<Props> = (props): JSX.Element => {
                         {notification.data.type === NotificationTypes.ASSIGN_TASK &&
                           notification.data.task?.name}
                         {notification.data.type === NotificationTypes.COMMIT &&
-                          notification.data.repository?.name}
+                          notification.data.repository?.full_name}
                         {notification.data.type === NotificationTypes.MERGE &&
                           notification.data.pr_details?.title}
                       </span>
