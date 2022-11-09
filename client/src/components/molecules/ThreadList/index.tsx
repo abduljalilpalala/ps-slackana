@@ -129,7 +129,7 @@ const ThreadList: FC<Props> = (props): JSX.Element => {
                   >
                     <header className="flex-shrink-0">
                       <img
-                        src={user.avatar.url}
+                        src={user?.avatar.url}
                         onError={(e) => handleImageError(e, '/images/avatar.png')}
                         className="h-8 w-8 rounded-md"
                         alt=""
@@ -137,7 +137,7 @@ const ThreadList: FC<Props> = (props): JSX.Element => {
                     </header>
                     <main className="text-sm text-slate-900">
                       <header className="flex items-end space-x-2">
-                        <h3 className="font-bold line-clamp-1">{user.name}</h3>
+                        <h3 className="font-bold line-clamp-1">{user?.name}</h3>
                         <p className="text-xs text-slate-500 line-clamp-1">
                           {moment(thread.created_at).fromNow()}
                         </p>

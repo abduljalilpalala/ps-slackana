@@ -1,6 +1,16 @@
+export type GithubType = {
+  type: string
+  name: string
+  avatar: string
+  pr_title?: string
+  pr_url?: string
+  repository: string
+  commit_url: string
+}
+
 export type Chat = {
   id: number
-  member: {
+  member?: {
     id: number
     user: {
       id: number

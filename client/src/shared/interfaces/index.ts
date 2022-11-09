@@ -132,7 +132,7 @@ export interface Notification {
       avatar_url: string
     }
     repository?: {
-      name: string
+      full_name: string
     }
     commit?: {
       message: string

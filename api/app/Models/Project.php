@@ -77,4 +77,9 @@ class Project extends Model implements HasMedia
   {
     return $this->members()->where('user_id', $userId);
   }
+
+  public function scopeRepository($query, $name)
+  {
+    return $query->where('repository', $name);
+  }
 }

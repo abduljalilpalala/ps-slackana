@@ -42,13 +42,13 @@ class ProjectController extends Controller
       'title' => $request->title,
       'description' => $request->description
     ]);
-    
+
     $project->teams()->createMany($request->teams);
 
     $project->sections()->createMany([
-      ['name'=>'To Do'],
-      ['name'=>'In Progress'],
-      ['name'=>'Completed'],
+      ['name' => 'To Do'],
+      ['name' => 'In Progress'],
+      ['name' => 'Completed'],
     ]);
 
     $member = $project->members()->create([
