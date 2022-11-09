@@ -148,27 +148,28 @@ const ThreadList: FC<Props> = (props): JSX.Element => {
                         </article>
                       </section>
                     </main>
-                    <aside
-                      className={`
+                    {author?.id === user?.id && (
+                      <aside
+                        className={`
                         absolute right-4 -top-4 flex items-center justify-center space-x-0.5 rounded border
                         border-slate-300 bg-white px-0.5 pt-0.5 opacity-0 shadow-lg group-message-hover:opacity-100
                       `}
-                    >
-                      {author?.id === user?.id && (
+                      >
                         <ThreadOptionDropdown
                           thread={thread}
                           actions={{ handleDeleteThread, handleOpenEditThreadDialog }}
                         />
-                      )}
-                      <ReactTooltip
-                        place="top"
-                        type="dark"
-                        effect="solid"
-                        id="actions"
-                        getContent={(dataTip) => dataTip}
-                        className="!rounded-lg !bg-black !text-xs font-semibold !text-white"
-                      />
-                    </aside>
+
+                        <ReactTooltip
+                          place="top"
+                          type="dark"
+                          effect="solid"
+                          id="actions"
+                          getContent={(dataTip) => dataTip}
+                          className="!rounded-lg !bg-black !text-xs font-semibold !text-white"
+                        />
+                      </aside>
+                    )}
                   </section>
                 )
               })}
