@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Utils\Permission;
+use App\Utils\ProjectSettings;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProjectResource extends JsonResource
@@ -19,6 +20,7 @@ class ProjectResource extends JsonResource
       'teams' => TeamResource::collection($this->whenLoaded('teams')),
       'members' => MemberResource::collection($this->whenLoaded('members')),
       'can' => Permission::permissions($this->pivot->role_id),
+      'settings' => ProjectSettings::settings($this->id),
       'numberOfActiveMembers' => $this->when(isset($this->members_count), $this->members_count),
       'role' => $this->pivot->role_id,
       'isArchived' => $this->is_archived,

@@ -26,7 +26,7 @@ class SendProjectMessageEvent implements ShouldBroadcast
    */
   public function __construct(Project $project)
   {
-    $this->result = ProjectMessageResource::collection(Project::find($project->id)->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->get());
+    $this->result = ProjectMessageResource::collection(Project::find($project->id)->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->orderBy('created_at', 'ASC')->get());
     $this->project = $project;
   }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ProjectSettingsEnum;
 use App\Enums\ProjectStatusEnum;
 use App\Enums\RoleEnum;
 use App\Http\Requests\UpdateProjectRequest;
@@ -49,6 +50,11 @@ class ProjectController extends Controller
       ['name' => 'To Do'],
       ['name' => 'In Progress'],
       ['name' => 'Completed'],
+    ]);
+
+    $project->settings()->create([
+      'setting' => ProjectSettingsEnum::MUTE_NUDGE->toString(),
+      'status' => false
     ]);
 
     $member = $project->members()->create([

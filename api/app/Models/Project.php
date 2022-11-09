@@ -82,4 +82,9 @@ class Project extends Model implements HasMedia
   {
     return $query->where('repository', $name);
   }
+
+  public function settings()
+  {
+    return $this->hasMany(ProjectSetting::class);
+  }
 }
