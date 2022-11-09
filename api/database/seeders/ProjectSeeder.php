@@ -2,10 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ProjectSettingsEnum;
 use App\Enums\ProjectStatusEnum;
 use App\Enums\RoleEnum;
 use App\Models\Project;
 use App\Models\ProjectMember;
+use App\Models\ProjectSetting;
 use App\Models\Section;
 use App\Models\Team;
 use App\Models\User;
@@ -48,6 +50,14 @@ class ProjectSeeder extends Seeder
         'title' => 'Slackana',
         'description' => 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam neque, ut dicta voluptate mollitia quo nam, perspiciatis aspernatur, sint nihil facilis ab quas molestiae culpa officiis quis aliquam quidem commodi!',
         'status_id' => ProjectStatusEnum::ON_TRACK,
+      ]);
+
+      ProjectSetting::updateOrCreate([
+        'project_id' => $project->id,
+        'setting' => ProjectSettingsEnum::MUTE_NUDGE->toString()
+      ], [
+        'setting' => ProjectSettingsEnum::MUTE_NUDGE->toString(),
+        'status' => false
       ]);
 
       Team::updateOrCreate(

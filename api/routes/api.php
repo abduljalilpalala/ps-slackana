@@ -14,6 +14,7 @@ use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\ProjectMessageController;
 use App\Http\Controllers\ProjectMessageThreadController;
 use App\Http\Controllers\ProjectRepositoryController;
+use App\Http\Controllers\ProjectSettingController;
 use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\ProjectTeamController;
 use App\Http\Controllers\SectionController;
@@ -51,6 +52,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::apiResource('project.message', ProjectMessageController::class);
 
   Route::group(['prefix' => 'project'], function () {
+    Route::put('/{project}/change-settings', [ProjectSettingController::class, 'update']);
     Route::put('/{project}/repository', [ProjectRepositoryController::class, 'update']);
     Route::put('/{project}/project-status', [ProjectStatusController::class, 'update']);
     Route::delete('/{project}/archive', [ArchiveProjectController::class, 'destroy']);

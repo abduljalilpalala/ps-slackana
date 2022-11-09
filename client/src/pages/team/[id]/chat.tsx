@@ -55,7 +55,7 @@ const Chat: NextPage = (): JSX.Element => {
     return () => {
       pusher.unsubscribe(`project.${id}.chat`)
     }
-  }, [id])
+  }, [])
 
   useEffect(() => {
     const channel = pusher.subscribe(`chat.${chat_id}.thread`)
