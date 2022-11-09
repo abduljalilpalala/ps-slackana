@@ -91,7 +91,7 @@ const ChatList: FC<Props> = (props): JSX.Element => {
               ${
                 chat_id === chat.id.toString()
                   ? 'border-y border-amber-100 bg-amber-50'
-                  : 'hover:bg-slate-100'
+                  : !chat?.member?.is_removed && 'hover:bg-slate-100'
               }
             `}
           >
@@ -101,20 +101,42 @@ const ChatList: FC<Props> = (props): JSX.Element => {
                   <img
                     src={user?.avatar?.url}
                     onError={(e) => handleImageError(e, '/images/avatar.png')}
-                    className="h-8 w-8 rounded-md"
+                    className={`
+                      h-8 w-8 rounded-md ${chat?.member?.is_removed && 'grayscale saturate-50'}
+                    `}
                     alt=""
                   />
                 </header>
                 <main className="text-sm text-slate-900">
-                  <header className="flex items-end space-x-2">
-                    <h3 className="font-bold line-clamp-1">{user?.name}</h3>
-                    <p className="text-xs text-slate-500 line-clamp-1">
-                      {moment(chat.created_at).fromNow()}
-                    </p>
+                  <header className="flex items-center space-x-2">
+                    <h3
+                      className={`font-bold line-clamp-1 ${
+                        !chat.member.is_removed ? 'text-slate-900' : 'select-none text-slate-500'
+                      }`}
+                    >{`${
+                      !chat.member.is_removed ? user?.name : `${user?.name} (deactivated)`
+                    }`}</h3>
+                    {!chat.member.is_removed && (
+                      <p className="text-xs text-slate-500 line-clamp-1">
+                        {moment(chat.created_at).fromNow()}
+                      </p>
+                    )}
                   </header>
                   <section>
-                    <article className="prose pb-6">
-                      <ReactMarkdown children={chat.message} />
+                    <article
+                      className={`
+                        prose pb-6 ${
+                          chat.member.is_removed
+                            ? 'select-none text-sm italic text-slate-500'
+                            : 'text-slate-700'
+                        }
+                        `}
+                    >
+                      {!chat.member.is_removed ? (
+                        <ReactMarkdown children={chat.message} />
+                      ) : (
+                        'The account has been deactivated!'
+                      )}
                     </article>
                     {chat.thread?.length ? (
                       <button
@@ -138,35 +160,37 @@ const ChatList: FC<Props> = (props): JSX.Element => {
                     ) : null}
                   </section>
                 </main>
-                <aside
-                  className={`
-                absolute right-4 -top-4 flex items-center justify-center space-x-0.5 rounded border
-              border-slate-300 bg-white px-0.5 pt-0.5 opacity-0 shadow-lg group-message-hover:opacity-100
-              `}
-                >
-                  <button
-                    onClick={() => router.push(`/team/${id}/chat/?chat_id=${chat.id}`)}
-                    data-for="actions"
-                    data-tip="Reply to thread"
-                    className="rounded p-1 text-slate-400 focus:bg-slate-200 focus:text-slate-900 hover:bg-slate-200 hover:text-slate-900"
+                {!chat.member.is_removed && (
+                  <aside
+                    className={`
+                      absolute right-4 -top-4 flex items-center justify-center space-x-0.5 rounded border
+                    border-slate-300 bg-white px-0.5 pt-0.5 opacity-0 shadow-lg group-message-hover:opacity-100
+                    `}
                   >
-                    <ThreadMessageIcon className="h-5 w-5 fill-current" />
-                  </button>
-                  {author?.id === user?.id && (
-                    <MessageOptionDropdown
-                      chat={chat}
-                      actions={{ handleDeleteMessage, handleOpenEditMessageDialog }}
+                    <button
+                      onClick={() => router.push(`/team/${id}/chat/?chat_id=${chat.id}`)}
+                      data-for="actions"
+                      data-tip="Reply to thread"
+                      className="rounded p-1 text-slate-400 focus:bg-slate-200 focus:text-slate-900 hover:bg-slate-200 hover:text-slate-900"
+                    >
+                      <ThreadMessageIcon className="h-5 w-5 fill-current" />
+                    </button>
+                    {author?.id === user?.id && (
+                      <MessageOptionDropdown
+                        chat={chat}
+                        actions={{ handleDeleteMessage, handleOpenEditMessageDialog }}
+                      />
+                    )}
+                    <ReactTooltip
+                      place="top"
+                      type="dark"
+                      effect="solid"
+                      id="actions"
+                      getContent={(dataTip) => dataTip}
+                      className="!rounded-lg !bg-black !text-xs font-semibold !text-white"
                     />
-                  )}
-                  <ReactTooltip
-                    place="top"
-                    type="dark"
-                    effect="solid"
-                    id="actions"
-                    getContent={(dataTip) => dataTip}
-                    className="!rounded-lg !bg-black !text-xs font-semibold !text-white"
-                  />
-                </aside>
+                  </aside>
+                )}
               </>
             ) : (
               <>
