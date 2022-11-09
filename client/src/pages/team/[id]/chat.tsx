@@ -1,5 +1,6 @@
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
+import { UseFormReset } from 'react-hook-form'
 import React, { useEffect, useState } from 'react'
 import { confirmAlert } from 'react-confirm-alert'
 
@@ -32,7 +33,7 @@ const Chat: NextPage = (): JSX.Element => {
 
   const dispatch = useAppDispatch()
   const { chat, project, auth } = useAppSelector((state) => state)
-  const { chats, threads, isLoading } = chat
+  const { chats, threads, isLoading, isLoadingSubmitChat, isLoadingSubmitThreadChat } = chat
   const {
     projectDescription: { title: projectTitle }
   } = project
@@ -192,8 +193,52 @@ const Chat: NextPage = (): JSX.Element => {
         message: data?.message
       }
     }
-
     await dispatch(updateThread(request)).then(() => handleCloseEditModalThreadToggle())
+  }
+
+  // This will Add Add Thread message when pressing 'Enter' key
+  const onPressAddThread = async (
+    event: React.KeyboardEvent<HTMLFormElement>,
+    data: ChatMessageValues,
+    reset: UseFormReset<ChatMessageValues>
+  ): Promise<void> => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      const request = {
+        messageId: chat_id,
+        payload: {
+          project_id: id,
+          member_id: user?.id,
+          message: data?.message
+        }
+      }
+      await dispatch(addThread(request))
+      reset({
+        message: ''
+      })
+    }
+  }
+
+  // This will Add Chat Message when pressing 'Enter' key
+  const onPressAddMessage = async (
+    event: React.KeyboardEvent<HTMLFormElement>,
+    data: ChatMessageValues,
+    reset: UseFormReset<ChatMessageValues>
+  ): Promise<void> => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      const request = {
+        projectId: id,
+        payload: {
+          member_id: user?.id,
+          message: data?.message
+        }
+      }
+      await dispatch(addMessage(request))
+      reset({
+        message: ''
+      })
+    }
   }
 
   return (
@@ -234,7 +279,11 @@ const Chat: NextPage = (): JSX.Element => {
             )}
           </main>
           <div className="px-6">
-            <ChatEditor handleMessage={handleMessage} />
+            <ChatEditor
+              handleMessage={handleMessage}
+              checkKeyDown={onPressAddMessage}
+              isLoadingEnterPress={isLoadingSubmitChat}
+            />
           </div>
         </section>
         {chat_id && (
@@ -256,7 +305,11 @@ const Chat: NextPage = (): JSX.Element => {
             />
             {!isLoadingThread && (
               <div className="px-4 py-2">
-                <ChatEditor handleMessage={handleReplyThread} />
+                <ChatEditor
+                  handleMessage={handleReplyThread}
+                  checkKeyDown={onPressAddThread}
+                  isLoadingEnterPress={isLoadingSubmitThreadChat}
+                />
               </div>
             )}
           </section>

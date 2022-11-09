@@ -16,6 +16,8 @@ type InitialState = {
   message: Chat | null
   isError: boolean
   isLoading: boolean
+  isLoadingSubmitChat: boolean
+  isLoadingSubmitThreadChat: boolean
   isSuccess: boolean
   error: {
     status: number
@@ -30,6 +32,8 @@ const initialState: InitialState = {
   isError: false,
   isLoading: false,
   isSuccess: false,
+  isLoadingSubmitChat: false,
+  isLoadingSubmitThreadChat: false,
   error: {
     status: 0,
     content: null
@@ -194,8 +198,11 @@ export const chatSlice = createSlice({
       })
 
       // Add Message
+      .addCase(addMessage.pending, (state) => {
+        state.isLoadingSubmitChat = true
+      })
       .addCase(addMessage.fulfilled, (state, action: PayloadAction<any>) => {
-        state.isLoading = false
+        state.isLoadingSubmitChat = false
         state.isError = false
         state.error = {
           status: 0,
@@ -204,7 +211,7 @@ export const chatSlice = createSlice({
         state.chats = action.payload
       })
       .addCase(addMessage.rejected, (state, action: PayloadAction<any>) => {
-        state.isLoading = false
+        state.isLoadingSubmitChat = false
         state.isError = true
         state.error = action.payload
       })
@@ -256,8 +263,11 @@ export const chatSlice = createSlice({
       })
 
       // // Add Thread
+      .addCase(addThread.pending, (state) => {
+        state.isLoadingSubmitThreadChat = true
+      })
       .addCase(addThread.fulfilled, (state, { payload }: PayloadAction<any>) => {
-        state.isLoading = false
+        state.isLoadingSubmitThreadChat = false
         state.isError = false
         state.error = {
           status: 0,
@@ -273,7 +283,7 @@ export const chatSlice = createSlice({
         if (state.message) state.message.thread = newThreadMessages
       })
       .addCase(addThread.rejected, (state, action: PayloadAction<any>) => {
-        state.isLoading = false
+        state.isLoadingSubmitThreadChat = false
         state.isError = true
         state.error = action.payload
       })
