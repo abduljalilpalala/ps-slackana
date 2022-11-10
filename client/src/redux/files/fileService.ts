@@ -1,8 +1,14 @@
 import { axios } from '~/shared/lib/axios'
 import { ProjectFileType } from '~/redux/files/fileType'
+import { IniValueType } from '~/shared/types'
 
 const getProjectFiles = async (projectId: number): Promise<Array<ProjectFileType> | string> => {
   const response = await axios.get(`/api/project/${projectId}/file`)
+  return response.data
+}
+
+const getIniValue = async (): Promise<IniValueType> => {
+  const response = await axios.get('/api/ini/')
   return response.data
 }
 
@@ -45,7 +51,8 @@ const fileService = {
   getProjectFile,
   addProjectFile,
   renameProjectFile,
-  deleteProjectFile
+  deleteProjectFile,
+  getIniValue
 }
 
 export default fileService
