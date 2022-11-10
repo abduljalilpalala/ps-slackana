@@ -25,6 +25,7 @@ import {
   setThreads
 } from '~/redux/chat/chatSlice'
 import { pusher } from '~/shared/lib/pusher'
+import ThreadSlider from '~/components/organisms/ThreadDrawer'
 
 const Chat: NextPage = (): JSX.Element => {
   const router = useRouter()
@@ -286,35 +287,54 @@ const Chat: NextPage = (): JSX.Element => {
             />
           </div>
         </section>
-        {chat_id && (
-          <section
-            className={`
-            default-scrollbar flex h-screen w-[350px] flex-shrink-0 flex-col 
-            overflow-y-auto scrollbar-thumb-slate-400`}
-          >
-            <ThreadList
-              chatData={chats}
-              threads={threads}
-              isLoadingThread={isLoadingThread}
-              isOpenEditModalThread={isOpenEditModalThread}
-              actions={{
-                handleDeleteThread,
-                handleUpdateThread,
-                handleCloseEditModalThreadToggle
-              }}
-            />
-            {!isLoadingThread && (
-              <div className="px-4 py-2">
-                <ChatEditor
-                  handleMessage={handleReplyThread}
-                  checkKeyDown={onPressAddThread}
-                  isLoadingEnterPress={isLoadingSubmitThreadChat}
-                />
-              </div>
-            )}
-          </section>
-        )}
+        <div className="hidden lg:block">
+          {chat_id && (
+            <section
+              className={`
+                default-scrollbar flex h-screen w-[350px] flex-shrink-0 flex-col 
+                overflow-y-auto scrollbar-thumb-slate-400
+              `}
+            >
+              <ThreadList
+                chatData={chats}
+                threads={threads}
+                isLoadingThread={isLoadingThread}
+                isOpenEditModalThread={isOpenEditModalThread}
+                actions={{
+                  handleDeleteThread,
+                  handleUpdateThread,
+                  handleCloseEditModalThreadToggle
+                }}
+              />
+              {!isLoadingThread && (
+                <div className="px-4 py-2">
+                  <ChatEditor
+                    handleMessage={handleReplyThread}
+                    checkKeyDown={onPressAddThread}
+                    isLoadingEnterPress={isLoadingSubmitThreadChat}
+                  />
+                </div>
+              )}
+            </section>
+          )}
+        </div>
       </div>
+
+      {/* This will show the thread list on mobile view */}
+      <ThreadSlider
+        chatData={chats}
+        threads={threads}
+        isLoadingThread={isLoadingThread}
+        isOpenEditModalThread={isOpenEditModalThread}
+        isLoadingSubmitThreadChat={isLoadingSubmitThreadChat}
+        actions={{
+          handleDeleteThread,
+          handleUpdateThread,
+          handleCloseEditModalThreadToggle,
+          handleReplyThread,
+          onPressAddThread
+        }}
+      />
     </ProjectLayout>
   )
 }

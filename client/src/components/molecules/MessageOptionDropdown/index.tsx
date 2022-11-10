@@ -22,7 +22,7 @@ const MessageOptionDropdown: FC<Props> = (props): JSX.Element => {
       <Menu.Button
         data-for="act"
         data-tip="More Actions"
-        className="rounded p-1 text-slate-400 focus:bg-slate-200 focus:text-slate-900 hover:bg-slate-200 hover:text-slate-900"
+        className="rounded p-1 text-slate-400 outline-none focus:bg-slate-200 focus:text-slate-900 hover:bg-slate-200 hover:text-slate-900"
       >
         <MoreVertical className="h-5 w-5" />
         <ReactTooltip

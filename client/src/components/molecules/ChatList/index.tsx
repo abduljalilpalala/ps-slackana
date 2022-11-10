@@ -171,7 +171,7 @@ const ChatList: FC<Props> = (props): JSX.Element => {
                       onClick={() => router.push(`/team/${id}/chat/?chat_id=${chat.id}`)}
                       data-for="actions"
                       data-tip="Reply to thread"
-                      className="rounded p-1 text-slate-400 focus:bg-slate-200 focus:text-slate-900 hover:bg-slate-200 hover:text-slate-900"
+                      className="mb-0.5 rounded p-1 text-slate-400 focus:bg-slate-200 focus:text-slate-900 hover:bg-slate-200 hover:text-slate-900"
                     >
                       <ThreadMessageIcon className="h-5 w-5 fill-current" />
                     </button>
