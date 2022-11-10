@@ -28,8 +28,8 @@ export const styles = {
   menu_item_button: [
     tw`
       flex w-full items-center py-2 px-4 text-sm
-      font-medium text-[${rose_600}] transition duration-150
-      ease-in-out hover:bg-[${rose_50}]
+      font-medium transition duration-150
+      ease-in-out 
       [> svg]:(mr-2 h-4 w-4)
     `
   ]

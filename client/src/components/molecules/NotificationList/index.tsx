@@ -87,7 +87,7 @@ const NotificationList: FC<Props> = (props): JSX.Element => {
                 <td className="flex flex-1 items-center px-6 md:justify-between">
                   <a
                     onClick={() => handleReadNotification(notification)}
-                    className="cursor-pointer"
+                    className="flex flex-1 cursor-pointer items-center md:justify-between"
                   >
                     <div className="flex flex-wrap items-center space-x-2 py-2 text-slate-600">
                       {notificationIconType.map(

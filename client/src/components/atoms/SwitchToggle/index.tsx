@@ -2,20 +2,22 @@ import { useState } from 'react'
 import { Switch } from '@headlessui/react'
 
 type Props = {
-  value: (value: boolean) => void;
-  className?: string;
-  isDisabled?: boolean;
+  value: (value: boolean) => void
+  callback?: () => void
+  className?: string
+  isDisabled?: boolean
   state: boolean
 }
 
-const SwitchToggle: React.FC<Props> = ({ value, className, isDisabled, state }) => {
-  const [enabled, setEnabled] = useState(state);
+const SwitchToggle: React.FC<Props> = ({ value, callback, className, isDisabled, state }) => {
+  const [enabled, setEnabled] = useState<boolean>(state)
 
   const onChange = () => {
-    if (isDisabled) return;
+    if (isDisabled) return
 
-    setEnabled(!enabled);
-    value(!enabled);
+    callback?.()
+    value(!enabled)
+    setEnabled(!enabled)
   }
 
   return (
@@ -35,4 +37,4 @@ const SwitchToggle: React.FC<Props> = ({ value, className, isDisabled, state }) 
     </div>
   )
 }
-export default SwitchToggle;
+export default SwitchToggle
