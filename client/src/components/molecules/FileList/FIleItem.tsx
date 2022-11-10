@@ -4,7 +4,6 @@ import { Edit3, Trash, Download } from 'react-feather'
 
 import { Filename } from '~/shared/types'
 import { File } from '~/shared/interfaces'
-import { fileIconType } from '~/shared/jsons/fileIconType'
 import { useAppSelector } from '~/hooks/reduxSelector'
 import { MapMimeToFileComponent } from '~/utils/mapMimeToFileIcon'
 

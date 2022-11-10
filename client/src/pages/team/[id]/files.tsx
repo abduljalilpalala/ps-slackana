@@ -7,7 +7,7 @@ import FileList from '~/components/molecules/FileList'
 import Pagination from '~/components/atoms/Pagination'
 import PaginationSkeleton from '~/components/molecules/PaginationSkeleton'
 import ProjectLayout from '~/components/templates/ProjectLayout'
-import { darkToaster } from '~/utils/darkToaster'
+import DragFileUploadDialog from '~/components/molecules/FileList/DragFileUploadDialog'
 import { useFileMethods } from '~/hooks/fileMethods'
 import { useAppSelector } from '~/hooks/reduxSelector'
 import { DeleteConfirmModal } from '~/components/molecules/FileList/DeleteConfirmModal'
@@ -25,6 +25,7 @@ const Files: NextPage = (): JSX.Element => {
   } = useFileMethods(parseInt(projectIDFiles as string))
   const [pageNumber, setPageNumber] = useState<number>(0)
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [isOpenDragUpload, setIsOpenDragUpload] = useState<boolean>(false)
   /*
    * This will partially store the id and filename in modal
    */
@@ -41,6 +42,8 @@ const Files: NextPage = (): JSX.Element => {
   const displayFiles = files.slice(pagesVisited, pagesVisited + filesPerPage)
   const pageCount = Math.ceil(files.length / filesPerPage)
   const changePage = ({ selected }: { selected: number }): void => setPageNumber(selected)
+
+  const handleOpenDragUploadDialog = (): void => setIsOpenDragUpload(!isOpenDragUpload)
 
   /*
    * This is the toggle for Edit Modal
@@ -80,6 +83,8 @@ const Files: NextPage = (): JSX.Element => {
         <FileHeader
           useHandleCreateFiles={useHandleCreateFiles}
           isSubmitting={isFileMethodLoading}
+          isOpenDragUpload={isOpenDragUpload}
+          handleOpenDragUploadDialog={handleOpenDragUploadDialog}
         />
         <main
           className={`
@@ -136,13 +141,14 @@ const Files: NextPage = (): JSX.Element => {
 type FileHeaderProps = {
   useHandleCreateFiles: (data: any, callback: () => void) => Promise<void>
   isSubmitting: boolean
+  isOpenDragUpload: boolean
+  handleOpenDragUploadDialog: () => void
 }
 
 const FileHeader = (props: FileHeaderProps): JSX.Element => {
   const error = useAppSelector((state) => state.file.error)
   const isError = useAppSelector((state) => state.file.isError)
   const { userPermission: can } = useAppSelector((state) => state.project)
-
   /*
    * Add files
    */
@@ -156,6 +162,8 @@ const FileHeader = (props: FileHeaderProps): JSX.Element => {
     const fileUploaded = e.target.files
 
     if (fileUploaded && !isSubmitting) {
+      props.handleOpenDragUploadDialog()
+
       useHandleCreateFiles(fileUploaded, () => {
         if (isError) {
           toast.error(`${error.content}`)
@@ -178,26 +186,45 @@ const FileHeader = (props: FileHeaderProps): JSX.Element => {
         <LinkIcon className="h-5 w-5" />
         <h1 className="text-sm font-medium">List of Files</h1>
       </div>
+      {/* Create a button for toggling DragFileUploadDialog component */}
+
       {can?.uploadFile ? (
-        <label
-          htmlFor="upload"
-          className={`
-          flex cursor-pointer items-center rounded border border-blue-700 bg-blue-600 px-2 py-[0.26rem] text-sm text-white
-          shadow outline-none transition duration-150 ease-in-out focus:bg-blue-600 hover:bg-blue-700 active:scale-95 
-        ${isSubmitting ? 'hidden' : ''}`}
+        <button
+          type="button"
+          className={`flex cursor-pointer items-center rounded border border-blue-700 bg-blue-600 px-2 py-[0.26rem] text-sm text-white
+          shadow outline-none transition duration-150 ease-in-out focus:bg-blue-600 hover:bg-blue-700 active:scale-95 ${
+            isSubmitting ? 'hidden' : ''
+          }`}
+          onClick={props.handleOpenDragUploadDialog}
         >
-          <input
-            type="file"
-            ref={hiddenFileInput}
-            onChange={handleChange}
-            id="upload"
-            className="hidden"
-            multiple
-          />
-          <Upload className="mr-2 h-4 w-4" onClick={handleClick} />
-          Upload file(s)
-        </label>
+          <Upload className="h-5 w-5" />
+          <span> Upload Files</span>
+        </button>
       ) : null}
+
+      <DragFileUploadDialog
+        isOpen={props.isOpenDragUpload}
+        closeModal={props.handleOpenDragUploadDialog}
+        isSubmitting={isSubmitting}
+        actions={{
+          handleUploadFiles: useHandleCreateFiles,
+          onClick: handleClick,
+          onChange: handleChange
+        }}
+      >
+        <div className="flex justify-center">
+          {can?.uploadFile ? (
+            <input
+              type="file"
+              ref={hiddenFileInput}
+              onChange={handleChange}
+              id="upload"
+              className="hidden"
+              multiple
+            />
+          ) : null}
+        </div>
+      </DragFileUploadDialog>
     </header>
   )
 }

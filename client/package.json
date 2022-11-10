@@ -31,6 +31,7 @@
     "react-confirm-alert": "^3.0.6",
     "react-datepicker": "^4.8.0",
     "react-dom": "18.2.0",
+    "react-dropzone": "^14.2.3",
     "react-feather": "^2.0.10",
     "react-hook-form": "^7.35.0",
     "react-hot-toast": "^2.4.0",
