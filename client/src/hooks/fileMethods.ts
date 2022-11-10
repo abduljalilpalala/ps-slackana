@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
+import { toast } from 'react-hot-toast'
 
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
+import { formatIniValues } from '~/utils/formatIniValues'
 
 import {
   getProjectFiles,
@@ -14,8 +16,7 @@ import fileService from '~/redux/files/fileService'
 export const useFileMethods = (projectID: number) => {
   const [isFileLoading, setIsFileLoading] = useState(false)
   const dispatch = useAppDispatch()
-  const files = useAppSelector((state) => state.file.files)
-  const isLoading = useAppSelector((state) => state.file.isLoading)
+  const { files, isLoading } = useAppSelector((state) => state.file)
 
   useEffect(() => {
     setIsFileLoading(true)
@@ -24,10 +25,23 @@ export const useFileMethods = (projectID: number) => {
 
   const useHandleCreateFiles = async (data: FileList, callback: () => void): Promise<void> => {
     setIsFileLoading(true)
-    dispatch(addProjectFile({ projectId: projectID, file: data })).then((_) => {
+    // check if data file size is greater than 2MB
+    const iniValue = await fileService.getIniValue()
+    const { max_file_size, max_file_uploads } = formatIniValues(iniValue)
+
+    const isFileSizeValid = Array.from(data).every((file) => file.size <= max_file_size)
+    if (!isFileSizeValid || data.length >= max_file_uploads) {
+      !isFileSizeValid &&
+        toast.error(`Size of each files must not be greater than ${iniValue.upload_max_filesize}B`)
+      data.length >= max_file_uploads &&
+        toast.error(`You can only upload less than ${max_file_uploads} files at a time`)
       setIsFileLoading(false)
-      callback()
-    })
+    } else {
+      dispatch(addProjectFile({ projectId: projectID, file: data })).then((_) => {
+        setIsFileLoading(false)
+        callback()
+      })
+    }
   }
 
   const useHandleDeleteFile = async (fileID: string, callback: () => void): Promise<void> => {

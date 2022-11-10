@@ -51,6 +51,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::apiResource('notification', NotificationController::class);
   Route::apiResource('project.message', ProjectMessageController::class);
 
+  Route::group(['prefix' => 'ini'], function () {
+    Route::get('/', function () {
+      return ['upload_max_filesize' => ini_get('upload_max_filesize'), 'max_file_uploads' => ini_get('max_file_uploads')];
+    });
+  });
+
+
   Route::group(['prefix' => 'project'], function () {
     Route::put('/{project}/change-settings', [ProjectSettingController::class, 'update']);
     Route::put('/{project}/repository', [ProjectRepositoryController::class, 'update']);

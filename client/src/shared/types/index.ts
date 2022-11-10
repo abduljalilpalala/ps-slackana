@@ -1,6 +1,11 @@
 import { IconType } from 'react-icons'
 import { Icon } from 'react-feather'
 
+export type IniValueType = {
+  upload_max_filesize: string
+  max_file_uploads: string
+}
+
 export type SignInUpFormValues = {
   name: string
   email: string
