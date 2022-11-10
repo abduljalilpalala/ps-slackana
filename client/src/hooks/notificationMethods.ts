@@ -14,7 +14,9 @@ export const useNotificationMethods = (id: number = 0) => {
   const [hasNotification, setHasNotification] = useState<boolean>(false)
   const { user } = useAppSelector((state) => state.auth)
   const dispatch = useAppDispatch()
-  const { sidebarProject, isSidebarLoading } = useAppSelector((state) => state.project)
+  const { sidebarProject, isSidebarLoading, overviewProject } = useAppSelector(
+    (state) => state.project
+  )
 
   useEffect(() => {
     dispatch(getSidebarProjects())
@@ -66,7 +68,16 @@ export const useNotificationMethods = (id: number = 0) => {
     useGetNotificationsOnMount()
   }, [])
 
+  const unsubscribePusher = () => {
+    pusher.unsubscribe(`user.${user?.id}.notifications`)
+  }
+
   useEffect(() => {
+    if (!overviewProject.id) return
+    if (overviewProject.isArchived) {
+      unsubscribePusher()
+      return
+    }
     const channel = pusher.subscribe(`user.${user?.id}.notifications`)
     channel.bind('NotificationEvent', (data: any) => {
       setHasNotification(true)
@@ -74,9 +85,9 @@ export const useNotificationMethods = (id: number = 0) => {
       useGetNotificationsTableOnUpdate(data?.project?.id)
     })
     return () => {
-      pusher.unsubscribe(`user.${user?.id}.notifications`)
+      unsubscribePusher()
     }
-  }, [user])
+  }, [overviewProject.isArchived])
   return {
     notifications,
     hasNotification,

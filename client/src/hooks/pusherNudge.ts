@@ -7,13 +7,24 @@ import { useAppSelector } from './reduxSelector'
 export const usePusherNudge = () => {
   const {
     auth: { user },
-    project
+    project: { overviewProject, project }
   } = useAppSelector((state) => state)
 
+  const unsubscribePusher = () => {
+    project?.forEach(({ id }: any) => {
+      pusher.unsubscribe(`project.${id}.member.${user.id}`)
+    })
+  }
+
   useEffect(() => {
-    if (project.project) {
-      const projects = project.project
-      projects?.forEach(({ id }: any) => {
+    if (!overviewProject.id) return
+    if (overviewProject.isArchived) {
+      unsubscribePusher()
+      return
+    }
+
+    if (project) {
+      project.forEach(({ id }: any) => {
         const channel = pusher.subscribe(`project.${id}.member.${user?.id}`)
         channel.bind('NudgeMemberEvent', (data: any) => {
           const { name, avatar } = data.user
@@ -22,9 +33,7 @@ export const usePusherNudge = () => {
       })
     }
     return () => {
-      project.project?.forEach(({ id }: any) => {
-        pusher.unsubscribe(`project.${id}.member.${user.id}`)
-      })
+      unsubscribePusher()
     }
-  }, [project.project])
+  }, [project, overviewProject.isArchived])
 }
