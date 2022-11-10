@@ -15,6 +15,9 @@ class ProjectSettingSeeder extends Seeder
    */
   public function run()
   {
-    ProjectSetting::upsert(ProjectSettingUtils::nudgeSetting(), ['project_id'], ['status', 'setting']);
+    $settings = ProjectSettingUtils::nudgeSetting();
+    foreach ($settings as $setting) {
+      ProjectSetting::firstOrCreate($setting);
+    }
   }
 }
