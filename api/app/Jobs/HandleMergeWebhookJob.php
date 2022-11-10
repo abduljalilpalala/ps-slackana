@@ -49,8 +49,10 @@ class HandleMergeWebhookJob implements ShouldQueue
           'message' => json_encode($message)
         ]);
         Notification::send($users, new GithubMergeNotification($payload->pull_request->merged_by, $pr_details, $project->id));
-        event(new GithubWebhookEvent($users, $project));
-        event(new SendProjectMessageEvent($project));
+        if (!$project->is_archived) {
+          event(new GithubWebhookEvent($users, $project));
+          event(new SendProjectMessageEvent($project));
+        }
       }
     }
   }

@@ -46,8 +46,10 @@ class HandlePushWebhookJob implements ShouldQueue
           'message' => json_encode($message)
         ]);
         Notification::send($users, new GithubPushNotification($payload->sender, $payload->repository, $commit, $project->id));
-        event(new GithubWebhookEvent($users, $project));
-        event(new SendProjectMessageEvent($project));
+        if (!$project->is_archived) {
+          event(new GithubWebhookEvent($users, $project));
+          event(new SendProjectMessageEvent($project));
+        }
       }
     }
   }

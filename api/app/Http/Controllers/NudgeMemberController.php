@@ -10,7 +10,9 @@ class NudgeMemberController extends Controller
 {
   public function show(Project $project, User $member)
   {
-    event(new NudgeMemberEvent($project, $member));
+    if (!$project->is_archived) {
+      event(new NudgeMemberEvent($project, $member));
+    }
     
     return response()->noContent();
   }

@@ -12,7 +12,7 @@ class ProjectMessageController extends Controller
 {
   public function index(Project $project)
   {
-    return ProjectMessageResource::collection($project->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->get());
+    return ProjectMessageResource::collection($project->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->orderBy('created_at', 'asc')->get());
   }
 
   public function show(Project $project, ProjectMessage $message)

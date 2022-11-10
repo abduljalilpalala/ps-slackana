@@ -43,7 +43,9 @@ class TaskController extends Controller
       if ($request->project_member_id) {
         $member = ProjectMember::with('user')->findOrFail($request->project_member_id);
         Notification::send($member->user, new AssignTaskNotification(auth()->user()->id, $task->id, $project->id));
-        event(new AssignTaskEvent($member->user, $project));
+        if (!$project->is_archived) {
+          event(new AssignTaskEvent($member->user, $project));
+        }
       }
       return response()->noContent();
     }
