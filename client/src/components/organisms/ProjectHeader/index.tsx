@@ -12,7 +12,8 @@ import {
   setUserPermission,
   setEditProjectTitle,
   setEditProjectDescription,
-  updateProjectRepo
+  updateProjectRepo,
+  updateProjectSettings
 } from '~/redux/project/projectSlice'
 import { styles } from '~/shared/twin/project-header.styles'
 import AddMemberModal from '~/components/organisms/AddMemberModal'
@@ -23,16 +24,16 @@ import ProjectActionDropdown from '~/components/molecules/ProjectActionDropdown'
 import ProjectStatusDropdown from '~/components/molecules/ProjectStatusDropdown'
 import handleImageError from '~/helpers/handleImageError'
 import { usePusherNudge } from '~/hooks/pusherNudge'
-import DialogBox from '~/components/templates/DialogBox'
-import SubmitButton from '~/components/atoms/SubmitButton'
 import { darkToaster } from '~/utils/darkToaster'
+import ProjectSettingsModal from '../ProjectSettingsModal'
 
 const ProjectHead: FC = (): JSX.Element => {
   const router = useRouter()
   const { id } = router.query
   const dispatch = useAppDispatch()
   const [addModal, setAddModal] = useState<boolean>(false)
-  const [addRepo, setAddRepo] = useState<boolean>(false)
+  const [openSettings, setOpenSettings] = useState<boolean>(false)
+  const [muteNudge, setMuteNudge] = useState<boolean>(false)
   const [repo, setRepo] = useState<string>('')
 
   const { isLoading, isRepoLoading, refresher, overviewProject } = useAppSelector(
@@ -65,6 +66,7 @@ const ProjectHead: FC = (): JSX.Element => {
     dispatch(setEditProjectTitle(projectTitle))
     dispatch(setEditProjectDescription(description))
     setRepo(overviewProject?.repository)
+    setMuteNudge(overviewProject?.settings?.muteNudge)
   }, [projectTitle, description])
 
   useEffect(() => {
@@ -79,9 +81,18 @@ const ProjectHead: FC = (): JSX.Element => {
     dispatch(setUserPermission(userPermission))
   }, [isLoading, memberStateUpdate])
 
+  const handleMuteNudge = () => {
+    dispatch(
+      updateProjectSettings({
+        project_id: parseInt(id as string),
+        setting: 'muteNudge',
+        status: !muteNudge
+      })
+    )
+  }
+
   const handleSubmitProjectRepo = () => {
     dispatch(updateProjectRepo({ project_id: id, repository: repo })).then((_) => {
-      setAddRepo(false)
       darkToaster('✅', 'Repository is set successfully')
     })
   }
@@ -108,40 +119,20 @@ const ProjectHead: FC = (): JSX.Element => {
       slug: 'files'
     }
   ]
-  const addRepoComponent = (
-    <DialogBox
-      isOpen={true}
-      closeModal={() => setAddRepo(false)}
-      headerTitle="Set Repository Name"
-      bodyClass="!px-0 !pb-0 mobile:!px-0 !pt-0"
-    >
-      <div className="flex flex-col text-center">
-        <div className="mt-3 flex items-center justify-between border-b px-6 pb-3">
-          <div className="flex w-full flex-row items-center rounded-md border border-slate-300 pl-2">
-            <Edit3 color="#94A3B8" />
-            <input
-              type="text"
-              defaultValue={repo}
-              onChange={(e) => setRepo(e.target.value)}
-              className="mr-5 w-full border-none text-slate-900 focus:ring-transparent"
-              placeholder="owner/repository-name"
-            />
-          </div>
-        </div>
-        <div className=" w-full items-center p-3">
-          <SubmitButton
-            text="Save"
-            isSubmitting={isRepoLoading}
-            submitted={handleSubmitProjectRepo}
-            className="!bg-blue-600 !text-slate-50 hover:!bg-blue-800 mobile:!w-full"
-          />
-        </div>
-      </div>
-    </DialogBox>
-  )
   return (
     <div className="flex w-full items-center">
-      {addRepo && addRepoComponent}
+      {openSettings && (
+        <ProjectSettingsModal
+          handleMuteNudge={handleMuteNudge}
+          muteNudge={muteNudge}
+          isRepoLoading={isRepoLoading}
+          repo={repo}
+          setMuteNudge={setMuteNudge}
+          setRepo={setRepo}
+          handleSubmitProjectRepo={handleSubmitProjectRepo}
+          setOpenSettings={setOpenSettings}
+        />
+      )}
       {addModal && <AddMemberModal close={() => setAddModal(false)} />}
       <header css={styles.header} className="w-full min-w-[366px]">
         <section css={styles.section}>
@@ -178,7 +169,7 @@ const ProjectHead: FC = (): JSX.Element => {
                 <h1>{projectTitle}</h1>
               )}
               <div className="flex items-center justify-center gap-3">
-                <ProjectActionDropdown actions={{ setAddRepo }} />
+                <ProjectActionDropdown actions={{ setOpenSettings }} />
                 <ProjectStatusDropdown />
               </div>
             </div>

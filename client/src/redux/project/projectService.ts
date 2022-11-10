@@ -1,4 +1,5 @@
 import { axios } from '~/shared/lib/axios'
+import { ProjectSetting } from './projectType'
 
 const filterProjects = async (params: number): Promise<any> => {
   const response = await axios.get(`/api/project?filter=${params}`)
@@ -102,6 +103,11 @@ const updateProjectRepo = async (project_id: number, repository: string): Promis
   const response = await axios.put(`/api/project/${project_id}/repository`, { repository })
   return response.data
 }
+const updateProjectSettings = async (setting: ProjectSetting): Promise<any> => {
+  const { project_id } = setting
+  const response = await axios.put(`/api/project/${project_id}/change-settings`, setting)
+  return response.data
+}
 
 const projectService = {
   getProject,
@@ -115,7 +121,8 @@ const projectService = {
   getSidebarProjects,
   updateProjectStatus,
   updateProjectDetails,
-  updateProjectRepo
+  updateProjectRepo,
+  updateProjectSettings
 }
 
 export default projectService

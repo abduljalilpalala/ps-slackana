@@ -8,6 +8,7 @@ import {
 import { AxiosResponseError } from '~/shared/types'
 import { catchError } from '~/utils/handleAxiosError'
 import projectService from './projectService'
+import { ProjectSetting } from './projectType'
 
 type InitialState = {
   project: any
@@ -233,6 +234,17 @@ export const updateProjectRepo = createAsyncThunk(
     const { project_id, repository } = repoData
     try {
       return await projectService.updateProjectRepo(project_id, repository)
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(catchError(error))
+    }
+  }
+)
+
+export const updateProjectSettings = createAsyncThunk(
+  'project/updateProjectSettings',
+  async (settingData: ProjectSetting, thunkAPI) => {
+    try {
+      return await projectService.updateProjectSettings(settingData)
     } catch (error: any) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
@@ -534,6 +546,23 @@ export const projectSlice = createSlice({
         state.isError = true
         state.isSuccess = false
         state.isRepoLoading = false
+        state.error = action.payload
+      })
+      // Update Project Settings
+      .addCase(updateProjectSettings.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(updateProjectSettings.fulfilled, (state) => {
+        state.isLoading = false
+        state.error = {
+          status: 0,
+          content: null
+        }
+      })
+      .addCase(updateProjectSettings.rejected, (state, action: PayloadAction<any>) => {
+        state.isError = true
+        state.isSuccess = false
+        state.isLoading = false
         state.error = action.payload
       })
   }

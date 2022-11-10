@@ -3,7 +3,7 @@ import { Menu } from '@headlessui/react'
 import { ChevronDown } from 'react-feather'
 import { HiOutlineArchive } from 'react-icons/hi'
 import { HiCode } from 'react-icons/hi'
-import { HiClipboardList } from 'react-icons/hi'
+import { HiCog } from 'react-icons/hi'
 
 import { darkToaster } from '~/utils/darkToaster'
 import MenuTransition from '~/components/templates/MenuTransition'
@@ -13,12 +13,12 @@ import { archiveProject, getProject, unarchiveProject } from '~/redux/project/pr
 
 type Props = {
   actions: {
-    setAddRepo: (e: boolean) => void
+    setOpenSettings: (e: boolean) => void
   }
 }
 const ProjectActionDropdown: FC<Props> = (props): JSX.Element => {
   const {
-    actions: { setAddRepo }
+    actions: { setOpenSettings }
   } = props
   const dispatch = useAppDispatch()
 
@@ -38,16 +38,6 @@ const ProjectActionDropdown: FC<Props> = (props): JSX.Element => {
       })
     }
   }
-  const handleCopySigningKey = () => {
-    navigator.clipboard.writeText(process.env.NEXT_PUBLIC_GITHUB_SIGNING_KEY as string)
-    darkToaster('✅', 'Signing key is successfully copied')
-  }
-  const handleCopyPayloadURL = () => {
-    navigator.clipboard.writeText(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL as string}api/github-webhooks`
-    )
-    darkToaster('✅', 'Payload URL is successfully copied')
-  }
   return (
     <Menu as="div" className="relative z-30 -mb-1.5 inline-block text-left">
       {({ open }) => (
@@ -62,39 +52,23 @@ const ProjectActionDropdown: FC<Props> = (props): JSX.Element => {
           <MenuTransition>
             <Menu.Items css={styles.menu_items}>
               <Menu.Item>
-                <button onClick={onClick} css={styles.menu_item_button} className="group">
+                <button
+                  onClick={onClick}
+                  css={styles.menu_item_button}
+                  className="group text-rose-600 hover:bg-rose-50"
+                >
                   <HiOutlineArchive aria-hidden="true" />
                   {isArchived ? 'Unarchive' : 'Archive'}
                 </button>
               </Menu.Item>
               <Menu.Item>
                 <button
-                  onClick={() => setAddRepo(true)}
+                  onClick={() => setOpenSettings(true)}
                   css={styles.menu_item_button}
-                  className="group"
+                  className="group hover:bg-slate-50"
                 >
-                  <HiCode aria-hidden="true" />
-                  Set Repository
-                </button>
-              </Menu.Item>
-              <Menu.Item>
-                <button
-                  onClick={handleCopySigningKey}
-                  css={styles.menu_item_button}
-                  className="group"
-                >
-                  <HiClipboardList aria-hidden="true" />
-                  Signing Key
-                </button>
-              </Menu.Item>
-              <Menu.Item>
-                <button
-                  onClick={handleCopyPayloadURL}
-                  css={styles.menu_item_button}
-                  className="group"
-                >
-                  <HiClipboardList aria-hidden="true" />
-                  Payload URL
+                  <HiCog aria-hidden="true" />
+                  Project Settings
                 </button>
               </Menu.Item>
             </Menu.Items>
