@@ -241,9 +241,9 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
       {...provided?.draggableProps}
       {...provided?.dragHandleProps}
       style={{ ...provided?.draggableProps?.style }}
-      className={`
+      className={` ${task?.id < 1 ? 'bg-slate-50' : 'bg-white'}
         group-task relative flex w-full cursor-pointer flex-col justify-between rounded-md border
-        bg-white transition duration-75 ease-in-out focus-within:border-slate-400
+         transition duration-75 ease-in-out focus-within:border-slate-400
       focus:border-slate-400 focus:outline-none focus:ring-slate-400 hover:border-slate-400
       ${snapshot?.isDragging ? 'border-2 border-slate-400' : ''}
        ${isTaskCompleted && 'hover:border-slate-300'}
@@ -251,7 +251,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
     >
       <div className="ml-4 flex items-center">
         <button
-          disabled={completeTask}
+          disabled={completeTask || task?.id < 1}
           onClick={handleTaskStatus}
           className={`
             ${completeTask && 'cursor-not-allowed '}
@@ -294,7 +294,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
           />
         )}
         <div className="absolute right-2 top-2 opacity-0 group-task-hover:opacity-100 group-task-focus:opacity-100">
-          {(permissions?.deleteTask || permissions?.renameTask) && !isEditing && (
+          {(permissions?.deleteTask || permissions?.renameTask) && !isEditing && task?.id >= 1 && (
             <Menu as="div" className="relative z-10 inline-block items-center bg-white text-left">
               {({ open }) => (
                 <>
@@ -365,6 +365,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
                 className="overflow-hidden rounded-full"
                 onClick={handleUpdateAssigneeToggle}
                 data-for="assignee"
+                disabled={task?.id < 1}
                 data-tip={!updateAssignee?.user ? `Assignee` : updateAssignee?.user?.name}
               >
                 <img
@@ -376,6 +377,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
             ) : (
               <button
                 data-for="assignee"
+                disabled={task?.id < 1}
                 data-tip={!updateAssignee?.user ? `Assignee` : updateAssignee?.user?.name}
                 className={`
                   hover:border-slate rounded-full border-[1.5px] border-dashed border-slate-400 p-0.5
@@ -391,7 +393,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
           </div>
           <Tooltip text={!dueDate ? `Due Date` : moment(dueDate).format('MMMM D, YYYY')}>
             <ReactDatePicker
-              disabled={!permissions?.assignDueDates}
+              disabled={!permissions?.assignDueDates || task?.id < 1}
               selected={selectedDueDate}
               onChange={handleSetDueDate}
               value={dueDate}
@@ -407,6 +409,7 @@ const TaskList: React.FC<Props> = (props): JSX.Element => {
           `}
         >
           <button
+            disabled={task?.id < 1}
             onClick={() => {
               setIsTaskSliderOpen(true)
               setTaskID(task?.id)

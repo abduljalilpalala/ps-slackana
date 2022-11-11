@@ -7,6 +7,7 @@ import {
   getSections,
   removeTaskInSection,
   setSections,
+  updateNewTaskInSection,
   updateTaskAssigneeInSection,
   updateTaskDueDateInSection,
   updateTaskSectionIDInSection,
@@ -57,10 +58,11 @@ export const useTaskMethods = (projectID: number) => {
   ): Promise<void> => {
     dispatch(setSectionID({ section_id }))
     dispatch(setAddNewTaskData({ ...data, project_member_id: data.project_member_id?.id }))
+    const id = Math.random()
     dispatch(
       addNewTaskInSection({
         newTask: {
-          id: Math.random(),
+          id: id,
           section_id: section_id,
           assignee: data.project_member_id,
           name: data.name,
@@ -77,10 +79,8 @@ export const useTaskMethods = (projectID: number) => {
     )
     callback()
     toast.promise(
-      dispatch(createTask()).then((_) => {
-        dispatch(reorderTasks()).then((_) => {
-          dispatch(getSections())
-        })
+      dispatch(createTask()).then((res) => {
+        dispatch(updateNewTaskInSection({ newTask: res.payload, section_id, task_id: id }))
       }),
       {
         loading: 'Creating task...',

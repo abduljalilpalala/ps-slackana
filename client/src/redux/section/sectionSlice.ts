@@ -166,6 +166,18 @@ export const sectionSlice = createSlice({
       sections[index] = section
       state.sections = sections
     },
+    updateNewTaskInSection: (state, { payload: { newTask, section_id, task_id } }) => {
+      let sections: any[] = state.sections
+      let section = state.sections.filter((section) => section.id == section_id)[0]
+      let task = section?.tasks?.filter((task: any) => task?.id == task_id)[0]
+      let taskIndex = section?.tasks?.indexOf(task as never)
+      let tasks: any = section.tasks
+      let index = sections.indexOf(section)
+      tasks[taskIndex as number] = newTask
+      section.tasks = tasks
+      sections[index] = section
+      state.sections = sections
+    },
     removeTaskInSection: (state, { payload: { section_id, task_id } }) => {
       let sections: any[] = state.sections
       let section = state.sections.filter((section) => section.id == section_id)[0]
@@ -341,6 +353,7 @@ export const {
   updateTaskAssigneeInSection,
   updateTaskDueDateInSection,
   updateTaskStatusInSection,
-  setSections
+  setSections,
+  updateNewTaskInSection
 } = sectionSlice.actions
 export default sectionSlice.reducer

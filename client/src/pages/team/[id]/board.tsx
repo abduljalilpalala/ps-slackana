@@ -334,7 +334,7 @@ const Board: NextPage = (): JSX.Element => {
                             let moveTask = !permissions?.moveTask || !canMove(task?.assignee?.id)
                             return (
                               <Draggable
-                                isDragDisabled={moveTask}
+                                isDragDisabled={moveTask || task?.id < 1}
                                 key={task.id}
                                 draggableId={task.id + ''}
                                 index={i}
