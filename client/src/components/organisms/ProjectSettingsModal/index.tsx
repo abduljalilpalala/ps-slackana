@@ -114,8 +114,12 @@ const ProjectSettingsModal: FC<Props> = (props): JSX.Element => {
                 />
                 <button
                   onClick={() => handleSubmitProjectRepo()}
-                  disabled={isRepoLoading}
-                  className={`inline-flex cursor-pointer items-center rounded-r-md border border-r-0 border-green-600 bg-green-600 px-3 text-sm hover:bg-green-700 `}
+                  disabled={isRepoLoading || !repo?.length}
+                  className={`inline-flex cursor-pointer items-center rounded-r-md ${
+                    !repo?.length
+                      ? 'border-slate-500 bg-slate-500'
+                      : 'border-green-600 bg-green-600 hover:bg-green-700 '
+                  } border border-r-0   px-3 text-sm `}
                 >
                   {isRepoLoading ? (
                     <Spinner className="h-5 w-5 text-white" />
