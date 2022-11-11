@@ -47,7 +47,7 @@ class TaskController extends Controller
           event(new AssignTaskEvent($member->user, $project));
         }
       }
-      return response()->noContent();
+      return new TaskResource(Task::with(['project_member.user.avatar', 'project_member.role', 'project_member.teams'])->findOrFail($task->id));
     }
     return $this->unauthorizedAccess();
   }
