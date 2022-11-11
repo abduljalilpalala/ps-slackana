@@ -8,7 +8,7 @@ const getProjectFiles = async (projectId: number): Promise<Array<ProjectFileType
 }
 
 const getIniValue = async (): Promise<IniValueType> => {
-  const response = await axios.get('/api/ini/')
+  const response = await axios.get('/api/ini')
   return response.data
 }
 
