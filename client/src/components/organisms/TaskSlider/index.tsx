@@ -388,12 +388,12 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
                     <>
                       <Menu.Button
                         className={`
-                      rounded-md p-1.5 text-slate-500 outline-none transition duration-75 ease-in-out focus:bg-slate-200 
-                    focus:text-slate-900 hover:bg-slate-200 hover:text-slate-900 active:scale-95
-                        ${open ? 'bg-slate-200 text-slate-900' : ''}
-                      `}
+                          rounded-md p-1.5 text-slate-500 outline-none transition duration-75 ease-in-out 
+                          hover:bg-slate-200 hover:text-slate-900 active:scale-95
+                          ${open ? 'bg-slate-200 text-slate-900' : ''}
+                        `}
                       >
-                        <MoreHorizontal className="h-4 w-4" />
+                        <MoreHorizontal className={`h-4 w-4  ${open ? 'text-slate-900' : ''}`} />
                       </Menu.Button>
                       <MenuTransition>
                         <Menu.Items

@@ -1,146 +1,167 @@
-import toast from "react-hot-toast";
-import React, { useState } from "react";
-import ReactTooltip from "react-tooltip";
+import { X } from 'react-feather'
+import toast from 'react-hot-toast'
+import React, { useEffect, useState } from 'react'
+import ReactTooltip from 'react-tooltip'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
 
 import {
   uploadPhoto,
   updatePassword,
   updateNotification,
-  updateProfileDetails,
-} from "~/redux/setting/settingSlice";
-import TaskIcon from "~/shared/icons/TaskIcon";
-import { darkToaster } from "~/utils/darkToaster";
-import { Password, Profile } from "./SettingsType";
-import { globals } from "~/shared/twin/globals.styles";
-import DialogBox from "~/components/templates/DialogBox";
-import { getProject } from "~/redux/project/projectSlice";
-import handleImageError from "~/helpers/handleImageError";
-import { hydrateUserState } from "~/redux/auth/authSlice";
-import SwitchToggle from "~/components/atoms/SwitchToggle";
-import SubmitButton from "~/components/atoms/SubmitButton";
-import { useAppDispatch, useAppSelector } from "~/hooks/reduxSelector";
-import { styles as settingsStyle } from '~/shared/twin/settings-modal.style';
+  updateProfileDetails
+} from '~/redux/setting/settingSlice'
+import { Security } from '~/shared/types'
+import TaskIcon from '~/shared/icons/TaskIcon'
+import { darkToaster } from '~/utils/darkToaster'
+import { Password, Profile } from './SettingsType'
+import { styles } from '~/shared/twin/auth.styles'
+import { Spinner } from '~/shared/icons/SpinnerIcon'
+import { globals } from '~/shared/twin/globals.styles'
+import { SecurityFormSchema } from '~/shared/validation'
+import DialogBox from '~/components/templates/DialogBox'
+import { getProject } from '~/redux/project/projectSlice'
+import handleImageError from '~/helpers/handleImageError'
+import { hydrateUserState } from '~/redux/auth/authSlice'
+import SwitchToggle from '~/components/atoms/SwitchToggle'
+import SubmitButton from '~/components/atoms/SubmitButton'
+import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
+import { styles as settingsStyle } from '~/shared/twin/settings-modal.style'
 
 const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch()
+  const [passError, setPassError]: any = useState(null)
 
-  const [active, setActive] = useState<string>("Profile");
+  const [active, setActive] = useState<string>('Profile')
   const onClick = (e: any): void => {
-    const value = e.target.innerText;
-    setActive(value);
+    const value = e.target.innerText
+    setActive(value)
   }
 
-  const { auth: { user, isLoading: userLoading }, setting, project } = useAppSelector((state) => state) || {};
-  const { name, email, avatar, id, notification } = user || {};
-  const { overviewProject: { id: projectID } } = project || {};
-  const { isLoading, error } = setting || {};
-  const { status, content } = error || {};
-  const { status: notificationStatus } = (notification ?? {})[0] || {};
-  const { currentPassword, newConfirmedPassword, newPassword } = content || {};
-  const isError = status === 422;
+  const {
+    auth: { user, isLoading: userLoading },
+    setting,
+    project
+  } = useAppSelector((state) => state) || {}
+  const { name, email, avatar, id, notification } = user || {}
+  const {
+    overviewProject: { id: projectID }
+  } = project || {}
+  const { isLoading, error } = setting || {}
+  const { status, content } = error || {}
+  const { status: notificationStatus } = (notification ?? {})[0] || {}
+  const { currentPassword, newConfirmedPassword, newPassword } = content || {}
+  const isError = status === 422
+
+  useEffect(() => {
+    setPassError(currentPassword)
+  }, [content])
 
   const [profileData, setProfileData] = useState<Profile>({
     fullName: name,
     email: email
-  });
-  const { fullName: nameState, email: emailState } = profileData;
+  })
+  const { fullName: nameState, email: emailState } = profileData
   const onProfileChange = (e: any) => {
-    const value = e.target.value;
-    const name = e.target.name;
-    setProfileData((prev) => ({ ...prev, [name]: value }));
+    const value = e.target.value
+    const name = e.target.name
+    setProfileData((prev) => ({ ...prev, [name]: value }))
   }
 
   const [passwordData, setPasswordData] = useState<Password>({
-    currentPassword: "",
-    newPassword: "",
-    newConfirmedPassword: ""
-  });
-  const onPasswordChange = (e: { target: { value: string, name: string } }): void => {
-    const value = e.target.value;
-    const name = e.target.name;
+    currentPassword: '',
+    newPassword: '',
+    newConfirmedPassword: ''
+  })
+  const onPasswordChange = (e: { target: { value: string; name: string } }): void => {
+    const value = e.target.value
+    const name = e.target.name
     setPasswordData((prev: any) => ({ ...prev, [name]: value }))
   }
 
   const uploadImage = (e: any): void => {
-    const files = e.target.files[0];
+    const files = e.target.files[0]
     toast.promise(
-      dispatch(uploadPhoto(files))
-        .then(((_: any) => {
-          dispatch(hydrateUserState());
-          dispatch(getProject(projectID));
-        })),
+      dispatch(uploadPhoto(files)).then((_: any) => {
+        dispatch(hydrateUserState())
+        dispatch(getProject(projectID))
+      }),
       {
         loading: 'Uploading...',
-        success: "Photo uploaded successfully!",
-        error: "Something went wrong.",
+        success: 'Photo uploaded successfully!',
+        error: 'Something went wrong.'
       }
-    );
+    )
   }
 
   const onSubmit = (component: string, value?: boolean): void => {
     switch (component) {
-      case "profile":
-        dispatch(updateProfileDetails({ id, name: nameState, email: emailState }))
-          .then((res: any) => {
+      case 'profile':
+        dispatch(updateProfileDetails({ id, name: nameState, email: emailState })).then(
+          (res: any) => {
             if (res?.payload?.status === 422) {
-              return darkToaster("❗", "Email was already exist.")
+              return darkToaster('❗', 'Email was already exist.')
             }
-            dispatch(hydrateUserState());
-            dispatch(getProject(projectID));
-            darkToaster("✅", "Profile updated successfully!")
-          })
-        break;
+            dispatch(hydrateUserState())
+            dispatch(getProject(projectID))
+            darkToaster('✅', 'Profile updated successfully!')
+          }
+        )
+        break
 
-      case "security":
-        dispatch(updatePassword(passwordData))
-          .then((res: any) => {
-            if (res?.payload?.status === 422) {
-              return darkToaster("❗", "Please resolve the error/s.")
-            }
-            darkToaster("✅", "Password updated successfully!")
-          });
-        break;
-
-      case "notification":
-        dispatch(updateNotification({ id, status: value }))
-          .then((_: any) => {
-            darkToaster("✅", value ? "You can now receive notifications!" : "Your notification was muted!")
-          });
-        break;
+      case 'notification':
+        dispatch(updateNotification({ id, status: value })).then((_: any) => {
+          darkToaster(
+            '✅',
+            value ? 'You can now receive notifications!' : 'Your notification was muted!'
+          )
+        })
+        break
 
       default:
-        alert("No component selected");
+        alert('No component selected')
     }
   }
 
-  const menuList = ["Profile", "Security", "Notification"];
+  const menuList = ['Profile', 'Security', 'Notification']
   const modalMenu = menuList.map((menu: string, index: number) => {
     return (
       <button
         key={index}
         onClick={onClick}
         css={`
-          ${settingsStyle.inactive} 
+          ${settingsStyle.inactive}
           ${active === menu && settingsStyle.active}
-        `}>
+        `}
+      >
         {menu}
       </button>
     )
-  });
+  })
+
+  const {
+    reset,
+    register,
+    handleSubmit,
+    formState: { isSubmitting, errors }
+  } = useForm<Security>({
+    mode: 'onTouched',
+    resolver: yupResolver(SecurityFormSchema)
+  })
 
   const activeComponent = (component: string) => {
     switch (component) {
-      case "Profile": {
+      case 'Profile': {
         return (
           <>
             <div className="flex flex-col gap-4">
-              <p className="text-slate-800 text-px-12 text-left">Your photo</p>
+              <p className="text-px-12 text-left text-slate-800">Your photo</p>
               <div css={settingsStyle.uploadContainer}>
                 <img
                   src={avatar?.url}
                   onError={(e) => handleImageError(e, '/images/avatar.png')}
                   alt="team-icon"
-                  className="rounded-full max-h-[88px] min-h-[88px] max-w-[88px] min-w-[88px]"
+                  className="max-h-[88px] min-h-[88px] min-w-[88px] max-w-[88px] rounded-full"
                 />
                 <div className="flex flex-col gap-3">
                   <input
@@ -154,21 +175,26 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
                   <label
                     css={settingsStyle.upload}
                     htmlFor="upload"
-                    className={`flex justify-center items-center cursor-pointer ${userLoading && "!bg-gray-500 !cursor-not-allowed"} mobile:!max-w-[120px] mobile:!text-sm`}
+                    className={`flex cursor-pointer items-center justify-center ${
+                      userLoading && '!cursor-not-allowed !bg-gray-500'
+                    } mobile:!max-w-[120px] mobile:!text-sm`}
                   >
-                    {userLoading ? 'Loading...' : "Upload photo"}
+                    {userLoading ? 'Loading...' : 'Upload photo'}
                   </label>
 
                   <button
                     data-tip="Under development"
                     css={settingsStyle.remove}
-                    className="hover:!text-slate-900 bg-slate-500 opacity-50 cursor-not-allowed mobile:!max-w-[120px] mobile:!text-sm">
+                    className="cursor-not-allowed bg-slate-500 opacity-50 hover:!text-slate-900 mobile:!max-w-[120px] mobile:!text-sm"
+                  >
                     Remove photo
                   </button>
                   <ReactTooltip />
                 </div>
               </div>
-              <p className="text-slate-600 text-px-12 text-left">Photos help your teammates recognize you in Slackana</p>
+              <p className="text-px-12 text-left text-slate-600">
+                Photos help your teammates recognize you in Slackana
+              </p>
             </div>
             <div className="flex flex-col gap-4">
               <div>
@@ -181,13 +207,15 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
                   css={globals.form_control}
                   disabled={isLoading}
                   placeholder="john doe"
-                  value={nameState || ""}
+                  value={nameState || ''}
                   onChange={onProfileChange}
-                  style={{ border: `${content?.name ? "1px solid red" : ""}` }}
+                  style={{ border: `${content?.name ? '1px solid red' : ''}` }}
                 />
-                {isError && <span className="text-sm text-red-600 float-left">{content?.name}</span>}
+                {isError && (
+                  <span className="float-left text-sm text-red-600">{content?.name}</span>
+                )}
               </div>
-              <div >
+              <div>
                 <label htmlFor="email" css={globals.form_label} className="float-left">
                   Email
                 </label>
@@ -197,77 +225,153 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
                   css={globals.form_control}
                   disabled={isLoading}
                   placeholder="name@company.com"
-                  value={emailState || ""}
+                  value={emailState || ''}
                   onChange={onProfileChange}
-                  style={{ border: `${content?.email ? "1px solid red" : ""}` }}
+                  style={{ border: `${content?.email ? '1px solid red' : ''}` }}
                 />
-                {isError && <span className="text-sm text-red-600 float-left">{content?.email}</span>}
+                {isError && (
+                  <span className="float-left text-sm text-red-600">{content?.email}</span>
+                )}
               </div>
             </div>
-            <SubmitButton isSubmitting={isLoading} submitted={() => onSubmit("profile")} text="Save changes" />
+            <SubmitButton
+              isSubmitting={isLoading}
+              submitted={() => onSubmit('profile')}
+              text="Save changes"
+            />
           </>
         )
       }
 
-      case "Security": {
+      case 'Security': {
+        // This will handle Update Password Security
+        const handleUpdatePassword = async (data: Security): Promise<void> => {
+          const payload = {
+            currentPassword: data.current_password,
+            newPassword: data.new_password,
+            newConfirmedPassword: data.confirm_password
+          }
+
+          const res = await dispatch(updatePassword(payload))
+
+          if (res?.payload?.status === 422) {
+            darkToaster('❗', 'Please resolve the error/s.')
+            return
+          }
+
+          darkToaster('✅', 'Password updated successfully!')
+          reset({
+            current_password: '',
+            new_password: '',
+            confirm_password: ''
+          })
+        }
+
         return (
-          <div className="flex flex-col gap-9">
+          <form className="flex flex-col gap-9" onSubmit={handleSubmit(handleUpdatePassword)}>
+            {passError?.length >= 2 && (
+              <div
+                className={`
+                  relative flex w-full flex-col items-center justify-center rounded border
+                  border-rose-200 bg-rose-50 py-2 text-center text-rose-800 hover:shadow
+                  hover:shadow-rose-100
+                `}
+              >
+                {passError?.map((error: string, index: number) => {
+                  return (
+                    <span key={index} className="pr-5 pl-1 text-sm font-medium">
+                      {passError?.length >= 2 && '*'} {error}
+                    </span>
+                  )
+                })}
+                <button
+                  type="button"
+                  className="absolute right-2 rounded hover:bg-rose-100"
+                  onClick={() => setPassError(null)}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
             <div className="flex flex-col gap-6">
-              <div >
+              <div>
                 <label htmlFor="currentPassword" css={globals.form_label} className="float-left">
                   Current password <span>*</span>
                 </label>
                 <input
                   type="password"
-                  name="currentPassword"
+                  id="currentPassword"
                   css={globals.form_control}
-                  disabled={isLoading}
-                  placeholder="********"
-                  onChange={onPasswordChange}
+                  {...register('current_password')}
+                  disabled={isSubmitting}
+                  placeholder="••••••••"
+                  className={`
+                    ${
+                      errors?.current_password &&
+                      'border-rose-400 focus:border-rose-400 focus:ring-rose-400'
+                    }`}
                 />
-                {isError && <div className="flex flex-col justify-start w-full text-left">
-                  {currentPassword?.map((error: string, index: number) => {
-                    return <span key={index} className="text-sm text-red-600 float-left mt-[3px]">{currentPassword.length >= 2 && "*"} {error}</span>
-                  })}
-                </div>}
+                {errors?.current_password && (
+                  <span className="error">{`${errors.current_password.message}`}</span>
+                )}
               </div>
-              <div >
+              <div>
                 <label htmlFor="newPassword" css={globals.form_label} className="float-left">
                   New password <span>*</span>
                 </label>
                 <input
                   type="password"
-                  name="newPassword"
+                  id="newPassword"
+                  {...register('new_password')}
                   css={globals.form_control}
-                  disabled={isLoading}
-                  placeholder="***********"
-                  onChange={onPasswordChange}
+                  disabled={isSubmitting}
+                  placeholder="••••••••"
+                  className={`
+                    ${
+                      errors?.new_password &&
+                      'border-rose-400 focus:border-rose-400 focus:ring-rose-400'
+                    }`}
                 />
-                {isError && <span className="text-sm text-red-600 float-left text-left">{newPassword}</span>}
+                {errors?.new_password && (
+                  <span className="error">{`${errors.new_password.message}`}</span>
+                )}
               </div>
-              <div >
-                <label htmlFor="newConfirmedPassword" css={globals.form_label} className="float-left">
+              <div>
+                <label
+                  htmlFor="newConfirmedPassword"
+                  css={globals.form_label}
+                  className="float-left"
+                >
                   Confirm new password <span>*</span>
                 </label>
                 <input
                   type="password"
-                  name="newConfirmedPassword"
+                  id="newConfirmedPassword"
+                  {...register('confirm_password')}
                   css={globals.form_control}
-                  disabled={isLoading}
-                  placeholder="***********"
-                  onChange={onPasswordChange}
+                  disabled={isSubmitting}
+                  placeholder="••••••••"
+                  className={`
+                    ${
+                      errors?.confirm_password &&
+                      'border-rose-400 focus:border-rose-400 focus:ring-rose-400'
+                    }`}
                 />
-                {isError && <span className="text-sm text-red-600 float-left text-left">{newConfirmedPassword}</span>}
+                {errors?.confirm_password && (
+                  <span className="error">{`${errors.confirm_password.message}`}</span>
+                )}
               </div>
             </div>
-            <SubmitButton isSubmitting={isLoading} submitted={() => onSubmit("security")} text="Save changes" />
-          </div>
-        );
+            <button type="submit" disabled={isSubmitting} css={styles.form_submit}>
+              {isSubmitting ? <Spinner className="h-5 w-5" /> : 'Save Changes'}
+            </button>
+          </form>
+        )
       }
 
-      case "Notification": {
+      case 'Notification': {
         const switchState = (value: boolean) => {
-          onSubmit("notification", value);
+          onSubmit('notification', value)
         }
 
         return (
@@ -279,7 +383,11 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
                   <TaskIcon />
                   <p css={settingsStyle.value}>Notifications for Task reminder</p>
                 </div>
-                <SwitchToggle value={switchState} className="mt-[3px]" state={notificationStatus ? true : false} />
+                <SwitchToggle
+                  value={switchState}
+                  className="mt-[3px]"
+                  state={notificationStatus ? true : false}
+                />
               </div>
               {/* <div css={settingsStyle.disabled}>
                 <div className="flex flex-row gap-3">
@@ -290,13 +398,11 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
               </div> */}
             </div>
           </div>
-        );
+        )
       }
 
       default: {
-        return (
-          <h1 className="text-px-18 text-rose-600">404 Error!</h1>
-        );
+        return <h1 className="text-px-18 text-rose-600">404 Error!</h1>
       }
     }
   }
@@ -312,7 +418,7 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
     >
       {activeComponent(active)}
     </DialogBox>
-  );
-};
+  )
+}
 
-export default SettingsModal;
+export default SettingsModal

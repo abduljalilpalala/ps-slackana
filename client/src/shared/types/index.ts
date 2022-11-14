@@ -98,3 +98,9 @@ export type NotificationConstants = {
   COMMIT: string
   MERGE: string
 }
+
+export type Security = {
+  current_password: string
+  new_password: string
+  confirm_password: string
+}
