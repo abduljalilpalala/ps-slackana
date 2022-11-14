@@ -101,6 +101,22 @@ export const deleteProjectFile = createAsyncThunk(
   }
 )
 
+export const downloadProjectFile = createAsyncThunk(
+  'file/downloadProjectFile',
+  async (payload: { projectId: number; fileId: string }, thunkAPI) => {
+    try {
+      const response = await fileService.getProjectFile(payload.projectId, payload.fileId)
+      if (response) {
+        const files = await fileService.getProjectFiles(payload.projectId)
+        const formattedFiles = formatFiles(files)
+        return formattedFiles
+      }
+    } catch (error) {
+      return thunkAPI.rejectWithValue(catchError(error))
+    }
+  }
+)
+
 export const fileSlice = createSlice({
   name: 'projectFiles',
   initialState,
@@ -188,6 +204,19 @@ export const fileSlice = createSlice({
         state.files = action.payload
       })
       .addCase(deleteProjectFile.rejected, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isError = true
+        state.error = action.payload
+      })
+      .addCase(downloadProjectFile.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(downloadProjectFile.fulfilled, (state, action: PayloadAction<any>) => {
+        state.isLoading = false
+        state.isSuccess = true
+        state.files = action.payload
+      })
+      .addCase(downloadProjectFile.rejected, (state, action: PayloadAction<any>) => {
         state.isLoading = false
         state.isError = true
         state.error = action.payload

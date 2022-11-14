@@ -16,7 +16,7 @@ const getProjectFile = async (projectId: number, fileId: string): Promise<Blob |
   const response = await axios.get(`/api/project/${projectId}/file/${fileId}`, {
     responseType: 'blob'
   })
-  return response.data
+  return response
 }
 
 const addProjectFile = async (projectId: number, file: FileList): Promise<string> => {

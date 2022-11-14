@@ -8,7 +8,8 @@ import {
   getProjectFiles,
   addProjectFile,
   deleteProjectFile,
-  renameProjectFile
+  renameProjectFile,
+  downloadProjectFile
 } from '~/redux/files/fileSlice'
 
 import fileService from '~/redux/files/fileService'
@@ -16,31 +17,39 @@ import fileService from '~/redux/files/fileService'
 export const useFileMethods = (projectID: number) => {
   const [isFileLoading, setIsFileLoading] = useState(false)
   const dispatch = useAppDispatch()
-  const { files, isLoading } = useAppSelector((state) => state.file)
+  const { files, isLoading, error, isError } = useAppSelector((state) => state.file)
 
   useEffect(() => {
     setIsFileLoading(true)
     dispatch(getProjectFiles(projectID)).then((_) => setIsFileLoading(false))
+    if (isError) {
+      toast.error('Error loading files. The server is probably down.')
+    }
   }, [projectID])
 
   const useHandleCreateFiles = async (data: FileList, callback: () => void): Promise<void> => {
     setIsFileLoading(true)
     // check if data file size is greater than 2MB
-    const iniValue = await fileService.getIniValue()
-    const { max_file_size, max_file_uploads } = formatIniValues(iniValue)
-
-    const isFileSizeValid = Array.from(data).every((file) => file.size <= max_file_size)
-    if (!isFileSizeValid || data.length >= max_file_uploads) {
-      !isFileSizeValid &&
-        toast.error(`Size of each files must not be greater than ${iniValue.upload_max_filesize}B`)
-      data.length >= max_file_uploads &&
-        toast.error(`You can only upload less than ${max_file_uploads} files at a time`)
-      setIsFileLoading(false)
-    } else {
-      dispatch(addProjectFile({ projectId: projectID, file: data })).then((_) => {
+    try {
+      const iniValue = await fileService.getIniValue()
+      const { max_file_size, max_file_uploads } = formatIniValues(iniValue)
+      const isFileSizeValid = Array.from(data).every((file) => file.size <= max_file_size)
+      if (!isFileSizeValid || data.length >= max_file_uploads) {
+        !isFileSizeValid &&
+          toast.error(
+            `Size of each files must not be greater than ${iniValue.upload_max_filesize}B`
+          )
+        data.length >= max_file_uploads &&
+          toast.error(`You can only upload less than ${max_file_uploads} files at a time`)
         setIsFileLoading(false)
-        callback()
-      })
+      } else {
+        dispatch(addProjectFile({ projectId: projectID, file: data })).then((_) => {
+          setIsFileLoading(false)
+          callback()
+        })
+      }
+    } catch (e) {
+      toast.error('Error uploading! The server is probably down.')
     }
   }
 
@@ -65,9 +74,15 @@ export const useFileMethods = (projectID: number) => {
   }
 
   const useHandleDownloadFile = async (fileID: string): Promise<string | Blob> => {
-    setIsFileLoading(true)
     const file = fileService.getProjectFile(projectID, fileID)
-    setIsFileLoading(false)
+
+    setIsFileLoading(true)
+    dispatch(downloadProjectFile({ projectId: projectID, fileId: fileID })).then((_) => {
+      setIsFileLoading(false)
+      if (isError) {
+        toast.error('Error downloading the file. The server is probably down.')
+      }
+    })
     return file
   }
 

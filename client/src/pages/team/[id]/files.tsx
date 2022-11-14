@@ -26,6 +26,7 @@ const Files: NextPage = (): JSX.Element => {
   const [pageNumber, setPageNumber] = useState<number>(0)
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [isOpenDragUpload, setIsOpenDragUpload] = useState<boolean>(false)
+  const { error, isError } = useAppSelector((state) => state.file)
   /*
    * This will partially store the id and filename in modal
    */
@@ -61,7 +62,11 @@ const Files: NextPage = (): JSX.Element => {
    */
   const handleUpdateFilename = async (data: Filename): Promise<void> => {
     useHandleRenameFile(filename.id, data.filename, () => {
-      toast.success('File renamed successfully!')
+      if (isError) {
+        toast.error(`${filename.filename} renaming to ${data.filename} failed! ${error.content}`)
+      } else {
+        toast.success(`${filename.filename} renamed to ${data.filename}!`)
+      }
     })
     handleOpenEditModal(data)
   }
@@ -69,10 +74,15 @@ const Files: NextPage = (): JSX.Element => {
   /*
    * Handle Delete the File
    */
-  const handleDeleteFile = async (id: string): Promise<void> => {
+  const handleDeleteFile = async (id: string, fileName: string): Promise<void> => {
     DeleteConfirmModal(() => {
       useHandleDeleteFile(id, () => {
-        toast.success('File deleted successfully!')
+        const name = fileName.split('.').slice(0, -1).join('.')
+        if (isError) {
+          toast.error(`${name} failed to delete! ${error.content}`)
+        } else {
+          toast.success(`${name} deleted!`)
+        }
       })
     })
   }
@@ -168,7 +178,11 @@ const FileHeader = (props: FileHeaderProps): JSX.Element => {
         if (isError) {
           toast.error(`${error.content}`)
         } else {
-          toast.success('File uploaded successfully!')
+          Object.entries(fileUploaded).forEach((entry) => {
+            const [_, value] = entry
+            const filename = value.name.split('.').slice(0, -1).join('.')
+            toast.success(`${filename} uploaded successfully!`)
+          })
         }
         e.target.value = ''
       })

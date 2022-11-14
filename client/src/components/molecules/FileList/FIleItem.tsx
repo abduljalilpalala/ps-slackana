@@ -13,7 +13,7 @@ type Props = {
   file: File
   actions: {
     handleOpenEditModal: (data?: Filename) => void
-    handleDeleteFile: (id: string) => Promise<void>
+    handleDeleteFile: (id: string, fileName: string) => Promise<void>
     handleDownloadFile: (id: string, fileName: string) => Promise<void>
   }
 }
@@ -67,7 +67,7 @@ const FileItem: FC<Props> = (props): JSX.Element => {
             className={`outline-none active:scale-95 ${can?.deleteFile ? '' : 'hidden'}`}
             data-for="actions"
             data-tip="Delete"
-            onClick={() => handleDeleteFile(id)}
+            onClick={() => handleDeleteFile(id, filename)}
           >
             <Trash className="h-4 w-4 md:h-5 md:w-5" />
           </button>
