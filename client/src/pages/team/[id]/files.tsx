@@ -61,7 +61,7 @@ const Files: NextPage = (): JSX.Element => {
    */
   const handleUpdateFilename = async (data: Filename): Promise<void> => {
     useHandleRenameFile(filename.id, data.filename, () => {
-      toast.success('File renamed successfully!')
+      toast.success(`${filename.filename} renamed to ${data.filename}!`)
     })
     handleOpenEditModal(data)
   }
@@ -69,10 +69,11 @@ const Files: NextPage = (): JSX.Element => {
   /*
    * Handle Delete the File
    */
-  const handleDeleteFile = async (id: string): Promise<void> => {
+  const handleDeleteFile = async (id: string, fileName: string): Promise<void> => {
     DeleteConfirmModal(() => {
       useHandleDeleteFile(id, () => {
-        toast.success('File deleted successfully!')
+        const name = fileName.split('.').slice(0, -1).join('.')
+        toast.success(`${name} deleted!`)
       })
     })
   }
@@ -168,7 +169,10 @@ const FileHeader = (props: FileHeaderProps): JSX.Element => {
         if (isError) {
           toast.error(`${error.content}`)
         } else {
-          toast.success('File uploaded successfully!')
+          for (let i = 0; i < fileUploaded.length; i++) {
+            const filename = fileUploaded[i].name.split('.').slice(0, -1).join('.')
+            toast.success(`${filename} uploaded successfully!`)
+          }
         }
         e.target.value = ''
       })

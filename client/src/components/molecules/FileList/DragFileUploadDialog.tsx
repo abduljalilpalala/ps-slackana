@@ -29,7 +29,10 @@ const DragFileUploadDialog: FC<Props> = (props): JSX.Element => {
         if (isError) {
           toast.error(`${error.content}`)
         } else {
-          toast.success('File uploaded successfully!')
+          for (let i = 0; i < acceptedFiles.length; i++) {
+            const filename = acceptedFiles[i].name.split('.').slice(0, -1).join('.')
+            toast.success(`${filename} uploaded successfully!`)
+          }
         }
       })
     }

@@ -16,7 +16,7 @@ type Props = {
   filename: Filename
   actions: {
     handleOpenEditModal: (data?: Filename) => void
-    handleDeleteFile: (id: string) => Promise<void>
+    handleDeleteFile: (id: string, fileName: string) => Promise<void>
     handleUpdateFilename: (data: Filename) => Promise<void>
   }
   isUpdating: boolean
