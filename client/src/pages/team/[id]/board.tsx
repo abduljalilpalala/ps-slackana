@@ -122,13 +122,26 @@ const Board: NextPage = (): JSX.Element => {
    */
   const handleSaveSection = async (): Promise<void> => {
     dispatch(sectionRefresher())
-    dispatch(createSection()).then((_) => {
-      dispatch(getSections()).then((_) => {
+    toast
+      .promise(
+        dispatch(createSection())
+          .unwrap()
+          .then((_) => {
+            dispatch(getSections()).then((_) => {
+              setShowAddSection(!showAddSection)
+              dispatch(resetRefresher())
+            })
+          }),
+        {
+          loading: 'Creating section...',
+          success: 'Section created successfully!',
+          error: 'Error on creating section!'
+        }
+      )
+      .catch((_) => {
         setShowAddSection(!showAddSection)
         dispatch(resetRefresher())
-        toast.success('Successfully Added!')
       })
-    })
   }
 
   /**
@@ -138,12 +151,20 @@ const Board: NextPage = (): JSX.Element => {
     dispatch(setRemoveSectionData({ id }))
     const message = confirm('Do you want to delete section?')
     if (message) {
-      dispatch(removeSection()).then((_) => {
-        dispatch(getSections()).then((_) => {
-          dispatch(resetRefresher())
-          toast.success('Successfully Removed!')
-        })
-      })
+      toast.promise(
+        dispatch(removeSection())
+          .unwrap()
+          .then((_) => {
+            dispatch(getSections()).then((_) => {
+              dispatch(resetRefresher())
+            })
+          }),
+        {
+          loading: 'Removing section...',
+          success: 'Section removed successfully!',
+          error: 'Error on removing section!'
+        }
+      )
     }
   }
 
@@ -154,6 +175,10 @@ const Board: NextPage = (): JSX.Element => {
     const name = e.target.value
     dispatch(setRenameSectionData({ id, name }))
     dispatch(renameSection())
+      .unwrap()
+      .catch((_) => {
+        toast.error('Error on updating section!')
+      })
   }
 
   const handleShowAddTask = (id: number): void => setCurrentBoardId(id)
