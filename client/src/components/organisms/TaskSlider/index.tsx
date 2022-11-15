@@ -404,9 +404,12 @@ const TaskSlider: FC<Props> = (props): JSX.Element => {
                         >
                           <Menu.Item>
                             <button
+                              disabled={deleteTask}
                               onClick={handleRemoveTask}
                               className={classNames(
-                                'flex w-full items-center space-x-3 py-2 px-4 font-medium text-rose-600',
+                                `${
+                                  deleteTask && 'cursor-not-allowed'
+                                } flex w-full items-center space-x-3 py-2 px-4 font-medium text-rose-600`,
                                 'text-sm transition duration-150 ease-in-out hover:bg-rose-100 active:bg-rose-600 active:text-white'
                               )}
                             >
