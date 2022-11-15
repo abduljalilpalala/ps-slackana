@@ -54,9 +54,7 @@ const Notifications: NextPage = (): JSX.Element => {
   const handleReadNotification = (notification: Notification) => {
     useMarkReadNotification(notification.id, notification.data.project_id)
     if (notification.data.type === NotificationTypes.ASSIGN_TASK) {
-      router.push(
-        `/team/${notification.data.project_id}/board?task_id=${notification.data.task?.id}`
-      )
+      window.location.href = `/team/${notification.data.project_id}/board?task_id=${notification.data.task?.id}`
     }
     if (notification.data.type === NotificationTypes.COMMIT) {
       window.open(notification.data.commit?.url)

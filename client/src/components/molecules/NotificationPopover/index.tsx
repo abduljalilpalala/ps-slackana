@@ -30,9 +30,7 @@ const NotificationPopover = (): JSX.Element => {
     useMarkReadNotification(notification?.id, notification?.data.project_id)
     if (notification?.data?.type === NotificationTypes.ASSIGN_TASK) {
       callback()
-      router.push(
-        `/team/${notification?.data?.project_id}/board?task_id=${notification?.data?.task?.id}`
-      )
+      window.location.href = `/team/${notification?.data?.project_id}/board?task_id=${notification?.data?.task?.id}`
     }
     if (notification?.data?.type === NotificationTypes.COMMIT) {
       window.open(notification?.data?.commit?.url)
