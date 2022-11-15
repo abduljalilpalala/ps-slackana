@@ -32,7 +32,7 @@ export const signInUpAuthCheck: GetServerSideProps = wrapper.getServerSideProps(
 
 export const authCheck: GetServerSideProps = wrapper.getServerSideProps(
   (store) =>
-    async ({ req, params }) => {
+    async ({ req, params, query }) => {
       const token = req.cookies['token']
       const config = { headers: { Authorization: `Bearer ${token}` } }
 
@@ -45,6 +45,9 @@ export const authCheck: GetServerSideProps = wrapper.getServerSideProps(
           req.url?.includes('board')
         ) {
           await axios.get(`/api/project/${params?.id}/member/${res.data.id}`, config)
+          if (req.url?.includes('board?task_id')) {
+            await axios.get(`/api/project/${params?.id}/task/${query?.task_id}/details`, config)
+          }
         }
       } catch (error: any) {
         if (error.response.status === 404) {
