@@ -43,7 +43,7 @@ class ProjectMessageController extends Controller
 
   private function returnData(Project $project)
   {
-    event(new SendProjectMessageEvent($project));
+    // event(new SendProjectMessageEvent($project));
     return ProjectMessageResource::collection(Project::find($project->id)->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->orderBy('created_at', 'ASC')->get());
   }
 }

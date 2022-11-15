@@ -102,9 +102,9 @@ const EditMessageDialog: FC<Props> = (props): JSX.Element => {
                     {!isSubmitting ? (
                       <SendIcon
                         className={`
-                            h-5 w-5 fill-current text-slate-400
-                            ${isDirty || isValid || isSubmitting ? 'text-blue-500' : ''}
-                          `}
+                      h-5 w-5 fill-current text-slate-400
+                      ${isDirty || isValid || isSubmitting ? 'text-blue-500' : ''}
+                    `}
                       />
                     ) : (
                       <Spinner className="h-5 w-5 fill-current text-slate-400" />

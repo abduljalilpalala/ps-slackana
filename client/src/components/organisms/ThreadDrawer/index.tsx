@@ -29,7 +29,7 @@ type Props = {
       threadId: number
     }) => Promise<void>
     handleUpdateThread: (data: ThreadMessage) => Promise<void>
-    handleCloseEditModalThreadToggle: () => void
+    handleCloseEditModalThreadSliderToggle: () => void
     handleReplyThread: (data: ChatMessageValues) => Promise<void>
     onPressAddThread: (
       event: React.KeyboardEvent<HTMLFormElement>,
@@ -48,7 +48,7 @@ const ThreadSlider: FC<Props> = (props): JSX.Element => {
     actions: {
       handleDeleteThread,
       handleUpdateThread,
-      handleCloseEditModalThreadToggle,
+      handleCloseEditModalThreadSliderToggle,
       handleReplyThread,
       onPressAddThread
     }
@@ -92,7 +92,7 @@ const ThreadSlider: FC<Props> = (props): JSX.Element => {
       message: thread?.message
     }
     setThreadMessage(data)
-    handleCloseEditModalThreadToggle()
+    handleCloseEditModalThreadSliderToggle()
   }
 
   return (
@@ -130,7 +130,7 @@ const ThreadSlider: FC<Props> = (props): JSX.Element => {
             <EditMessageDialog
               isOpen={isOpenEditModalThread}
               threadMessage={threadMessage}
-              closeModal={handleCloseEditModalThreadToggle}
+              closeModal={handleCloseEditModalThreadSliderToggle}
               actions={{ handleUpdateThread }}
             />
           )}

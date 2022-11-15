@@ -44,7 +44,7 @@ class ProjectMessageThreadController extends Controller
 
     $updatedMessage = new ProjectMessageResource(ProjectMessage::withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->findOrFail($message->id));
 
-    event(new SendProjectMessageThreadEvent($newThreadMessages, $updatedMessage, $message->id));
+    // event(new SendProjectMessageThreadEvent($newThreadMessages, $updatedMessage, $message->id));
 
     return [
       'newThreadMessages' => $newThreadMessages,

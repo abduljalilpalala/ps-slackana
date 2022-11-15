@@ -5,15 +5,17 @@ import ReactMarkdown from 'react-markdown'
 import { ChevronRight } from 'react-feather'
 import { NextRouter, useRouter } from 'next/router'
 import { useForm, Controller } from 'react-hook-form'
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { FC, useEffect, useRef, useState, Fragment } from 'react'
 
-import { Chat, GithubType } from '~/redux/chat/chatType'
 import { Message } from '~/shared/interfaces'
 import SendIcon from '~/shared/icons/SendIcon'
 import { converter } from '~/utils/mdeOptions'
 import DownRight from '~/shared/icons/DownRightIcon'
 import { Spinner } from '~/shared/icons/SpinnerIcon'
+import { CloseIcon } from '~/shared/icons/CloseIcon'
+import { Dialog, Transition } from '@headlessui/react'
 import { useAppSelector } from '~/hooks/reduxSelector'
+import { Chat, GithubType } from '~/redux/chat/chatType'
 import DialogBox from '~/components/templates/DialogBox'
 import MessageOptionDropdown from '../MessageOptionDropdown'
 import ThreadMessageIcon from '~/shared/icons/ThreadMessageIcon'
@@ -263,42 +265,79 @@ const EditMessageDialog: FC<EditMessageDialogProps> = (props): JSX.Element => {
   })
 
   return (
-    <DialogBox isOpen={isOpen} closeModal={closeModal} bodyClass="px-0 -my-20">
-      <form onSubmit={handleSubmit(handleUpdateMessage)} className="relative -mt-4 mb-10">
-        <input {...register('id')} hidden type="text" defaultValue={chatMessage.id} />
-        <Controller
-          name="message"
-          control={control}
-          defaultValue={chatMessage.message}
-          rules={{ required: 'You must a message to reply.' }}
-          render={({ field }) => (
-            <ReactMde
-              {...field}
-              selectedTab={selectedTab}
-              onTabChange={setSelectedTab}
-              generateMarkdownPreview={(markdown) => Promise.resolve(converter.makeHtml(markdown))}
-              childProps={{
-                writeButton: {
-                  tabIndex: -1
-                }
-              }}
-            />
-          )}
-        />
-        <button type="submit" className="absolute top-0.5 right-0 py-3.5 px-4 outline-none">
-          {!isSubmitting ? (
-            <SendIcon
-              className={`
-                h-5 w-5 fill-current text-slate-400
-                ${isDirty || isValid || isSubmitting ? 'text-blue-500' : ''}
-              `}
-            />
-          ) : (
-            <Spinner className="h-5 w-5 fill-current text-slate-400" />
-          )}
-        </button>
-      </form>
-    </DialogBox>
+    <Transition appear show={isOpen} as={Fragment}>
+      <Dialog as="div" className="relative z-50" onClose={closeModal}>
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-slate-900 bg-opacity-50" />
+        </Transition.Child>
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4 text-center">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel>
+                <form
+                  onSubmit={handleSubmit(handleUpdateMessage)}
+                  className="relative rounded-xl bg-white"
+                >
+                  <input {...register('id')} hidden type="text" defaultValue={chatMessage.id} />
+                  <Controller
+                    name="message"
+                    control={control}
+                    defaultValue={chatMessage.message}
+                    rules={{ required: 'You must a message to reply.' }}
+                    render={({ field }) => (
+                      <ReactMde
+                        {...field}
+                        selectedTab={selectedTab}
+                        onTabChange={setSelectedTab}
+                        generateMarkdownPreview={(markdown) =>
+                          Promise.resolve(converter.makeHtml(markdown))
+                        }
+                        childProps={{
+                          writeButton: {
+                            tabIndex: -1
+                          }
+                        }}
+                      />
+                    )}
+                  />
+                  <button
+                    type="submit"
+                    className="absolute top-0.5 right-1 rounded-r-lg bg-white py-3 px-3 outline-none"
+                  >
+                    {!isSubmitting ? (
+                      <SendIcon
+                        className={`
+                          h-5 w-5 fill-current text-slate-400
+                          ${isDirty || isValid || isSubmitting ? 'text-blue-500' : ''}
+                        `}
+                      />
+                    ) : (
+                      <Spinner className="h-5 w-5 fill-current text-slate-400" />
+                    )}
+                  </button>
+                </form>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </Dialog>
+    </Transition>
   )
 }
 

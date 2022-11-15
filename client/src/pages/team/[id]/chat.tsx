@@ -70,10 +70,13 @@ const Chat: NextPage = (): JSX.Element => {
 
   const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false)
   const [isOpenEditModalThread, setIsOpenEditModalThread] = useState<boolean>(false)
+  const [isOpenEditModalThreadSlider, setIsOpenEditModalThreadSlider] = useState<boolean>(false)
 
   const handleCloseEditModalToggle = (): void => setIsOpenEditModal(!isOpenEditModal)
   const handleCloseEditModalThreadToggle = (): void =>
     setIsOpenEditModalThread(!isOpenEditModalThread)
+  const handleCloseEditModalThreadSliderToggle = (): void =>
+    setIsOpenEditModalThreadSlider(!isOpenEditModalThreadSlider)
 
   // Add Message
   const handleMessage = async (data: ChatMessageValues): Promise<void> => {
@@ -95,7 +98,10 @@ const Chat: NextPage = (): JSX.Element => {
       message: data?.message
     }
 
-    await dispatch(updateMessage(payload)).then(() => handleCloseEditModalToggle())
+    await dispatch(updateMessage(payload))
+    setIsOpenEditModal(false)
+    setIsOpenEditModalThread(false)
+    setIsOpenEditModalThreadSlider(false)
   }
 
   // Delete Message
@@ -147,6 +153,9 @@ const Chat: NextPage = (): JSX.Element => {
     }
 
     await dispatch(addThread(request))
+    setIsOpenEditModal(false)
+    setIsOpenEditModalThread(false)
+    setIsOpenEditModalThreadSlider(false)
   }
 
   // Delete Thread Message
@@ -325,12 +334,12 @@ const Chat: NextPage = (): JSX.Element => {
         chatData={chats}
         threads={threads}
         isLoadingThread={isLoadingThread}
-        isOpenEditModalThread={isOpenEditModalThread}
+        isOpenEditModalThread={isOpenEditModalThreadSlider}
         isLoadingSubmitThreadChat={isLoadingSubmitThreadChat}
         actions={{
           handleDeleteThread,
           handleUpdateThread,
-          handleCloseEditModalThreadToggle,
+          handleCloseEditModalThreadSliderToggle,
           handleReplyThread,
           onPressAddThread
         }}
