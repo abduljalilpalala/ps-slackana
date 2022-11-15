@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react'
 import { useRouter } from 'next/router'
+import { ChevronDown } from 'react-feather'
 import { Menu, Transition } from '@headlessui/react'
 
 import {
@@ -67,28 +68,36 @@ const TeamTemplate = ({ data, callBack, teams, loadingState }: any) => {
         <Menu as="div" className="relative inline-block text-left">
           <div>
             <Menu.Button disabled={!can?.removeTeam && !can?.editTeam}>
-              <div
-                onClick={() => dispatch(setRemoveTeamID({ teamID, projectID }))}
-                className="flex w-[200px] items-center gap-2 truncate mobile:!w-full"
-              >
-                <div className="flex max-h-[44px] max-w-[44px] items-center justify-center rounded-full border">
-                  <img
-                    src={icon?.url}
-                    onError={(e) => handleImageError(e, dummyTeamIcon[7])}
-                    alt="team-icon"
-                    width={100}
-                    height={100}
-                    className="rounded-full"
-                  />
-                </div>
-                <span
-                  data-tip={name.length >= 15 ? name : null}
-                  className="truncate text-base font-semibold"
+              {({ open }) => (
+                <div
+                  onClick={() => dispatch(setRemoveTeamID({ teamID, projectID }))}
+                  className="group flex w-[200px] items-center gap-2 truncate active:scale-95 mobile:!w-full"
                 >
-                  {name}
-                </span>
-                <ReactTooltip />
-              </div>
+                  <div className="flex max-h-[44px] max-w-[44px] items-center justify-center rounded-full border">
+                    <img
+                      src={icon?.url}
+                      onError={(e) => handleImageError(e, dummyTeamIcon[7])}
+                      alt="team-icon"
+                      width={100}
+                      height={100}
+                      className="rounded-full"
+                    />
+                  </div>
+                  <span
+                    data-tip={name.length >= 15 ? name : null}
+                    className="truncate text-base font-semibold"
+                  >
+                    {name}
+                  </span>
+                  <ChevronDown
+                    className={`
+                    h-5 w-5 stroke-2 opacity-0 transition duration-75 ease-in-out group-hover:opacity-100
+                    ${open ? 'opacity-100' : ''}
+                  `}
+                  />
+                  <ReactTooltip />
+                </div>
+              )}
             </Menu.Button>
           </div>
           <Transition
