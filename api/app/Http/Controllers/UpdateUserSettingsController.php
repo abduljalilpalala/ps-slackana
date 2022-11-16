@@ -23,4 +23,10 @@ class UpdateUserSettingsController extends Controller
     }
     return response()->noContent();
   }
+
+  public function destroy(Request $request)
+  {
+    auth()->user()->addMedia(public_path('assets/avatar/default-avatar.png'))->preservingOriginal()->toMediaCollection('avatar');
+    return response()->noContent();
+  }
 }

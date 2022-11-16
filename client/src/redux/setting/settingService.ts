@@ -29,12 +29,8 @@ const uploadPhoto = async (photoData: any): Promise<any> => {
   return response.data
 }
 
-const removePhoto = async (photoData: any): Promise<any> => {
-  const response = await axios.post('/api/user/setting', photoData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  })
+const removePhoto = async (id: number): Promise<any> => {
+  const response = await axios.delete(`/api/user/setting/${id}`)
 
   return response.data
 }

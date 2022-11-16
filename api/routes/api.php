@@ -82,7 +82,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
   Route::group(['prefix' => 'user'], function () {
     Route::put('change-password', [ChangeUserPasswordController::class, 'update']);
-    Route::apiResource('setting', UpdateUserSettingsController::class)->only(['store', 'update']);
+    Route::apiResource('setting', UpdateUserSettingsController::class)->only(['store', 'update', 'destroy']);
     Route::put('change-details', [UserController::class, 'update']);
     Route::get('/', [UserController::class, 'index']);
   });

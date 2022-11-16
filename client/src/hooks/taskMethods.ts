@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -40,6 +41,7 @@ import {
 } from '~/redux/task/taskSlice'
 
 export const useTaskMethods = (projectID: number) => {
+  const router = useRouter()
   const { task } = useAppSelector((state) => state)
   const {
     taskData,
@@ -167,9 +169,10 @@ export const useTaskMethods = (projectID: number) => {
   }
   const useHandleGetTask = async (task_id: number) => {
     setIsTaskLoading(true)
-    dispatch(getTask(task_id)).then((_) => {
-      setIsTaskLoading(false)
-    })
+    dispatch(getTask(task_id))
+      .unwrap()
+      .then(() => setIsTaskLoading(false))
+      .catch(() => router.push('/not-found'))
   }
   const useHandleGetTaskWithoutLoading = async (task_id: number) => {
     dispatch(getTask(task_id))
