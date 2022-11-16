@@ -9,7 +9,8 @@ import {
   uploadPhoto,
   updatePassword,
   updateNotification,
-  updateProfileDetails
+  updateProfileDetails,
+  removePhoto
 } from '~/redux/setting/settingSlice'
 import { Security } from '~/shared/types'
 import TaskIcon from '~/shared/icons/TaskIcon'
@@ -89,6 +90,22 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
       {
         loading: 'Uploading...',
         success: 'Photo uploaded successfully!',
+        error: 'Something went wrong.'
+      }
+    )
+  }
+
+  const removeImage = (): void => {
+    toast.promise(
+      dispatch(removePhoto(id))
+        .unwrap()
+        .then(() => {
+          dispatch(hydrateUserState())
+          dispatch(getProject(projectID))
+        }),
+      {
+        loading: 'Removing photo...',
+        success: 'Photo removed successfully!',
         error: 'Something went wrong.'
       }
     )
@@ -183,11 +200,16 @@ const SettingsModal = ({ close }: { close: (value: boolean) => void }) => {
                   </label>
 
                   <button
-                    data-tip="Under development"
                     css={settingsStyle.remove}
-                    className="cursor-not-allowed bg-slate-500 opacity-50 hover:!text-slate-900 mobile:!max-w-[120px] mobile:!text-sm"
+                    onClick={removeImage}
+                    disabled={avatar?.url?.includes('default-avatar.png') || userLoading}
+                    className={`bg-slate-300 ${
+                      avatar?.url?.includes('default-avatar.png')
+                        ? 'opacity-50'
+                        : 'hover:bg-slate-400 hover:!text-slate-900'
+                    }   mobile:!max-w-[120px] mobile:!text-sm`}
                   >
-                    Remove photo
+                    {userLoading ? 'Loading...' : 'Remove photo'}
                   </button>
                   <ReactTooltip />
                 </div>

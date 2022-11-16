@@ -2,7 +2,7 @@ import {
   createSlice,
   PayloadAction,
   createAsyncThunk,
-  ActionReducerMapBuilder,
+  ActionReducerMapBuilder
 } from '@reduxjs/toolkit'
 
 import { AxiosResponseError } from '~/shared/types'
@@ -68,9 +68,9 @@ export const uploadPhoto: any = createAsyncThunk(
 )
 export const removePhoto: any = createAsyncThunk(
   'auth/removePhotoStatus',
-  async (_: any, thunkAPI) => {
+  async (id: number, thunkAPI) => {
     try {
-      return await settingService.removePhoto("")
+      return await settingService.removePhoto(id)
     } catch (error: any) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
@@ -89,7 +89,7 @@ export const settingSlice = createSlice({
         status: 0,
         content: null
       }
-    },
+    }
   },
   extraReducers: (builder: ActionReducerMapBuilder<InitialState>) => {
     builder
