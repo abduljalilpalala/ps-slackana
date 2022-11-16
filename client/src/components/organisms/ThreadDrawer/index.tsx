@@ -3,97 +3,42 @@ import { Hash, X } from 'react-feather'
 import { useRouter } from 'next/router'
 import ReactTooltip from 'react-tooltip'
 import ReactMarkdown from 'react-markdown'
-import { UseFormReset } from 'react-hook-form'
 import React, { FC, useEffect, useState } from 'react'
 
-import { Chat } from '~/redux/chat/chatType'
-import { ChatMessageValues } from '~/shared/types'
-import { ThreadMessage } from '~/shared/interfaces'
 import { Spinner } from '~/shared/icons/SpinnerIcon'
 import { showMessage } from '~/redux/chat/chatSlice'
 import handleImageError from '~/helpers/handleImageError'
-import ChatEditor from '~/components/molecules/ChatEditor'
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
 import ThreadOptionDropdown from '~/components/molecules/ThreadOptionDropdown'
-import EditMessageDialog from '~/components/molecules/ThreadList/EditMessageDialog'
+import ChatThreadEditor from '~/components/molecules/ChatEditor/ChatThreadEditor'
+import { NOT_FOUND } from '~/utils/constants'
 
-type Props = {
-  isLoadingThread: boolean
-  chatData: Chat[]
-  threads: Chat[]
-  isOpenEditModalThread: boolean
-  isLoadingSubmitThreadChat: boolean
-  actions: {
-    handleDeleteThread: (payload: {
-      messageId: string | string[] | undefined
-      threadId: number
-    }) => Promise<void>
-    handleUpdateThread: (data: ThreadMessage) => Promise<void>
-    handleCloseEditModalThreadToggle: () => void
-    handleReplyThread: (data: ChatMessageValues) => Promise<void>
-    onPressAddThread: (
-      event: React.KeyboardEvent<HTMLFormElement>,
-      data: ChatMessageValues,
-      reset: UseFormReset<ChatMessageValues>
-    ) => void
-  }
-}
-
-const ThreadSlider: FC<Props> = (props): JSX.Element => {
-  const {
-    isLoadingThread,
-    isOpenEditModalThread,
-    threads,
-    isLoadingSubmitThreadChat,
-    actions: {
-      handleDeleteThread,
-      handleUpdateThread,
-      handleCloseEditModalThreadToggle,
-      handleReplyThread,
-      onPressAddThread
-    }
-  } = props
-
+const ThreadSlider: FC = (): JSX.Element => {
   const {
     overviewProject: { title }
   } = useAppSelector((state) => state.project)
 
   const { message } = useAppSelector((state) => state.chat)
-  const [threadMessage, setThreadMessage] = useState<ThreadMessage>({
-    id: 0,
-    thread_id: 0,
-    message: ''
-  })
 
   const router = useRouter()
   const { id, chat_id } = router.query
   const dispatch = useAppDispatch()
   const { user: author } = useAppSelector((state) => state.auth)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const onLoad = () => {
+    setIsLoading(() => true)
+    dispatch(showMessage({ projectId: id, messageId: chat_id }))
+      .unwrap()
+      .then(() => setIsLoading(() => false))
+      .catch(() => router.push(NOT_FOUND))
+  }
 
   useEffect(() => {
     if (chat_id) {
-      onLoadThread()
+      onLoad()
     }
   }, [chat_id])
-
-  const onLoadThread = async () => {
-    if (id && chat_id) {
-      const payload = {
-        projectId: id,
-        messageId: chat_id
-      }
-      await dispatch(showMessage(payload))
-    }
-  }
-
-  const handleOpenEditThreadDialog = (thread?: Chat) => {
-    const data = {
-      thread_id: thread?.id,
-      message: thread?.message
-    }
-    setThreadMessage(data)
-    handleCloseEditModalThreadToggle()
-  }
 
   return (
     <>
@@ -126,15 +71,7 @@ const ThreadSlider: FC<Props> = (props): JSX.Element => {
           </button>
         </header>
         <main className="default-scrollbar flex h-full flex-col overflow-y-auto">
-          {isOpenEditModalThread && (
-            <EditMessageDialog
-              isOpen={isOpenEditModalThread}
-              threadMessage={threadMessage}
-              closeModal={handleCloseEditModalThreadToggle}
-              actions={{ handleUpdateThread }}
-            />
-          )}
-          {isLoadingThread ? (
+          {isLoading ? (
             <div className="flex items-center justify-center py-6">
               <Spinner className="h-5 w-5 text-blue-500" />
             </div>
@@ -206,11 +143,7 @@ const ThreadSlider: FC<Props> = (props): JSX.Element => {
                             border-slate-300 bg-white px-0.5 pt-0.5 opacity-0 shadow-lg group-message-hover:opacity-100
                           `}
                           >
-                            <ThreadOptionDropdown
-                              thread={thread}
-                              actions={{ handleDeleteThread, handleOpenEditThreadDialog }}
-                            />
-
+                            <ThreadOptionDropdown chat={thread} />
                             <ReactTooltip
                               place="top"
                               type="dark"
@@ -229,11 +162,7 @@ const ThreadSlider: FC<Props> = (props): JSX.Element => {
             </>
           )}
           <div className="px-4 py-2 pb-[90px]">
-            <ChatEditor
-              handleMessage={handleReplyThread}
-              checkKeyDown={onPressAddThread}
-              isLoadingEnterPress={isLoadingSubmitThreadChat}
-            />
+            <ChatThreadEditor />
           </div>
         </main>
       </section>
@@ -248,7 +177,7 @@ type DividerProps = {
 const Divider = ({ threadCount }: DividerProps) => {
   return (
     <>
-      {!!threadCount && (
+      {threadCount ? (
         <div className="px-6 py-3">
           <div className="relative flex items-center border-b border-slate-200">
             <span className="absolute bg-white pr-2 text-xs font-medium text-slate-500">
@@ -256,7 +185,7 @@ const Divider = ({ threadCount }: DividerProps) => {
             </span>
           </div>
         </div>
-      )}
+      ) : null}
     </>
   )
 }

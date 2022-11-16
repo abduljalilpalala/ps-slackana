@@ -1,9 +1,18 @@
-import { Chat } from './chatType'
+import {
+  AddMessageThreadType,
+  AddMessageType,
+  Chat,
+  DeleteMessageThreadType,
+  DeleteMessageType,
+  MessageThreadResponse,
+  UpdateMessageThreadType,
+  UpdateMessageType
+} from './chatType'
 import { axios } from '~/shared/lib/axios'
 
-{
+
   /* Chat Messages */
-}
+
 const getMessages = async (projectId: number | string): Promise<Chat[]> => {
   const response = await axios.get(`/api/project/${projectId}/message`)
   return response.data
@@ -14,65 +23,48 @@ const showMessage = async (projectId: number, messageId: number): Promise<string
   return response.data
 }
 
-const addMessage = async (
-  projectId: number,
-  payload: { member_id: number; message: string }
-): Promise<any> => {
-  const response = await axios.post(`/api/project/${projectId}/message`, payload)
-
+const addMessage = async (payload: AddMessageType): Promise<any> => {
+  const { projectId, message } = payload
+  const response = await axios.post(`/api/project/${projectId}/message`, { message })
   return response.data
 }
 
-const updateMessage = async (
-  projectId: number,
-  memberId: number,
-  message: string
-): Promise<string> => {
-  const response = await axios.put(`/api/project/${projectId}/message/${memberId}`, {
-    member_id: memberId,
-    message
-  })
+const updateMessage = async (payload: UpdateMessageType): Promise<Chat> => {
+  const { projectId, messageId, message } = payload
+  const response = await axios.put(`/api/project/${projectId}/message/${messageId}`, { message })
   return response.data
 }
 
-const deleteMessage = async (projectId: number, messageId: number): Promise<string> => {
+const deleteMessage = async (payload: DeleteMessageType): Promise<number> => {
+  const { projectId, messageId } = payload
   const response = await axios.delete(`/api/project/${projectId}/message/${messageId}`)
   return response.data
 }
 
-{
-  /* Thread Messages */
-}
+/* Thread Messages */
+
 const getThreads = async (messageId: number): Promise<Chat[]> => {
   const response = await axios.get(`/api/project/message/${messageId}/thread`)
   return response.data
 }
 
-const addThread = async (
-  messageId: number,
-  payload: { member_id: number; message: string }
-): Promise<any> => {
-  const response = await axios.post(`/api/project/message/${messageId}/thread`, payload)
-
+const addThread = async (payload: AddMessageThreadType): Promise<MessageThreadResponse> => {
+  const { projectId, messageId, message } = payload
+  const request = { project: projectId, message }
+  const response = await axios.post(`/api/project/message/${messageId}/thread`, request)
   return response.data
 }
 
-const updateThread = async (
-  message_id: number,
-  thread_id: number,
-  payload: {
-    member_id: number
-    message: string
-  }
-): Promise<string> => {
-  const response = await axios.put(`/api/project/message/${message_id}/thread/${thread_id}`, {
-    member_id: payload.member_id,
-    message: payload.message
+const updateThread = async (payload: UpdateMessageThreadType): Promise<MessageThreadResponse> => {
+  const { messageId, threadId, message } = payload
+  const response = await axios.put(`/api/project/message/${messageId}/thread/${threadId}`, {
+    message
   })
   return response.data
 }
 
-const deleteThread = async (messageId: number, threadId: number): Promise<string> => {
+const deleteThread = async (payload: DeleteMessageThreadType): Promise<MessageThreadResponse> => {
+  const { messageId, threadId } = payload
   const response = await axios.delete(`/api/project/message/${messageId}/thread/${threadId}`)
   return response.data
 }

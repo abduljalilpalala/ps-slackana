@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Enums\MessageActionEnum;
 use App\Http\Resources\ProjectMessageResource;
 use App\Models\Project;
 use App\Models\ProjectMessage;
@@ -19,15 +20,21 @@ class SendProjectMessageEvent implements ShouldBroadcast
 
   public $result;
   public $project;
+  public $actionType;
   /**
    * Create a new event instance.
    *
    * @return void
    */
-  public function __construct(Project $project)
+  public function __construct(Project $project, $message, MessageActionEnum $actionType)
   {
-    $this->result = ProjectMessageResource::collection(Project::find($project->id)->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->orderBy('created_at', 'ASC')->get());
     $this->project = $project;
+    if ($actionType !== MessageActionEnum::DELETE_MESSAGE) {
+      $this->result =  new ProjectMessageResource(ProjectMessage::withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->findOrFail($message->id));
+    } else {
+      $this->result = $message;
+    }
+    $this->actionType = $actionType;
   }
 
   /**
@@ -48,7 +55,8 @@ class SendProjectMessageEvent implements ShouldBroadcast
   public function broadcastWith()
   {
     return [
-      'result' => $this->result
+      'data' => $this->result,
+      'type' => $this->actionType,
     ];
   }
 }

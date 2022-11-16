@@ -5,3 +5,5 @@ export const NotificationTypes: NotificationConstants = {
   COMMIT: 'commit',
   MERGE: 'merge'
 } as const
+
+export const NOT_FOUND = '/404'
