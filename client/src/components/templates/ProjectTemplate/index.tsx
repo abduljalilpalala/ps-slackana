@@ -80,7 +80,7 @@ const ProjectTemplate = ({ data, isLoading }: ProjectTemplateType): JSX.Element 
               <ProjectStatus status={statusChecker(status?.name)} />
               <p className="w-full max-w-[170px] truncate text-ellipsis text-slate-900">{title}</p>
             </div>
-            <p className="text-slate-600">{moment(created_at).format('MMM DD, YYYY')}</p>
+            <p className="text-sm text-slate-500">{moment(created_at).format('MMM DD, YYYY')}</p>
           </div>
         </div>
       )}
