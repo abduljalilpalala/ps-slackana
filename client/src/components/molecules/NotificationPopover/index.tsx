@@ -13,6 +13,7 @@ import { formatMoment } from '~/utils/formatMoment'
 import handleImageError from '~/helpers/handleImageError'
 import { Notification } from '~/shared/interfaces'
 import { NotificationTypes } from '~/utils/constants'
+import { Spinner } from '~/shared/icons/SpinnerIcon'
 
 const NotificationPopover = (): JSX.Element => {
   const router = useRouter()
@@ -21,6 +22,7 @@ const NotificationPopover = (): JSX.Element => {
     notifications,
     hasNotification,
     sidebarProject,
+    isPopoverLoading,
     useMarkReadNotification,
     useSeenNotifications
   } = useNotificationMethods()
@@ -64,7 +66,12 @@ const NotificationPopover = (): JSX.Element => {
                 <h1>Notifications</h1>
               </header>
               <main css={styles.main} className="scroll-show-on-hover default-scrollbar">
-                {notifications.length ? (
+                {isPopoverLoading ? (
+                  <div className="m-auto mt-2 flex items-center justify-center">
+                    <Spinner className="h-5 w-5" />
+                    <span className="ml-1 text-sm"> Loading...</span>
+                  </div>
+                ) : notifications.length ? (
                   notifications.map((notification: Notification) => {
                     return (
                       <a

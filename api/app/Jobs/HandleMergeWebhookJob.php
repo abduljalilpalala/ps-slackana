@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\MessageActionEnum;
 use App\Enums\PullRequestStatusEnum;
 use App\Events\GithubWebhookEvent;
 use App\Events\SendProjectMessageEvent;
@@ -44,14 +45,11 @@ class HandleMergeWebhookJob implements ShouldQueue
           "title" => $payload->pull_request->title,
           "url" => $payload->pull_request->html_url
         ];
-        ProjectMessage::create([
-          'project_id' => $project->id,
-          'message' => json_encode($message)
-        ]);
+        $newMessage = ProjectMessage::createGithubMessage($project, ["message" => json_encode($message)]);
         Notification::send($users, new GithubMergeNotification($payload->pull_request->merged_by, $pr_details, $project->id));
         if (!$project->is_archived) {
           event(new GithubWebhookEvent($users, $project));
-          event(new SendProjectMessageEvent($project));
+          event(new SendProjectMessageEvent($project, $newMessage, MessageActionEnum::ADD_MESSAGE));
         }
       }
     }
