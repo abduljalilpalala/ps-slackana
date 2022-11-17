@@ -12,7 +12,7 @@ import { ERROR_MESSAGE } from '~/utils/messages'
 import { Spinner } from '~/shared/icons/SpinnerIcon'
 import { updateMessage } from '~/redux/chat/chatSlice'
 import { useAppDispatch } from '~/hooks/reduxSelector'
-import DialogBox from '~/components/templates/DialogBox'
+import DialogTemplate from '~/components/templates/DialogTemplate'
 
 type Props = {
   isOpen: boolean
@@ -66,11 +66,11 @@ const EditMessageDialog: FC<Props> = ({ isOpen, closeModal, chat }): JSX.Element
   }
 
   return (
-    <DialogBox isOpen={isOpen} closeModal={closeModal} bodyClass="px-0 -my-20">
+    <DialogTemplate isOpen={isOpen} closeModal={closeModal}>
       <form
         onSubmit={handleSubmit(handleUpdateMessage)}
         onKeyDown={checkKeyDown}
-        className="relative -mt-4 mb-10"
+        className="relative rounded-xl bg-white"
       >
         <input {...register('id')} hidden type="text" />
         <Controller
@@ -93,13 +93,13 @@ const EditMessageDialog: FC<Props> = ({ isOpen, closeModal, chat }): JSX.Element
         />
         <button
           type="submit"
-          className="absolute top-0.5 right-0 py-3.5 px-4 outline-none"
+          className="absolute top-2 right-2 bg-[#f8fafc] py-2 px-2 outline-none"
           disabled={!isValid}
         >
           <SubmitButton isLoading={isLoading} isValid={isValid} />
         </button>
       </form>
-    </DialogBox>
+    </DialogTemplate>
   )
 }
 

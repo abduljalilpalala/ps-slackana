@@ -3,7 +3,7 @@ import { Hash, X } from 'react-feather'
 import { useRouter } from 'next/router'
 import ReactTooltip from 'react-tooltip'
 import ReactMarkdown from 'react-markdown'
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useEffect, useRef, useState } from 'react'
 
 import { Spinner } from '~/shared/icons/SpinnerIcon'
 import { showMessage } from '~/redux/chat/chatSlice'
@@ -13,7 +13,9 @@ import ThreadOptionDropdown from '~/components/molecules/ThreadOptionDropdown'
 import ChatThreadEditor from '~/components/molecules/ChatEditor/ChatThreadEditor'
 import { NOT_FOUND } from '~/utils/constants'
 
-const ThreadSlider: FC = (): JSX.Element => {
+const ThreadDrawer: FC = (): JSX.Element => {
+  const drawerThredRef = useRef<HTMLDivElement>(null)
+
   const {
     overviewProject: { title }
   } = useAppSelector((state) => state.project)
@@ -40,6 +42,16 @@ const ThreadSlider: FC = (): JSX.Element => {
     }
   }, [chat_id])
 
+  useEffect(() => {
+    if (drawerThredRef.current) {
+      drawerThredRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'end',
+        inline: 'nearest'
+      })
+    }
+  }, [message])
+
   return (
     <>
       {chat_id && (
@@ -50,7 +62,7 @@ const ThreadSlider: FC = (): JSX.Element => {
       )}
       <section
         className={`
-          fixed right-0 z-20 h-full w-full flex-1 flex-shrink-0 overflow-hidden
+          fixed right-0 z-20 flex h-full w-full flex-1 flex-shrink-0 flex-col overflow-hidden
            bg-white text-slate-900 transition-all duration-300 ease-in-out sm:max-w-[351px] 
           ${chat_id ? 'block translate-x-0 lg:hidden' : 'translate-x-full'}
         `}
@@ -161,7 +173,7 @@ const ThreadSlider: FC = (): JSX.Element => {
               )}
             </>
           )}
-          <div className="px-4 py-2 pb-[90px]">
+          <div className="px-4 py-2" ref={drawerThredRef}>
             <ChatThreadEditor />
           </div>
         </main>
@@ -190,4 +202,4 @@ const Divider = ({ threadCount }: DividerProps) => {
   )
 }
 
-export default ThreadSlider
+export default ThreadDrawer

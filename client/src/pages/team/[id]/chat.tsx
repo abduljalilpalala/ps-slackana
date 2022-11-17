@@ -15,6 +15,7 @@ import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
 
 const Chat: NextPage = (): JSX.Element => {
   const router = useRouter()
+
   const { id, chat_id } = router.query
   useChatPusher()
 
@@ -42,7 +43,7 @@ const Chat: NextPage = (): JSX.Element => {
           {chat_id ? (
             <section
               className={`
-                default-scrollbar flex h-screen w-[350px] flex-shrink-0 flex-col 
+                default-scrollbar flex h-full w-[350px] flex-shrink-0 flex-col 
                 overflow-y-auto scrollbar-thumb-slate-400
               `}
             >
