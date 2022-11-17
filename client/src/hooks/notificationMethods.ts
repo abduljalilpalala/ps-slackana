@@ -11,6 +11,7 @@ export const useNotificationMethods = (id: number = 0) => {
   const [notifications, setNotifications] = useState([])
   const [notificationsTable, setNotificationsTable] = useState([])
   const [isTableLoading, setIsTableLoading] = useState<boolean>(false)
+  const [isPopoverLoading, setIsPopoverLoading] = useState<boolean>(false)
   const [hasNotification, setHasNotification] = useState<boolean>(false)
   const { user } = useAppSelector((state) => state.auth)
   const dispatch = useAppDispatch()
@@ -46,10 +47,12 @@ export const useNotificationMethods = (id: number = 0) => {
     setNotificationsTable(response.data)
   }
   const useGetNotificationsOnMount = async () => {
+    setIsPopoverLoading(true)
     const response = await axios.get(`/api/notification`)
     const hasUnreadNotifications = response.data.some(
       (notification: Notification) => !notification.is_seen
     )
+    setIsPopoverLoading(false)
     setHasNotification(hasUnreadNotifications)
     setNotifications(response.data)
   }
@@ -95,6 +98,7 @@ export const useNotificationMethods = (id: number = 0) => {
     notificationsTable,
     isTableLoading,
     isSidebarLoading,
+    isPopoverLoading,
     setIsTableLoading,
     useGetNotificationsTable,
     useMarkReadNotification,

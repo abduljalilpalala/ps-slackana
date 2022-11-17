@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\MessageActionEnum;
 use App\Events\GithubWebhookEvent;
 use App\Events\SendProjectMessageEvent;
 use App\Models\Project;
@@ -41,14 +42,11 @@ class HandlePushWebhookJob implements ShouldQueue
       $project = Project::repository($payload->repository->full_name)->first();
       if ($project) {
         $users = $project->members->pluck('user');
-        ProjectMessage::create([
-          'project_id' => $project->id,
-          'message' => json_encode($message)
-        ]);
+        $newMessage = ProjectMessage::createGithubMessage($project, ["message" => json_encode($message)]);
         Notification::send($users, new GithubPushNotification($payload->sender, $payload->repository, $commit, $project->id));
         if (!$project->is_archived) {
           event(new GithubWebhookEvent($users, $project));
-          event(new SendProjectMessageEvent($project));
+          event(new SendProjectMessageEvent($project, $newMessage, MessageActionEnum::ADD_MESSAGE));
         }
       }
     }
