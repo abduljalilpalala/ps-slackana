@@ -2,53 +2,46 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\SendProjectMessageThreadEvent;
-use App\Http\Requests\ProjectMessageRequest;
-use App\Http\Resources\ProjectMessageResource;
-use App\Models\Project;
 use App\Models\ProjectMessage;
+use App\Enums\MessageActionEnum;
 use App\Models\ProjectMessageThread;
+use App\Events\SendProjectMessageThreadEvent;
+use App\Http\Resources\ProjectMessageResource;
+use App\Http\Requests\ProjectMessageThreadRequest;
 
 class ProjectMessageThreadController extends Controller
 {
-  public function index(ProjectMessage $message)
-  {
-    return ProjectMessageResource::collection($message->thread()->with('member.user.avatar')->get());
-  }
+    public function index(ProjectMessage $message)
+    {
+        return ProjectMessageResource::collection($message->thread()->with('member.user.avatar')->get());
+    }
 
-  public function store(ProjectMessageRequest $request, ProjectMessage $message)
-  {
-    $message->thread()->create([
-      'project_member_id' => Project::find($request->project_id)->user($request->member_id)->firstOrFail()->id,
-      'message' => $request->message
-    ]);
+    public function store(ProjectMessageThreadRequest $request, ProjectMessage $message)
+    {
+        $newThread = ProjectMessageThread::createThreadMessage($message, $request);
+        event(new SendProjectMessageThreadEvent($newThread, $message, MessageActionEnum::ADD_MESSAGE));
+        return response()->json([
+            'threadMessage' => $newThread->displayThreadMessage(),
+            'message' => $message->displayMessage(),
+        ]);
+    }
 
-    return $this->returnData($message);
-  }
+    public function update(ProjectMessageThreadRequest $request, ProjectMessage $message, ProjectMessageThread $thread)
+    {
+        $newThread = $thread->updateThreadMessage($request);
+        event(new SendProjectMessageThreadEvent($newThread, $message, MessageActionEnum::UPDATE_MESSAGE));
+        return response()->json([
+            'threadMessage' => $newThread->displayThreadMessage(),
+            'message' => $message->displayMessage()
+        ]);
+    }
 
-  public function update(ProjectMessageRequest $request, ProjectMessage $message, ProjectMessageThread $thread)
-  {
-    $thread->update(['message' => $request->message]);
-    return $this->returnData($message);
-  }
-
-  public function destroy(ProjectMessage $message, ProjectMessageThread $thread)
-  {
-    $thread->delete();
-    return $this->returnData($message);
-  }
-
-  private function returnData(ProjectMessage $message)
-  {
-    $newThreadMessages = ProjectMessageResource::collection(ProjectMessage::findOrFail($message->id)->thread()->with('member.user.avatar')->get());
-
-    $updatedMessage = new ProjectMessageResource(ProjectMessage::withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->findOrFail($message->id));
-
-    event(new SendProjectMessageThreadEvent($newThreadMessages, $updatedMessage, $message->id));
-
-    return [
-      'newThreadMessages' => $newThreadMessages,
-      'message' => $updatedMessage
-    ];
-  }
+    public function destroy(ProjectMessage $message, ProjectMessageThread $thread)
+    {
+        event(new SendProjectMessageThreadEvent($thread->deleteThreadMessage(), $message, MessageActionEnum::DELETE_MESSAGE));
+        return response()->json([
+            'threadMessage' => $thread->id,
+            'message' => $message->displayMessage()
+        ]);
+    }
 }

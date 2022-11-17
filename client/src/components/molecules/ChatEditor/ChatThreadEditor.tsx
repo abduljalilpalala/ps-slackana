@@ -8,11 +8,11 @@ import { converter } from '~/utils/mdeOptions'
 import SendIcon from '~/shared/icons/SendIcon'
 import { ERROR_MESSAGE } from '~/utils/messages'
 import { ChatMessageValues } from '~/shared/types'
-import { addMessage } from '~/redux/chat/chatSlice'
+import { addThread } from '~/redux/chat/chatSlice'
 import { Spinner } from '~/shared/icons/SpinnerIcon'
 import { useAppDispatch } from '~/hooks/reduxSelector'
 
-const ChatEditor: FC = (): JSX.Element => {
+const ChatThreadEditor: FC = (): JSX.Element => {
   const {
     reset,
     control,
@@ -25,12 +25,12 @@ const ChatEditor: FC = (): JSX.Element => {
 
   const dispatch = useAppDispatch()
   const router = useRouter()
-  const { id } = router.query
+  const { id, chat_id } = router.query
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const handleMessage = ({ message }: ChatMessageValues) => {
     setIsLoading(() => true)
-    dispatch(addMessage({ projectId: id, message }))
+    dispatch(addThread({ projectId: id, messageId: chat_id, message }))
       .unwrap()
       .then(() => reset({ message: '' }))
       .catch(() => toast.error(ERROR_MESSAGE))
@@ -93,4 +93,4 @@ const SubmitButton = ({ isLoading, isValid }: { isLoading: boolean; isValid: boo
   )
 }
 
-export default ChatEditor
+export default ChatThreadEditor

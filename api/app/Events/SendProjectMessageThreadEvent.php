@@ -2,11 +2,10 @@
 
 namespace App\Events;
 
+use App\Enums\MessageActionEnum;
 use App\Http\Resources\ProjectMessageResource;
 use App\Http\Resources\ProjectMessageThreadResource;
-use App\Models\Project;
 use App\Models\ProjectMessage;
-use App\Models\ProjectMessageThread;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -19,19 +18,23 @@ class SendProjectMessageThreadEvent implements ShouldBroadcast
 {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
-  public $newThreadMessages;
+  public $threadMessage;
   public $updatedMessage;
-  public $id;
+  public $actionType;
   /**
    * Create a new event instance.
    *
    * @return void
    */
-  public function __construct($newThreadMessages, $updatedMessage, $id)
+  public function __construct($threadMessage, $updatedMessage, MessageActionEnum $actionType)
   {
-    $this->newThreadMessages = $newThreadMessages;
-    $this->updatedMessage = $updatedMessage;
-    $this->id = $id;
+    $this->actionType = $actionType;
+    $this->updatedMessage = new ProjectMessageResource(ProjectMessage::withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->findOrFail($updatedMessage->id));
+    if ($actionType !== MessageActionEnum::DELETE_MESSAGE) {
+      $this->threadMessage = new ProjectMessageThreadResource($threadMessage);
+    } else {
+      $this->threadMessage = $threadMessage;
+    }
   }
 
   /**
@@ -41,7 +44,7 @@ class SendProjectMessageThreadEvent implements ShouldBroadcast
    */
   public function broadcastOn()
   {
-    return new Channel('chat.' . $this->id . '.thread');
+    return new Channel('chat.' . $this->updatedMessage->id . '.thread');
   }
 
   public function broadcastAs()
@@ -52,8 +55,9 @@ class SendProjectMessageThreadEvent implements ShouldBroadcast
   public function broadcastWith()
   {
     return [
-      'newThreadMessages' => $this->newThreadMessages,
-      'message' => $this->updatedMessage
+      'threadMessage' => $this->threadMessage,
+      'message' => $this->updatedMessage,
+      'type' => $this->actionType
     ];
   }
 }

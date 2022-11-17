@@ -6,7 +6,16 @@ import {
   current
 } from '@reduxjs/toolkit'
 
-import { Chat } from './chatType'
+import {
+  AddMessageThreadType,
+  AddMessageType,
+  Chat,
+  DeleteMessageThreadType,
+  DeleteMessageType,
+  MessageThreadResponse,
+  UpdateMessageThreadType,
+  UpdateMessageType
+} from './chatType'
 import chatService from './chatService'
 import { catchError } from '~/utils/handleAxiosError'
 
@@ -16,8 +25,8 @@ type InitialState = {
   message: Chat | null
   isError: boolean
   isLoading: boolean
-  isLoadingSubmitChat: boolean
-  isLoadingSubmitThreadChat: boolean
+  isDoneSendingChatMessage: boolean
+  isDoneSendingThreadMessage: boolean
   isSuccess: boolean
   error: {
     status: number
@@ -31,9 +40,9 @@ const initialState: InitialState = {
   message: null,
   isError: false,
   isLoading: false,
+  isDoneSendingChatMessage: false,
+  isDoneSendingThreadMessage: false,
   isSuccess: false,
-  isLoadingSubmitChat: false,
-  isLoadingSubmitThreadChat: false,
   error: {
     status: 0,
     content: null
@@ -65,9 +74,9 @@ export const showMessage = createAsyncThunk(
 
 export const addMessage = createAsyncThunk(
   'chat/addMessage',
-  async ({ projectId, payload }: any, thunkAPI) => {
+  async (payload: AddMessageType, thunkAPI) => {
     try {
-      return await chatService.addMessage(projectId, payload)
+      return await chatService.addMessage(payload)
     } catch (error) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
@@ -76,9 +85,9 @@ export const addMessage = createAsyncThunk(
 
 export const updateMessage = createAsyncThunk(
   'chat/updateMessage',
-  async ({ projectId, memberId, message }: any, thunkAPI) => {
+  async (payload: UpdateMessageType, thunkAPI) => {
     try {
-      return await chatService.updateMessage(projectId, memberId, message)
+      return await chatService.updateMessage(payload)
     } catch (error) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
@@ -87,9 +96,9 @@ export const updateMessage = createAsyncThunk(
 
 export const deleteMessage = createAsyncThunk(
   'chat/deleteMessage',
-  async ({ projectId, messageId }: any, thunkAPI) => {
+  async (payload: DeleteMessageType, thunkAPI) => {
     try {
-      return await chatService.deleteMessage(projectId, messageId)
+      return await chatService.deleteMessage(payload)
     } catch (error) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
@@ -97,19 +106,12 @@ export const deleteMessage = createAsyncThunk(
 )
 
 // THREADS
-export const getThreads = createAsyncThunk('chat/getThreads', async (messageId: any, thunkAPI) => {
-  try {
-    return await chatService.getThreads(messageId)
-  } catch (error) {
-    return thunkAPI.rejectWithValue(catchError(error))
-  }
-})
 
 export const addThread = createAsyncThunk(
   'chat/addThread',
-  async ({ messageId, payload }: any, thunkAPI) => {
+  async (payload: AddMessageThreadType, thunkAPI) => {
     try {
-      return await chatService.addThread(messageId, payload)
+      return await chatService.addThread(payload)
     } catch (error) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
@@ -118,9 +120,9 @@ export const addThread = createAsyncThunk(
 
 export const updateThread = createAsyncThunk(
   'chat/updateThread',
-  async ({ message_id, thread_id, payload }: any, thunkAPI) => {
+  async (payload: UpdateMessageThreadType, thunkAPI) => {
     try {
-      return await chatService.updateThread(message_id, thread_id, payload)
+      return await chatService.updateThread(payload)
     } catch (error) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
@@ -129,9 +131,9 @@ export const updateThread = createAsyncThunk(
 
 export const deleteThread = createAsyncThunk(
   'chat/deleteThread',
-  async ({ messageId, threadId }: any, thunkAPI) => {
+  async (payload: DeleteMessageThreadType, thunkAPI) => {
     try {
-      return await chatService.deleteThread(messageId, threadId)
+      return await chatService.deleteThread(payload)
     } catch (error) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
@@ -142,28 +144,76 @@ export const chatSlice = createSlice({
   name: 'chat',
   initialState,
   reducers: {
-    reset: (state) => {
-      state.isSuccess = false
-      state.isError = false
-      state.isSuccess = false
-      state.error = {
-        status: 0,
-        content: null
+    setMessageLoading: (state, action) => {
+      state.isDoneSendingChatMessage = action.payload
+    },
+    setAddedMessage: (state, { payload }: { payload: Chat | number }) => {
+      if (typeof payload !== 'number') {
+        if (!current(state.chats).some((chat) => chat.id === payload.id)) {
+          state.chats.push(payload)
+        }
       }
     },
-    setChats: (state, { payload }) => {
-      state.chats = payload
+    setUpdatedMessage: (state, { payload }: { payload: Chat | number }) => {
+      if (typeof payload !== 'number') {
+        const newMessages = current(state.chats).map((chat) => {
+          if (chat.id === payload.id) return payload
+          return chat
+        })
+        state.chats = newMessages
+      }
     },
-    setThreads: (state, { payload }) => {
-      const { message, newThreadMessages } = payload || {}
+    removeMessage: (state, { payload }: { payload: Chat | number }) => {
+      if (current(state.chats).some((chat) => chat.id === payload)) {
+        const newMessages = current(state.chats).filter((chat) => chat.id !== payload)
+        state.chats = newMessages
+      }
+    },
+    setAddedThreadMessage: (
+      state,
+      { payload }: { payload: { message: Chat; threadMessage: Chat } }
+    ) => {
+      const { message, threadMessage } = payload || {}
       const newMessages = current(state.chats).map((chat) => {
         if (chat.id === message.id) return message
         return chat
       })
-
       state.chats = newMessages
-      state.threads = newThreadMessages
-      state.message!.thread = newThreadMessages
+      if (
+        state.message &&
+        !current(state.message?.thread).some((chat) => chat.id === threadMessage.id)
+      ) {
+        state.message.thread.push(threadMessage)
+      }
+    },
+    setUpdatedThreadMessage: (state, { payload }: { payload: Chat }) => {
+      if (state.message) {
+        const threadMessages = current(state.message.thread).map((chat) => {
+          if (chat.id === payload.id) return payload
+          return chat
+        })
+        state.message.thread = threadMessages
+      }
+    },
+    removeThreadMessage: (
+      state,
+      { payload }: { payload: { message: Chat; threadMessage: number } }
+    ) => {
+      const { message, threadMessage } = payload || {}
+      const newMessages = current(state.chats).map((chat) => {
+        if (chat.id === message.id) return message
+        return chat
+      })
+      state.chats = newMessages
+      if (
+        state.message &&
+        current(state.message?.thread).some((chat) => chat.id === threadMessage)
+      ) {
+        const newThreadMessages = current(state.message.thread).filter(
+          (chat) => chat.id !== threadMessage
+        )
+        state.message.thread = newThreadMessages
+      }
     }
   },
   extraReducers: (builder: ActionReducerMapBuilder<InitialState>) => {
@@ -186,147 +236,107 @@ export const chatSlice = createSlice({
 
       // Get Single Message
       .addCase(showMessage.fulfilled, (state, action: PayloadAction<any>) => {
-        state.isLoading = false
-        state.isSuccess = true
-        state.isError = false
         state.message = action.payload
-      })
-      .addCase(showMessage.rejected, (state, action: PayloadAction<any>) => {
-        state.isLoading = false
-        state.isError = true
-        state.error = action.payload
       })
 
       // Add Message
       .addCase(addMessage.pending, (state) => {
-        state.isLoadingSubmitChat = true
+        state.isDoneSendingChatMessage = false
       })
-      .addCase(addMessage.fulfilled, (state, action: PayloadAction<any>) => {
-        state.isLoadingSubmitChat = false
-        state.isError = false
-        state.error = {
-          status: 0,
-          content: null
+
+      .addCase(addMessage.fulfilled, (state, { payload }: PayloadAction<Chat>) => {
+        state.isDoneSendingChatMessage = true
+        if (!current(state.chats).some((chat) => chat.id === payload.id)) {
+          state.chats.push(payload)
         }
-        state.chats = action.payload
-      })
-      .addCase(addMessage.rejected, (state, action: PayloadAction<any>) => {
-        state.isLoadingSubmitChat = false
-        state.isError = true
-        state.error = action.payload
       })
 
       // Delete Message
-      .addCase(deleteMessage.pending, (state) => {
-        state.isLoading = true
-      })
-      .addCase(deleteMessage.fulfilled, (state, action: PayloadAction<any>) => {
-        state.isLoading = false
-        state.isSuccess = true
-        state.chats = action.payload
-      })
-      .addCase(deleteMessage.rejected, (state, action: PayloadAction<any>) => {
-        state.isLoading = false
-        state.isError = true
-        state.error = action.payload
+      .addCase(deleteMessage.fulfilled, (state, { payload }: PayloadAction<number>) => {
+        if (current(state.chats).some((chat) => chat.id === payload)) {
+          const newMessages = current(state.chats).filter((chat) => chat.id !== payload)
+          state.chats = newMessages
+        }
       })
 
       // Update Message
-      .addCase(updateMessage.pending, (state) => {
-        state.isLoading = true
-      })
-      .addCase(updateMessage.fulfilled, (state, action: PayloadAction<any>) => {
-        state.isLoading = false
-        state.isSuccess = true
-        state.chats = action.payload
-      })
-      .addCase(updateMessage.rejected, (state, action: PayloadAction<any>) => {
-        state.isLoading = false
-        state.isError = true
-        state.error = action.payload
+      .addCase(updateMessage.fulfilled, (state, { payload }: PayloadAction<Chat>) => {
+        const newMessages = current(state.chats).map((chat) => {
+          if (chat.id === payload.id) return payload
+          return chat
+        })
+        state.chats = newMessages
       })
 
-      // Get All Threads
-      .addCase(getThreads.pending, (state) => {
-        state.isLoading = true
-      })
-      .addCase(getThreads.fulfilled, (state, action: PayloadAction<any>) => {
-        state.isLoading = false
-        state.isSuccess = true
-        state.isError = false
-        state.threads = action.payload
-      })
-      .addCase(getThreads.rejected, (state, action: PayloadAction<any>) => {
-        state.isLoading = false
-        state.isError = true
-        state.error = action.payload
-      })
-
-      // // Add Thread
+      // Add Thread
       .addCase(addThread.pending, (state) => {
-        state.isLoadingSubmitThreadChat = true
+        state.isDoneSendingThreadMessage = false
       })
-      .addCase(addThread.fulfilled, (state, { payload }: PayloadAction<any>) => {
-        state.isLoadingSubmitThreadChat = false
-        state.isError = false
-        state.error = {
-          status: 0,
-          content: null
-        }
-        const { message, newThreadMessages } = payload || {}
+
+      .addCase(addThread.fulfilled, (state, { payload }: PayloadAction<MessageThreadResponse>) => {
+        state.isDoneSendingThreadMessage = true
+        const { message, threadMessage } = payload || {}
+        if (typeof threadMessage === 'number') return
         const newMessages = current(state.chats).map((chat) => {
           if (chat.id === message.id) return message
           return chat
         })
-
         state.chats = newMessages
-        if (state.message) state.message.thread = newThreadMessages
-      })
-      .addCase(addThread.rejected, (state, action: PayloadAction<any>) => {
-        state.isLoadingSubmitThreadChat = false
-        state.isError = true
-        state.error = action.payload
-      })
-
-      .addCase(deleteThread.pending, (state) => {
-        state.isLoading = true
-      })
-      .addCase(deleteThread.fulfilled, (state, { payload }: PayloadAction<any>) => {
-        state.isLoading = false
-        state.isSuccess = true
-        const { message, newThreadMessages } = payload || {}
-        const newMessages = current(state.chats).map((chat) => {
-          if (chat.id === message.id) return message
-          return chat
-        })
-
-        state.chats = newMessages
-        if (state.message) state.message.thread = newThreadMessages
-      })
-      .addCase(deleteThread.rejected, (state, action: PayloadAction<any>) => {
-        state.isLoading = false
-        state.isError = true
-        state.error = action.payload
-      })
-
-      .addCase(updateThread.pending, (state) => {
-        state.isLoading = true
-      })
-      .addCase(updateThread.fulfilled, (state, action: PayloadAction<any>) => {
-        state.isLoading = false
-        state.isSuccess = true
-
-        if (state.message) {
-          state.message.thread = action.payload.newThreadMessages
+        if (
+          state.message &&
+          !current(state.message?.thread).some((chat) => chat.id === threadMessage.id)
+        ) {
+          state.message.thread.push(threadMessage)
         }
       })
-      .addCase(updateThread.rejected, (state, action: PayloadAction<any>) => {
-        state.isLoading = false
-        state.isError = true
-        state.error = action.payload
-      })
+
+      // Delete Thread
+      .addCase(
+        deleteThread.fulfilled,
+        (state, { payload }: PayloadAction<MessageThreadResponse>) => {
+          const { message, threadMessage } = payload || {}
+          const newMessages = current(state.chats).map((chat) => {
+            if (chat.id === message.id) return message
+            return chat
+          })
+          state.chats = newMessages
+          if (
+            state.message &&
+            current(state.message?.thread).some((chat) => chat.id === threadMessage)
+          ) {
+            const newThreadMessages = current(state.message.thread).filter(
+              (chat) => chat.id !== threadMessage
+            )
+            state.message.thread = newThreadMessages
+          }
+        }
+      )
+
+      // Update Thread
+      .addCase(
+        updateThread.fulfilled,
+        (state, { payload }: PayloadAction<MessageThreadResponse>) => {
+          const { threadMessage } = payload || {}
+          if (typeof threadMessage === 'number') return
+          if (state.message) {
+            const threadMessages = current(state.message.thread).map((chat) => {
+              if (chat.id === threadMessage.id) return threadMessage
+              return chat
+            })
+            state.message.thread = threadMessages
+          }
+        }
+      )
   }
 })
 
-export const { reset, setChats, setThreads } = chatSlice.actions
+export const {
+  setAddedMessage,
+  setUpdatedMessage,
+  removeMessage,
+  setAddedThreadMessage,
+  setUpdatedThreadMessage,
+  removeThreadMessage,
+  setMessageLoading
+} = chatSlice.actions
 export default chatSlice.reducer
