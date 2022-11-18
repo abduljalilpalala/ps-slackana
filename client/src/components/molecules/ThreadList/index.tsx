@@ -10,7 +10,6 @@ import handleImageError from '~/helpers/handleImageError'
 import ThreadOptionDropdown from '../ThreadOptionDropdown'
 import ChatThreadEditor from '../ChatEditor/ChatThreadEditor'
 import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
-import toast from 'react-hot-toast'
 import { NOT_FOUND } from '~/utils/constants'
 
 const ThreadList: FC = (): JSX.Element => {
@@ -18,6 +17,7 @@ const ThreadList: FC = (): JSX.Element => {
   const dispatch = useAppDispatch()
   const { id, chat_id } = router.query
   const messageRef = useRef<HTMLDivElement>(null)
+  const threadMessageRef = useRef<HTMLDivElement>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const { user: author } = useAppSelector((state) => state.auth)
   const { message, isDoneSendingThreadMessage } = useAppSelector((state) => state.chat)
@@ -35,6 +35,16 @@ const ThreadList: FC = (): JSX.Element => {
       onLoad()
     }
   }, [chat_id])
+
+  useEffect(() => {
+    if (threadMessageRef.current) {
+      threadMessageRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'end',
+        inline: 'nearest'
+      })
+    }
+  }, [message])
 
   return (
     <>
@@ -131,7 +141,9 @@ const ThreadList: FC = (): JSX.Element => {
           </>
         )}
       </div>
-      <div className="px-4 py-2">{!isLoading ? <ChatThreadEditor /> : null}</div>
+      <div className="px-4 py-2" ref={threadMessageRef}>
+        {!isLoading ? <ChatThreadEditor /> : null}
+      </div>
     </>
   )
 }
