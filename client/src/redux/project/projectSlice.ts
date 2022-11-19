@@ -9,10 +9,11 @@ import { AxiosResponseError } from '~/shared/types'
 import { catchError } from '~/utils/handleAxiosError'
 import projectService from './projectService'
 import { ProjectSetting } from './projectType'
+import { IProject } from '~/shared/interfaces'
 
 type InitialState = {
   project: any
-  sidebarProject: any
+  sidebarProject: IProject[]
   overviewProject: any
   userPermission: any
   newProject: {
@@ -58,7 +59,7 @@ type InitialState = {
 
 const initialState: InitialState = {
   project: null,
-  sidebarProject: null,
+  sidebarProject: [],
   userPermission: null,
   newProject: {
     title: '',
