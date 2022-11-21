@@ -152,3 +152,51 @@ export interface Notification {
   is_seen: boolean
   created_at: string
 }
+
+export interface IProject {
+  id: number
+  title: string
+  description: string
+  repository: null | undefined
+  icon: {
+    fileName: string
+    url: string
+  }
+  status: {
+    id: number
+    name: string
+  }
+  can: {
+    addMember: boolean
+    removeMember: boolean
+    nudgeMember: boolean
+    assignTeamLeader: boolean
+    setMVP: boolean
+    archiveProject: boolean
+    addTeam: boolean
+    editTeam: boolean
+    removeTeam: boolean
+    createSection: boolean
+    renameSection: boolean
+    removeSection: boolean
+    assignDueDates: boolean
+    createTask: boolean
+    renameTask: boolean
+    deleteTask: boolean
+    assignTask: boolean
+    setTaskAsCompleted: boolean
+    moveTask: boolean
+    uploadFile: boolean
+    downloadFile: boolean
+    deleteFile: boolean
+    renameFile: boolean
+  }
+  settings: {
+    muteNudge: number | boolean
+  }
+  numberOfActiveMembers: number | boolean
+  role: number
+  isArchived: number
+  created_at: string
+  updated_at: string
+}
