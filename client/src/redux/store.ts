@@ -9,6 +9,7 @@ import memberReducer from './member/memberSlice'
 import taskReducer from './task/taskSlice'
 import fileReducer from './files/fileSlice'
 import chatReducer from './chat/chatSlice'
+import notificationReducer from './notification/notificationSlice'
 
 export const store = configureStore({
   reducer: {
@@ -19,7 +20,8 @@ export const store = configureStore({
     member: memberReducer,
     task: taskReducer,
     file: fileReducer,
-    chat: chatReducer
+    chat: chatReducer,
+    notification: notificationReducer
   }
 })
 

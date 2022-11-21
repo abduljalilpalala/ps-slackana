@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { NextPage } from 'next'
 import { FC, useEffect, useState } from 'react'
-import { Hash } from 'react-feather'
+import { Check, Hash, MoreHorizontal } from 'react-feather'
 import { NextRouter, useRouter } from 'next/router'
+import { Menu } from '@headlessui/react'
 
 import { globals } from '~/shared/twin/globals.styles'
 import Pagination from '~/components/atoms/Pagination'
@@ -12,6 +13,8 @@ import { useNotificationMethods } from '~/hooks/notificationMethods'
 import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
 import { Notification, SidebarProject } from '~/shared/interfaces'
 import { NotificationTypes } from '~/utils/constants'
+import MenuTransition from '~/components/templates/MenuTransition'
+import { classNames } from '~/helpers/classNames'
 
 const Notifications: NextPage = (): JSX.Element => {
   const router: NextRouter = useRouter()
@@ -22,12 +25,15 @@ const Notifications: NextPage = (): JSX.Element => {
     isSidebarLoading,
     notificationsTable,
     isTableLoading,
+    useSetCurrentID,
     useGetNotificationsTable,
+    useMarkAllReadNotification,
     useMarkReadNotification
   } = useNotificationMethods(parseInt(id as string))
 
   useEffect(() => {
     useGetNotificationsTable(parseInt(id as string), type as string)
+    useSetCurrentID(parseInt(id as string))
   }, [id, type])
 
   /*
@@ -63,6 +69,11 @@ const Notifications: NextPage = (): JSX.Element => {
       window.open(notification.data.pr_details?.url)
     }
   }
+
+  const handleMarkAllReadNotification = () => {
+    useMarkAllReadNotification(parseInt(id as string))
+  }
+
   return (
     <NotificationLayout metaTitle="Notifications">
       <article className="flex h-full min-h-full w-full overflow-hidden text-slate-700">
@@ -136,6 +147,40 @@ const Notifications: NextPage = (): JSX.Element => {
               >
                 Unread
               </button>
+              <Menu as="div" className={`inline-block bg-white text-center`}>
+                {({ open }) => (
+                  <div
+                    className={`${
+                      open && 'bg-slate-100'
+                    } w-10 py-2 outline-none hover:bg-slate-100 md:py-1.5`}
+                  >
+                    <Menu.Button>
+                      <MoreHorizontal className="absolute -mt-4 -ml-3 h-5 w-5" />
+                    </Menu.Button>
+                    <MenuTransition>
+                      <Menu.Items
+                        className={classNames(
+                          'absolute right-6 mt-3 w-44 origin-top-right divide-y divide-gray-200 overflow-hidden md:right-20',
+                          'rounded-md border border-slate-200 bg-white py-1 shadow-xl focus:outline-none'
+                        )}
+                      >
+                        <Menu.Item>
+                          <button
+                            className={classNames(
+                              'flex w-full items-center space-x-3 py-2 px-4 text-sm font-medium text-slate-900',
+                              'transition duration-150 ease-in-out hover:bg-slate-100 active:bg-slate-500 active:text-white'
+                            )}
+                            onClick={handleMarkAllReadNotification}
+                          >
+                            <Check className="mr-2 h-4 w-4" />
+                            Mark all as read
+                          </button>
+                        </Menu.Item>
+                      </Menu.Items>
+                    </MenuTransition>
+                  </div>
+                )}
+              </Menu>
             </div>
           </article>
           <article className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-between overflow-hidden bg-white px-4 pb-4">
