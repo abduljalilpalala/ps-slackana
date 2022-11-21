@@ -13,7 +13,8 @@ import { formatMoment } from '~/utils/formatMoment'
 import handleImageError from '~/helpers/handleImageError'
 import { Notification } from '~/shared/interfaces'
 import { NotificationTypes } from '~/utils/constants'
-import { Spinner } from '~/shared/icons/SpinnerIcon'
+import ImageSkeleton from '~/components/atoms/Skeletons/ImageSkeleton'
+import LineSkeleton from '~/components/atoms/Skeletons/LineSkeleton'
 
 const NotificationPopover = (): JSX.Element => {
   const router = useRouter()
@@ -47,6 +48,18 @@ const NotificationPopover = (): JSX.Element => {
     router.push(`/notifications/projects/${sidebarProject[0]?.id}?type=all`)
   }
 
+  const loadingNotification = () => (
+    <div key={Math.random()} className="mx-2 mt-1 flex items-center gap-2">
+      <div>
+        <ImageSkeleton className="max-h-[33px] max-w-[33px] rounded-full " />
+      </div>
+      <div className="flex flex-col items-start justify-start">
+        <LineSkeleton className="mt-[10px] w-48" />
+        <LineSkeleton className="w-40" />
+      </div>
+    </div>
+  )
+
   return (
     <Popover css={styles.popover}>
       {({ open, close }) => (
@@ -67,10 +80,7 @@ const NotificationPopover = (): JSX.Element => {
               </header>
               <main css={styles.main} className="scroll-show-on-hover default-scrollbar">
                 {isPopoverLoading ? (
-                  <div className="m-auto mt-2 flex items-center justify-center">
-                    <Spinner className="h-5 w-5" />
-                    <span className="ml-1 text-sm"> Loading...</span>
-                  </div>
+                  [...Array(3)].map(() => loadingNotification())
                 ) : notifications.length ? (
                   notifications.map((notification: Notification) => {
                     return (

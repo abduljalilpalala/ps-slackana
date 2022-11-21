@@ -6,10 +6,16 @@ import { useAppDispatch, useAppSelector } from './reduxSelector'
 import { getSections, setProjectID } from '~/redux/section/sectionSlice'
 import { getSidebarProjects } from '~/redux/project/projectSlice'
 import { Notification } from '~/shared/interfaces'
+import {
+  setCurrentID,
+  setNotifications,
+  setNotificationsTable
+} from '~/redux/notification/notificationSlice'
 
 export const useNotificationMethods = (id: number = 0) => {
-  const [notifications, setNotifications] = useState([])
-  const [notificationsTable, setNotificationsTable] = useState([])
+  const { notifications, notificationsTable, currentID } = useAppSelector(
+    (state) => state.notification
+  )
   const [isTableLoading, setIsTableLoading] = useState<boolean>(false)
   const [isPopoverLoading, setIsPopoverLoading] = useState<boolean>(false)
   const [hasNotification, setHasNotification] = useState<boolean>(false)
@@ -25,7 +31,7 @@ export const useNotificationMethods = (id: number = 0) => {
 
   const useGetNotifications = async () => {
     const response = await axios.get(`/api/notification`)
-    setNotifications(response.data)
+    dispatch(setNotifications(response.data))
   }
   const useGetNotificationsTable = async (
     project_id: number | null = sidebarProject[0]?.id,
@@ -34,17 +40,20 @@ export const useNotificationMethods = (id: number = 0) => {
     setIsTableLoading(true)
     const response = await axios.get(`/api/notification?project=${project_id}&type=${type}`)
     setIsTableLoading(false)
-    setNotificationsTable(response.data)
+    dispatch(setNotificationsTable(response.data))
+  }
+  const useSetCurrentID = async (project_id: number) => {
+    dispatch(setCurrentID(project_id))
   }
   const useGetNotificationsTableOnUpdate = async (project_id: number) => {
     const response = await axios.get(`/api/notification?project=${project_id}&type=all`)
-    if (id === project_id) {
-      setNotificationsTable(response.data)
+    if (currentID === project_id) {
+      dispatch(setNotificationsTable(response.data))
     }
   }
   const useGetNotificationsTableNoLoading = async (project_id: number) => {
     const response = await axios.get(`/api/notification?project=${project_id}&type=all`)
-    setNotificationsTable(response.data)
+    dispatch(setNotificationsTable(response.data))
   }
   const useGetNotificationsOnMount = async () => {
     setIsPopoverLoading(true)
@@ -54,7 +63,7 @@ export const useNotificationMethods = (id: number = 0) => {
     )
     setIsPopoverLoading(false)
     setHasNotification(hasUnreadNotifications)
-    setNotifications(response.data)
+    dispatch(setNotifications(response.data))
   }
   const useSeenNotifications = async () => {
     await axios.put(`/api/project/notification/seen`)
@@ -67,6 +76,11 @@ export const useNotificationMethods = (id: number = 0) => {
     useGetNotifications()
     useGetNotificationsTableNoLoading(project_id)
   }
+  const useMarkAllReadNotification = async (project_id: number) => {
+    await axios.put(`/api/project/${project_id}/notification/mark-read`)
+    useGetNotifications()
+    useGetNotificationsTableNoLoading(project_id)
+  }
   useEffect(() => {
     useGetNotificationsOnMount()
   }, [])
@@ -76,7 +90,6 @@ export const useNotificationMethods = (id: number = 0) => {
   }
 
   useEffect(() => {
-    if (!overviewProject.id) return
     if (overviewProject.isArchived) {
       unsubscribePusher()
       return
@@ -90,7 +103,7 @@ export const useNotificationMethods = (id: number = 0) => {
     return () => {
       unsubscribePusher()
     }
-  }, [overviewProject.isArchived])
+  }, [overviewProject.isArchived, currentID])
   return {
     notifications,
     hasNotification,
@@ -99,6 +112,8 @@ export const useNotificationMethods = (id: number = 0) => {
     isTableLoading,
     isSidebarLoading,
     isPopoverLoading,
+    useSetCurrentID,
+    useMarkAllReadNotification,
     setIsTableLoading,
     useGetNotificationsTable,
     useMarkReadNotification,
