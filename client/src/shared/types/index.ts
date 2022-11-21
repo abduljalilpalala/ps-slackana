@@ -1,5 +1,8 @@
-import { IconType } from 'react-icons'
 import { Icon } from 'react-feather'
+import { IconType } from 'react-icons'
+import { MouseEventHandler } from 'react'
+
+import { File } from './../interfaces'
 
 export type IniValueType = {
   upload_max_filesize: string
@@ -103,4 +106,22 @@ export type Security = {
   current_password: string
   new_password: string
   confirm_password: string
+}
+
+export type SortKeys = keyof File
+
+export type SortOrder = 'ASC' | 'DESC'
+
+export type SortFileProps = {
+  tableData: File[]
+  sortKey: SortKeys
+  reverse: boolean
+}
+
+export type SortButtonProps = {
+  label: string
+  sortOrder: SortOrder
+  columnKey: SortKeys
+  sortKey: SortKeys
+  onClick: MouseEventHandler<HTMLButtonElement>
 }
