@@ -1,17 +1,18 @@
 import { NextPage } from 'next'
+import toast from 'react-hot-toast'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
-import { Upload, Link2 as LinkIcon } from 'react-feather'
+import { Upload, Link2 as LinkIcon, Search } from 'react-feather'
+
 import { Filename } from '~/shared/types'
-import FileList from '~/components/molecules/FileList'
-import Pagination from '~/components/atoms/Pagination'
-import PaginationSkeleton from '~/components/molecules/PaginationSkeleton'
-import ProjectLayout from '~/components/templates/ProjectLayout'
-import DragFileUploadDialog from '~/components/molecules/FileList/DragFileUploadDialog'
 import { useFileMethods } from '~/hooks/fileMethods'
 import { useAppSelector } from '~/hooks/reduxSelector'
+import FileList from '~/components/molecules/FileList'
+import Pagination from '~/components/atoms/Pagination'
+import ProjectLayout from '~/components/templates/ProjectLayout'
+import PaginationSkeleton from '~/components/molecules/PaginationSkeleton'
+import DragFileUploadDialog from '~/components/molecules/FileList/DragFileUploadDialog'
 import { DeleteConfirmModal } from '~/components/molecules/FileList/DeleteConfirmModal'
-import toast from 'react-hot-toast'
 
 const Files: NextPage = (): JSX.Element => {
   const router = useRouter()
@@ -27,6 +28,7 @@ const Files: NextPage = (): JSX.Element => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [isOpenDragUpload, setIsOpenDragUpload] = useState<boolean>(false)
   const { error, isError } = useAppSelector((state) => state.file)
+  const [searchFilename, setSearchFilename] = useState<string>('')
   /*
    * This will partially store the id and filename in modal
    */
@@ -95,6 +97,7 @@ const Files: NextPage = (): JSX.Element => {
           isSubmitting={isFileMethodLoading}
           isOpenDragUpload={isOpenDragUpload}
           handleOpenDragUploadDialog={handleOpenDragUploadDialog}
+          setSearchFilename={setSearchFilename}
         />
         <main
           className={`
@@ -118,6 +121,7 @@ const Files: NextPage = (): JSX.Element => {
             isUpdating={isFileMethodLoading}
             length={files.length}
             projectID={parseInt(projectIDFiles as string)}
+            searchFilename={searchFilename}
           />
         </main>
         <footer className="mt-3 flex items-center justify-center ">
@@ -153,6 +157,7 @@ type FileHeaderProps = {
   isSubmitting: boolean
   isOpenDragUpload: boolean
   handleOpenDragUploadDialog: () => void
+  setSearchFilename: React.Dispatch<React.SetStateAction<string>>
 }
 
 const FileHeader = (props: FileHeaderProps): JSX.Element => {
@@ -162,7 +167,7 @@ const FileHeader = (props: FileHeaderProps): JSX.Element => {
   /*
    * Add files
    */
-  const { useHandleCreateFiles, isSubmitting } = props
+  const { useHandleCreateFiles, isSubmitting, setSearchFilename } = props
   const hiddenFileInput = React.useRef<HTMLInputElement>(null)
   const handleClick = (): void => {
     hiddenFileInput.current?.click()
@@ -203,17 +208,28 @@ const FileHeader = (props: FileHeaderProps): JSX.Element => {
       {/* Create a button for toggling DragFileUploadDialog component */}
 
       {can?.uploadFile ? (
-        <button
-          type="button"
-          className={`flex cursor-pointer items-center rounded border border-blue-700 bg-blue-600 px-2 py-[0.26rem] text-sm text-white
-          shadow outline-none transition duration-150 ease-in-out focus:bg-blue-600 hover:bg-blue-700 active:scale-95 ${
-            isSubmitting ? 'hidden' : ''
-          }`}
-          onClick={props.handleOpenDragUploadDialog}
-        >
-          <Upload className="h-5 w-5" />
-          <span> Upload Files</span>
-        </button>
+        <div className="flex items-center space-x-2">
+          <div className="group relative flex items-center">
+            <input
+              type="text"
+              placeholder="Search"
+              className="w-24 rounded border-slate-300 py-1 pl-8 text-sm sm:w-32 md:w-40 lg:w-full"
+              onChange={(e) => setSearchFilename(e.target.value)}
+            />
+            <Search className="absolute left-2 h-4 w-4 text-slate-400 group-focus-within:text-blue-600" />
+          </div>
+          <button
+            type="button"
+            className={`flex cursor-pointer items-center space-x-2 rounded border border-blue-700 bg-blue-600 px-2 py-[0.26rem] text-sm
+            text-white shadow outline-none transition duration-150 ease-in-out focus:bg-blue-600 hover:bg-blue-700 active:scale-95 ${
+              isSubmitting ? 'hidden' : ''
+            }`}
+            onClick={props.handleOpenDragUploadDialog}
+          >
+            <Upload className="h-4 w-4" />
+            <span> Upload Files</span>
+          </button>
+        </div>
       ) : null}
 
       <DragFileUploadDialog

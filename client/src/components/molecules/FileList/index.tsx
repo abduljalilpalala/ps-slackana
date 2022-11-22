@@ -22,6 +22,7 @@ type Props = {
   isUpdating: boolean
   length: number
   projectID: number
+  searchFilename: string
 }
 
 const FileList: FC<Props> = (props): JSX.Element => {
@@ -35,7 +36,8 @@ const FileList: FC<Props> = (props): JSX.Element => {
     isOpen,
     filename,
     actions: { handleOpenEditModal, handleDeleteFile, handleUpdateFilename },
-    length
+    length,
+    searchFilename
   } = props
 
   const handleDownloadFile = async (fileID: string, fileName: string): Promise<void> => {
@@ -125,19 +127,22 @@ const FileList: FC<Props> = (props): JSX.Element => {
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-300 text-sm text-slate-600">
-          {sortedFileData()?.map((file, i) => (
-            /*
-             * This will rendered actual data
-             * <tr>
-             *  <td>{data goes here}</td>
-             * </tr>
-             */
-            <FileItem
-              key={i}
-              file={file}
-              actions={{ handleOpenEditModal, handleDeleteFile, handleDownloadFile }}
-            />
-          ))}
+          {sortedFileData()
+            ?.filter(
+              (row: File) =>
+                !searchFilename?.length ||
+                row?.filename
+                  .toString()
+                  .toLowerCase()
+                  .includes(searchFilename.toString().toLocaleLowerCase())
+            )
+            ?.map((file, i) => (
+              <FileItem
+                key={i}
+                file={file}
+                actions={{ handleOpenEditModal, handleDeleteFile, handleDownloadFile }}
+              />
+            ))}
         </tbody>
       </table>
     </>
