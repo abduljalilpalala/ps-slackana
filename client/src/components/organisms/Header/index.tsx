@@ -63,13 +63,13 @@ const Header: FC<Props> = (props): JSX.Element => {
             <button
               onClick={handleToggleSearch}
               className={`
-                flex w-[30rem] items-center space-x-2 rounded bg-slate-800 py-1 shadow-sm outline-none
-                transition duration-100 ease-in-out
+                ml-24 flex w-[30rem] items-center space-x-2 rounded border border-slate-700 bg-slate-800 py-1
+                shadow-sm outline-none transition duration-100 ease-in-out hover:border-slate-600
               `}
             >
-              <Search className="ml-2 h-4 w-4 text-slate-600 group-hover:text-slate-500" />
-              <span className="text-sm font-medium text-slate-600 group-hover:text-slate-500">
-                Search
+              <Search className="ml-2 h-4 w-4 text-slate-600 group-hover:text-white" />
+              <span className="text-sm font-medium text-slate-400 group-hover:text-white">
+                Search <small>(Ctrl + m)</small>
               </span>
             </button>
           </div>

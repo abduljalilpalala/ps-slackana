@@ -94,7 +94,9 @@ const CommandPallete: FC<Props> = ({ isOpen, closeModal }): JSX.Element => {
                           {project.title}
                         </span>
                         <span
-                          className={`line-clamp-1 ${active ? 'text-slate-200' : 'text-slate-400'}`}
+                          className={`max-w-sm line-clamp-1 ${
+                            active ? 'text-slate-200' : 'text-slate-400'
+                          }`}
                         >
                           {project.description}
                         </span>
