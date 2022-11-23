@@ -5,10 +5,8 @@ import { IoIosMenu } from 'react-icons/io'
 
 import Logo2Icon from '~/shared/icons/Logo2Icon'
 import { styles } from '~/shared/twin/header.styles'
-import { useAppSelector } from '~/hooks/reduxSelector'
 import UserMenuDropDown from '~/components/molecules/UserMenuDropdown'
 import NotificationPopover from '~/components/molecules/NotificationPopover'
-import CommandPallete from '~/components/molecules/CommandPallete'
 
 type Props = {
   actions: {
