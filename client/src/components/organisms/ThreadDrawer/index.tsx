@@ -141,6 +141,11 @@ const ThreadDrawer: FC = (): JSX.Element => {
                             <p className="text-xs text-slate-500 line-clamp-1">
                               {moment(thread.created_at).fromNow()}
                             </p>
+                            <p className="text-xs text-rose-500 line-clamp-1">
+                              {thread.id < 1
+                                ? 'Message not sent (This message will be removed after refresh)'
+                                : ''}
+                            </p>
                           </header>
                           <section>
                             <article className="prose pb-6">
@@ -148,7 +153,7 @@ const ThreadDrawer: FC = (): JSX.Element => {
                             </article>
                           </section>
                         </main>
-                        {author?.id === user?.id && (
+                        {author?.id === user?.id && thread.id >= 1 && (
                           <aside
                             className={`
                             absolute right-4 -top-4 flex items-center justify-center space-x-0.5 rounded border

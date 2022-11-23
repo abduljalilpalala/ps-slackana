@@ -7,10 +7,11 @@ import { useRouter } from 'next/router'
 import { converter } from '~/utils/mdeOptions'
 import SendIcon from '~/shared/icons/SendIcon'
 import { ERROR_MESSAGE } from '~/utils/messages'
-import { ChatMessageValues } from '~/shared/types'
-import { addMessage } from '~/redux/chat/chatSlice'
+import { ChatMessageValues, MemberType } from '~/shared/types'
+import { addMessage, setAddedMessage } from '~/redux/chat/chatSlice'
 import { Spinner } from '~/shared/icons/SpinnerIcon'
-import { useAppDispatch } from '~/hooks/reduxSelector'
+import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
+import moment from 'moment'
 
 const ChatEditor: FC = (): JSX.Element => {
   const {
@@ -27,13 +28,35 @@ const ChatEditor: FC = (): JSX.Element => {
   const router = useRouter()
   const { id } = router.query
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const {
+    project: { overviewProject },
+    auth: { user }
+  } = useAppSelector((state) => state)
+
+  const getMemberFromProject = () => {
+    return overviewProject?.members?.filter(
+      (member: MemberType) => member?.user?.id === user?.id
+    )[0]
+  }
 
   const handleMessage = ({ message }: ChatMessageValues) => {
     setIsLoading(() => true)
     dispatch(addMessage({ projectId: id, message }))
       .unwrap()
       .then(() => reset({ message: '' }))
-      .catch(() => toast.error(ERROR_MESSAGE))
+      .catch(() => {
+        reset({ message: '' })
+        dispatch(
+          setAddedMessage({
+            id: Math.random(),
+            member: getMemberFromProject(),
+            message: message,
+            threadCount: undefined,
+            thread: [],
+            created_at: moment().toString()
+          })
+        )
+      })
       .finally(() => setIsLoading(() => false))
   }
 
