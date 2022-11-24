@@ -7,10 +7,12 @@ import { useRouter } from 'next/router'
 import { converter } from '~/utils/mdeOptions'
 import SendIcon from '~/shared/icons/SendIcon'
 import { ERROR_MESSAGE } from '~/utils/messages'
-import { ChatMessageValues } from '~/shared/types'
-import { addThread } from '~/redux/chat/chatSlice'
+import { ChatMessageValues, MemberType } from '~/shared/types'
+import { addThread, setAddedThreadMessage } from '~/redux/chat/chatSlice'
 import { Spinner } from '~/shared/icons/SpinnerIcon'
-import { useAppDispatch } from '~/hooks/reduxSelector'
+import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
+import moment from 'moment'
+import { Chat } from '~/redux/chat/chatType'
 
 const ChatThreadEditor: FC = (): JSX.Element => {
   const {
@@ -27,13 +29,39 @@ const ChatThreadEditor: FC = (): JSX.Element => {
   const router = useRouter()
   const { id, chat_id } = router.query
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { message: chatMessage } = useAppSelector((state) => state.chat)
+  const {
+    project: { overviewProject },
+    auth: { user }
+  } = useAppSelector((state) => state)
+
+  const getMemberFromProject = () => {
+    return overviewProject?.members?.filter(
+      (member: MemberType) => member?.user?.id === user?.id
+    )[0]
+  }
 
   const handleMessage = ({ message }: ChatMessageValues) => {
     setIsLoading(() => true)
     dispatch(addThread({ projectId: id, messageId: chat_id, message }))
       .unwrap()
       .then(() => reset({ message: '' }))
-      .catch(() => toast.error(ERROR_MESSAGE))
+      .catch(() => {
+        reset({ message: '' })
+        dispatch(
+          setAddedThreadMessage({
+            message: chatMessage as Chat,
+            threadMessage: {
+              id: Math.random(),
+              member: getMemberFromProject(),
+              message: message,
+              threadCount: undefined,
+              thread: [],
+              created_at: moment().toString()
+            }
+          })
+        )
+      })
       .finally(() => setIsLoading(() => false))
   }
 

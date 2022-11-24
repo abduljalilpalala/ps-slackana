@@ -160,7 +160,7 @@ const Notifications: NextPage = (): JSX.Element => {
                     <MenuTransition>
                       <Menu.Items
                         className={classNames(
-                          'absolute right-6 mt-3 w-44 origin-top-right divide-y divide-gray-200 overflow-hidden md:right-20',
+                          ' absolute right-6 mt-3 w-44 origin-top-right divide-y divide-gray-200 overflow-hidden md:right-12',
                           'rounded-md border border-slate-200 bg-white py-1 shadow-xl focus:outline-none'
                         )}
                       >

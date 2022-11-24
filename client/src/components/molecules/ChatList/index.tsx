@@ -94,6 +94,11 @@ const ChatList: FC = (): JSX.Element => {
                           {moment(chat.created_at).fromNow()}
                         </p>
                       )}
+                      <p className="text-xs text-rose-500 line-clamp-1">
+                        {chat.id < 1
+                          ? 'Message not sent (This message will be removed after refresh)'
+                          : ''}
+                      </p>
                     </header>
                     <section>
                       <article
@@ -137,7 +142,7 @@ const ChatList: FC = (): JSX.Element => {
                       ) : null}
                     </section>
                   </main>
-                  {!chat.member.is_removed && (
+                  {!chat.member.is_removed && chat.id >= 1 && (
                     <aside
                       className={`
                       absolute right-4 -top-4 flex items-center justify-center space-x-0.5 rounded border
