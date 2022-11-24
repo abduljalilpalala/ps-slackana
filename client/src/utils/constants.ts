@@ -7,3 +7,5 @@ export const NotificationTypes: NotificationConstants = {
 } as const
 
 export const NOT_FOUND = '/404'
+
+export const CHAT_LENGTH = 10

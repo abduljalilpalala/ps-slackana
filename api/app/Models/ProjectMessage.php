@@ -55,6 +55,11 @@ class ProjectMessage extends Model
 
   public function displayMessage()
   {
+    return new ProjectMessageResource(ProjectMessage::withCount(['thread'])->with(['member.user.avatar'])->findOrFail($this->id));
+  }
+
+  public function displayMessageWithThread()
+  {
     return new ProjectMessageResource(ProjectMessage::withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->findOrFail($this->id));
   }
 }

@@ -115,8 +115,8 @@ const ThreadDrawer: FC = (): JSX.Element => {
                   </section>
                 </main>
               </section>
-              <Divider threadCount={message?.thread?.length} />
-              {!message?.thread?.length ? (
+              <Divider threadCount={message?.threadCount} />
+              {!message?.threadCount ? (
                 <p className="text-center text-sm font-normal text-slate-400">No Threads</p>
               ) : (
                 <>

@@ -13,12 +13,12 @@ class ProjectMessageController extends Controller
 {
     public function index(Project $project)
     {
-        return ProjectMessageResource::collection($project->messages()->withCount(['thread'])->with(['member.user.avatar', 'thread.member.user.avatar'])->oldest()->get());
+        return ProjectMessageResource::collection(array_reverse($project->messages()->withCount(['thread'])->with(['member.user.avatar'])->latest()->paginate(10)->items()));
     }
 
     public function show(Project $project, ProjectMessage $message)
     {
-        return response()->json($message->displayMessage());
+        return response()->json($message->displayMessageWithThread());
     }
 
     public function store(ProjectMessageRequest $request, Project $project)
