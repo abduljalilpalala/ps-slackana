@@ -3,29 +3,57 @@ import { useRouter } from 'next/router'
 import ReactTooltip from 'react-tooltip'
 import ReactMarkdown from 'react-markdown'
 import { ChevronRight } from 'react-feather'
-import { FC, useEffect, useRef } from 'react'
+import { FC, useCallback, useEffect, useRef, useState } from 'react'
 
 import { GithubType } from '~/redux/chat/chatType'
 import DownRight from '~/shared/icons/DownRightIcon'
+import { Spinner } from '~/shared/icons/SpinnerIcon'
 import { NotificationTypes } from '~/utils/constants'
-import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
+import useChatLazyLoad from '~/hooks/useChatLazyLoad'
 import handleImageError from '~/helpers/handleImageError'
+import { setMessageLoading } from '~/redux/chat/chatSlice'
 import MessageOptionDropdown from '../MessageOptionDropdown'
 import ThreadMessageIcon from '~/shared/icons/ThreadMessageIcon'
-import { setMessageLoading } from '~/redux/chat/chatSlice'
+import { useAppDispatch, useAppSelector } from '~/hooks/reduxSelector'
 
 const ChatList: FC = (): JSX.Element => {
   const messageRef = useRef<HTMLDivElement>(null)
-  const dispatch = useAppDispatch()
+  const { chats, isDoneSendingChatMessage, isFetchingMoreData, hasMore } = useAppSelector(
+    (state) => state.chat
+  )
   const { user: author } = useAppSelector((state) => state.auth)
-  const { chats, isDoneSendingChatMessage } = useAppSelector((state) => state.chat)
+  const dispatch = useAppDispatch()
   const router = useRouter()
   const { id, chat_id } = router.query
+  const observer = useRef<IntersectionObserver | null>(null)
+  const [prevNode, setPrevNode] = useState<HTMLElement | null>(null)
+  const { setPageNumber } = useChatLazyLoad()
+  const lastChatElementRef = useCallback(
+    (node: HTMLElement) => {
+      if (isFetchingMoreData) {
+        prevNode?.scrollIntoView({
+          block: 'end',
+          inline: 'nearest'
+        })
+        return
+      }
+      if (observer.current) observer.current.disconnect()
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPrevNode(node)
+          setPageNumber((prev) => prev + 1)
+        }
+      })
+      if (node) {
+        observer.current.observe(node)
+      }
+    },
+    [isFetchingMoreData, hasMore]
+  )
 
   const scrollBottom = () => {
     if (messageRef.current) {
       messageRef.current.scrollIntoView({
-        behavior: 'smooth',
         block: 'end',
         inline: 'nearest'
       })
@@ -43,15 +71,24 @@ const ChatList: FC = (): JSX.Element => {
     scrollBottom()
   }, [])
 
+  
+
   return (
     <>
       <div className="flex flex-col py-4">
-        {chats.map((chat) => {
+        {isFetchingMoreData ? (
+          <div className="my-2 flex items-center justify-center">
+            <Spinner className="h-6 w-6 text-blue-500" />
+          </div>
+        ) : null}
+        {chats.map((chat, index) => {
           const user = chat?.member && chat?.member?.user
           const githubMessage: GithubType = !chat?.member && JSON.parse(chat?.message)
           return (
             <section
+              chat-id={chat.id}
               key={chat.id}
+              ref={index === 0 ? lastChatElementRef : null}
               className={`
               ${
                 !chat?.member && githubMessage?.type === NotificationTypes.COMMIT
@@ -59,7 +96,7 @@ const ChatList: FC = (): JSX.Element => {
                   : githubMessage?.type === NotificationTypes.MERGE
                   ? 'bg-purple-100'
                   : ''
-              } 
+              }
               group-message relative flex items-start space-x-2 border border-transparent px-6 py-1 transition duration-75 ease-in-out
               ${
                 chat_id === chat.id.toString()
@@ -116,7 +153,7 @@ const ChatList: FC = (): JSX.Element => {
                           'The account has been deactivated!'
                         )}
                       </article>
-                      {chat.thread?.length ? (
+                      {chat.threadCount ? (
                         <button
                           onClick={() =>
                             router.push(`/team/${id}/chat/?chat_id=${chat.id}`, undefined, {
@@ -128,7 +165,7 @@ const ChatList: FC = (): JSX.Element => {
                           <div className="flex items-center space-x-2">
                             <DownRight className="h-5 w-5 fill-current text-slate-500" />
                             <h4 className="shrink-0 font-semibold text-blue-600 hover:underline">
-                              {chat.thread.length} replies
+                              {chat.threadCount} replies
                             </h4>
                             <span className="font-medium text-slate-500 group-hover:hidden">
                               {moment(chat.created_at).fromNow()}

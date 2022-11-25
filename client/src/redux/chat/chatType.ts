@@ -38,6 +38,12 @@ export type AddMessageType = {
   projectId: string | string[] | undefined
   message: string
 }
+
+export type GetMessageType = {
+  projectId: string | string[] | undefined
+  pageNumber?: number
+}
+
 export type UpdateMessageType = {
   projectId: string | string[] | undefined
   messageId: number

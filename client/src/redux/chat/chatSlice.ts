@@ -12,19 +12,22 @@ import {
   Chat,
   DeleteMessageThreadType,
   DeleteMessageType,
+  GetMessageType,
   MessageThreadResponse,
   UpdateMessageThreadType,
   UpdateMessageType
 } from './chatType'
 import chatService from './chatService'
+import { CHAT_LENGTH } from '~/utils/constants'
 import { catchError } from '~/utils/handleAxiosError'
 
 type InitialState = {
   chats: Chat[]
-  threads: Chat[]
   message: Chat | null
   isError: boolean
   isLoading: boolean
+  isFetchingMoreData: boolean
+  hasMore: boolean
   isDoneSendingChatMessage: boolean
   isDoneSendingThreadMessage: boolean
   isSuccess: boolean
@@ -36,10 +39,11 @@ type InitialState = {
 
 const initialState: InitialState = {
   chats: [],
-  threads: [],
   message: null,
   isError: false,
   isLoading: false,
+  isFetchingMoreData: false,
+  hasMore: false,
   isDoneSendingChatMessage: false,
   isDoneSendingThreadMessage: false,
   isSuccess: false,
@@ -52,9 +56,20 @@ const initialState: InitialState = {
 // MESSAGES
 export const getMessages = createAsyncThunk(
   'chat/getMessages',
-  async (projectId: any, thunkAPI) => {
+  async (payload: GetMessageType, thunkAPI) => {
     try {
-      return await chatService.getMessages(projectId)
+      return await chatService.getMessages(payload)
+    } catch (error) {
+      return thunkAPI.rejectWithValue(catchError(error))
+    }
+  }
+)
+
+export const getMoreMessages = createAsyncThunk(
+  'chat/getMoreMessages',
+  async (payload: GetMessageType, thunkAPI) => {
+    try {
+      return await chatService.getMoreMessages(payload)
     } catch (error) {
       return thunkAPI.rejectWithValue(catchError(error))
     }
@@ -222,14 +237,30 @@ export const chatSlice = createSlice({
       .addCase(getMessages.pending, (state) => {
         state.isLoading = true
       })
-      .addCase(getMessages.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(getMessages.fulfilled, (state, action: PayloadAction<Chat[]>) => {
         state.isLoading = false
         state.isSuccess = true
         state.isError = false
+        state.hasMore = action.payload.length === CHAT_LENGTH
         state.chats = action.payload
       })
       .addCase(getMessages.rejected, (state, action: PayloadAction<any>) => {
         state.isLoading = false
+        state.isError = true
+        state.error = action.payload
+      })
+      .addCase(getMoreMessages.pending, (state) => {
+        state.isFetchingMoreData = true
+      })
+      .addCase(getMoreMessages.fulfilled, (state, action: PayloadAction<Chat[]>) => {
+        state.isFetchingMoreData = false
+        state.isSuccess = true
+        state.isError = false
+        state.hasMore = action.payload.length === CHAT_LENGTH
+        state.chats.unshift(...action.payload)
+      })
+      .addCase(getMoreMessages.rejected, (state, action: PayloadAction<any>) => {
+        state.isFetchingMoreData = false
         state.isError = true
         state.error = action.payload
       })

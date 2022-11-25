@@ -4,26 +4,35 @@ import {
   Chat,
   DeleteMessageThreadType,
   DeleteMessageType,
+  GetMessageType,
   MessageThreadResponse,
   UpdateMessageThreadType,
   UpdateMessageType
 } from './chatType'
 import { axios } from '~/shared/lib/axios'
 
+/* Chat Messages */
 
-  /* Chat Messages */
-
-const getMessages = async (projectId: number | string): Promise<Chat[]> => {
-  const response = await axios.get(`/api/project/${projectId}/message`)
+const getMessages = async ({ projectId, pageNumber = 1 }: GetMessageType): Promise<Chat[]> => {
+  const response = await axios.get(`/api/project/${projectId}/message`, {
+    params: { page: pageNumber }
+  })
   return response.data
 }
 
-const showMessage = async (projectId: number, messageId: number): Promise<string> => {
+const getMoreMessages = async ({ projectId, pageNumber = 1 }: GetMessageType): Promise<Chat[]> => {
+  const response = await axios.get(`/api/project/${projectId}/message`, {
+    params: { page: pageNumber }
+  })
+  return response.data
+}
+
+const showMessage = async (projectId: number, messageId: number): Promise<Chat> => {
   const response = await axios.get(`/api/project/${projectId}/message/${messageId}`)
   return response.data
 }
 
-const addMessage = async (payload: AddMessageType): Promise<any> => {
+const addMessage = async (payload: AddMessageType): Promise<Chat> => {
   const { projectId, message } = payload
   const response = await axios.post(`/api/project/${projectId}/message`, { message })
   return response.data
@@ -69,8 +78,10 @@ const deleteThread = async (payload: DeleteMessageThreadType): Promise<MessageTh
   return response.data
 }
 
+
 const chatService = {
   getMessages,
+  getMoreMessages,
   showMessage,
   addMessage,
   updateMessage,

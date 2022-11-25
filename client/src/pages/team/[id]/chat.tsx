@@ -1,8 +1,8 @@
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
-
 import { AlertTriangle } from 'react-feather'
+
 import useChatPusher from '~/hooks/chatPusher'
 import { getMessages } from '~/redux/chat/chatSlice'
 import { Spinner } from '~/shared/icons/SpinnerIcon'
@@ -22,7 +22,7 @@ const Chat: NextPage = (): JSX.Element => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    dispatch(getMessages(id))
+    dispatch(getMessages({ projectId: id }))
   }, [])
 
   return (
@@ -30,8 +30,8 @@ const Chat: NextPage = (): JSX.Element => {
       <div className="flex space-x-0.5 divide-x divide-slate-300 overflow-hidden">
         <section className="flex h-screen flex-1 flex-col">
           <main
-            className={`default-scrollbar flex h-full flex-col justify-between
-             overflow-y-auto scroll-smooth scrollbar-thumb-slate-400`}
+            className={`default-scrollbar flex h-full
+             flex-col justify-between overflow-y-auto`}
           >
             <MainChatContent />
           </main>
@@ -60,7 +60,7 @@ const Chat: NextPage = (): JSX.Element => {
 }
 
 const MainChatContent = () => {
-  const { chats, isLoading, isError } = useAppSelector((state) => state.chat)
+  const { chats, isLoading, isError, isFetchingMoreData } = useAppSelector((state) => state.chat)
   const {
     projectDescription: { title: projectTitle }
   } = useAppSelector((state) => state.project)
@@ -87,7 +87,7 @@ const MainChatContent = () => {
 
   return (
     <>
-      {projectTitle ? (
+      {projectTitle && !isFetchingMoreData ? (
         <h1 className="py-3 text-center text-sm font-medium text-slate-400">{projectTitle}</h1>
       ) : null}
       <ChatList />
