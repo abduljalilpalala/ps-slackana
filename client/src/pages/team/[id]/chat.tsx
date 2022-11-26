@@ -29,10 +29,7 @@ const Chat: NextPage = (): JSX.Element => {
     <ProjectLayout metaTitle="Chat">
       <div className="flex space-x-0.5 divide-x divide-slate-300 overflow-hidden">
         <section className="flex h-screen flex-1 flex-col">
-          <main
-            className={`default-scrollbar flex h-full
-             flex-col justify-between overflow-y-auto`}
-          >
+          <main className="default-scrollbar flex h-full flex-col overflow-y-auto">
             <MainChatContent />
           </main>
           <div className="px-6">
@@ -82,13 +79,19 @@ const MainChatContent = () => {
   }
 
   if (!chats.length) {
-    return <p className="text-center text-sm font-normal text-slate-400">No Conversation</p>
+    return (
+      <p className="flex min-h-full items-end justify-center pb-3 text-center text-sm font-normal text-slate-400">
+        No Conversation
+      </p>
+    )
   }
 
   return (
     <>
       {projectTitle && !isFetchingMoreData ? (
-        <h1 className="py-3 text-center text-sm font-medium text-slate-400">{projectTitle}</h1>
+        <h1 className="mb-auto py-3 text-center text-sm font-medium text-slate-400">
+          {projectTitle}
+        </h1>
       ) : null}
       <ChatList />
     </>
