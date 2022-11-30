@@ -121,6 +121,33 @@ Start the Back End Server
   $ php artisan serve --host=localhost
 ```
 
+# Commands for running the Docker
+
+Prerequisite: [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+- After installing Docker Desktop, navigate to the root of the project repo
+- Setup `.env` (refer on .env.example) on the root of the repo
+- Start the Docker containers to build the app initially. Use the command below if there are changes to the code, for example: new merged PRs
+
+```bash
+  $ docker-compose up --build
+```
+
+- You must also seed the database on the API container after you have initially started the all docker containers to create initial data for the app.
+  - On the docker desktop app, locate the API container, for example: `ps-slackana_api_1`
+  - Open the terminal by clicking the `terminal icon` on the right side of the container next to the `pause icon`
+  - Run the command below:
+
+```bash
+  $ php artisan db:seed
+```
+
+Additional: If there are no changes to the code and you have already built the app before, you can run the command below to avoid rebuilding and just start the containers directly
+
+```bash
+  $ docker-compose up
+```
+
 ## License
 
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
