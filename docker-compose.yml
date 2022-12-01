@@ -1,0 +1,66 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: ./api
+    ports:
+      - 8000:80
+    volumes:
+      - ./api:/var/www/laravel
+    environment:
+      - APP_URL=${APP_URL}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - DB_CONNECTION=${DB_CONNECTION}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+    networks:
+      - ps-slackana
+    depends_on:
+      - db
+
+  client:
+    build:
+      context: ./client
+    ports:
+      - 3000:3000
+    environment:
+      - BACKEND_URL=${BACKEND_URL}
+    networks:
+      - ps-slackana
+    depends_on:
+      - api
+
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: ps-slackana
+      MYSQL_PASSWORD: ps-slackana
+      MYSQL_DATABASE: api
+    networks:
+      - ps-slackana
+    ports:
+      - 3306:3306
+    volumes:
+      - slackana_db:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    networks:
+      - ps-slackana
+
+networks:
+  ps-slackana:
+    driver: bridge
+
+volumes:
+  slackana_db:
+    driver: local
